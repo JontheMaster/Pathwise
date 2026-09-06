@@ -11,6 +11,8 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
+    # Das Design-Handoff ist Referenzmaterial, kein Projektcode.
+    - design_reference/**
     - build/**
     - android/**
     - ios/**

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/styles.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/dark.css">
+<link rel="stylesheet" href="theme-scope.css">
+<script src="https://unpkg.com/lucide@0.441.0/dist/umd/lucide.min.js"></script>
+<script src="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/_ds_bundle.js"></script>
+<style>
+html,body{margin:0;background:#0B0F16 !important;min-height:100%}
+.stage{background:#0B0F16;color:#EDF2F8;font-family:"Nunito Sans",system-ui,sans-serif;padding:56px 64px 80px;display:flex;flex-direction:column;gap:64px;width:1360px;max-width:100%;box-sizing:border-box}
+.h1{margin:0;font:300 42px/1.15 "Jost",system-ui;color:#EDF2F8}
+.h2{margin:0;font:300 30px/1.2 "Jost",system-ui;color:#EDF2F8}
+.lead{margin:10px 0 0;max-width:760px;font:400 17px/1.6 "Nunito Sans",system-ui;color:#93A0AF;text-wrap:pretty}
+.cap{font:700 11.5px/1 "Nunito Sans",system-ui;letter-spacing:.1em;text-transform:uppercase;color:#6E7C8C}
+.dev-t{margin:8px 0 2px;font:600 19px/1.3 "Nunito Sans",system-ui;color:#EDF2F8}
+.dev-n{margin:0;max-width:400px;font:400 14px/1.55 "Nunito Sans",system-ui;color:#8695A6}
+.row{display:flex;gap:32px;flex-wrap:nowrap;align-items:flex-start;width:max-content;max-width:none}
+.stage > section{max-width:1232px}
+.station{display:flex;flex-direction:column;gap:14px;flex:none}
+.rule{height:1px;background:#1B2431}
+.code{margin:0;padding:20px 22px;background:#12171F;border:1px solid #232D3A;border-radius:14px;font:400 12.5px/1.7 "JetBrains Mono",ui-monospace,monospace;color:#C3CDD9;white-space:pre-wrap;overflow-wrap:anywhere;overflow:visible;max-width:100%}
+.bp{display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;padding:18px 20px;background:#12171F;border:1px solid #232D3A;border-radius:14px}
+.bp dt{font:400 12.5px/1.6 "JetBrains Mono",ui-monospace,monospace;color:#8FB2DA;white-space:nowrap}
+.bp dd{margin:0;font:400 13.5px/1.55 "Nunito Sans",system-ui;color:#C3CDD9}
+.map{width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse;font:400 14px/1.5 "Nunito Sans",system-ui}
+.map th{text-align:left;padding:10px 14px;border-bottom:1px solid #2A3543;font:700 11.5px/1 "Nunito Sans";letter-spacing:.09em;text-transform:uppercase;color:#6E7C8C}
+.map td{padding:11px 14px;border-bottom:1px solid #1B2431;color:#C3CDD9;vertical-align:top}
+.map td:first-child{color:#EDF2F8;font-weight:600;white-space:normal;overflow-wrap:anywhere}
+.map code{overflow-wrap:anywhere}
+.map code{font:400 12.5px/1.5 "JetBrains Mono",monospace;color:#8FB2DA}
+.scalebar{display:flex;align-items:flex-end;gap:22px}
+.sb{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.sb i{display:block;border:1.5px solid #3B4757;border-radius:3px;background:#12171F}
+.sb b{font:600 12px/1.3 "Nunito Sans",system-ui;color:#93A0AF}
+@media (max-width:900px){
+  html,body{overflow-x:hidden}
+  .stage{display:flex;width:100%;min-width:0;max-width:100%;padding:28px 20px 56px;gap:40px;overflow:hidden}
+  .stage section{max-width:100% !important}
+  .row{width:100% !important;max-width:100% !important}
+  .row.plain{flex-wrap:wrap !important}
+  .row.plain .station{min-width:0 !important;width:100%}
+  .dev-n{max-width:340px}
+  .h1{font-size:29px}
+  .h2{font-size:22px}
+  .lead{font-size:16px;max-width:100%}
+  .code{font-size:10.5px;line-height:1.6;padding:14px}
+  .map{display:table;overflow:visible;font-size:13px}
+  .scalebar{gap:14px}
+}
+.row.plain{flex-wrap:wrap;width:100%;max-width:100%}
+.row.plain .station{flex:1 1 420px;min-width:0}
+.row.plain .code{max-width:100%}
+.row:not(.plain) .station{max-width:none}
+.row:not(.plain) .dev-n{max-width:100%}
+.row:not(.plain){flex-wrap:nowrap;width:100%;max-width:100%;overflow:hidden;column-gap:20px;align-items:flex-start}
+.row:not(.plain) .devscale{order:-1}
+.row:not(.plain) .station{gap:10px;max-width:none}
+.row:not(.plain) .dev-t{margin:0;font-size:13px;line-height:1.35}
+.row:not(.plain) .cap{font-size:9.5px}
+.row:not(.plain) .dev-n{display:none}
+.row:not(.plain) .station > div:first-child{min-height:96px}
+.row:not(.plain) .dev-t{font-size:15px}
+@media (max-width:1200px){
+  .row:not(.plain) .dev-t{font-size:12px}
+}
+.devscale{overflow:hidden;flex:none;align-self:flex-start}
+.row:not(.plain) .station{flex:none}
+</style>
+</helmet>
+
+<div class="stage">
+
+  <section style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <span class="cap">Pathwise · Flutter-App</span>
+      <h1 class="h1">Ein Layout, sieben Ausgabewege</h1>
+      <p class="lead">Dieselbe Flutter-Oberfläche im Handy-Browser, als installierte App auf iOS und Android, auf dem Tablet und im Desktop-Browser. Mobil ist die Wahrheit: eine 390er-Spalte, 44px-Bedienelemente, die Beratungsleiste immer am Fuß. Ab 900px kommt links die Szenarienliste dazu, die Spalte selbst bleibt gleich. Jedes Gerät hier ist bedienbar.</p>
+    </div>
+
+    <div>
+      <span class="cap">Maßstabsgetreu, 1:8</span>
+      <p class="lead" style="margin-bottom:22px">Fünf verschiedene Pixelgrößen deckt die App ab — hier im Verhältnis zueinander. Darunter steht jede Reihe komplett im Bild: die Geräte sind in echter Pixelgröße aufgebaut und nur gemeinsam so weit herunterskaliert, dass sie ohne seitliches Scrollen nebeneinander passen.</p>
+      <div class="scalebar">
+        <sc-for list="{{ groessen }}" as="g" hint-placeholder-count="5">
+          <span class="sb">
+            <i style="width:{{ g.w }};height:{{ g.h }}"></i>
+            <b>{{ g.label }}</b>
+          </span>
+        </sc-for>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="station">
+        <div>
+          <span class="cap">Web · Handy</span>
+          <p class="dev-t">iOS Safari, 402 × 874</p>
+          <p class="dev-n">Der Regelfall: aufgerufen über einen Link im Vereinschat, ohne Installation und ohne Anmeldung. Die Beratungsleiste sitzt über der Safari-Leiste, nicht darunter.</p>
+        </div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ w402 }}" height="{{ h874 }}" dark="{{ true }}" style="width:402px;height:874px;flex:none;overflow:hidden" hint-size="402px,874px">
+          <div style="height:100%;display:flex;flex-direction:column;background:#12171F">
+            <div style="flex:none;height:56px"></div>
+            <div style="flex:1;min-height:0">
+              <dc-import name="PathwiseApp" theme="dark" preset="start" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+            </div>
+            <div style="flex:none;padding:8px 14px 30px;background:rgba(20,25,33,.94);border-top:1px solid #232D3A;display:flex;align-items:center;gap:12px">
+              <span style="flex:1;height:36px;border-radius:11px;background:#1F2733;display:flex;align-items:center;justify-content:center;gap:6px;font:400 13px/1 'Nunito Sans';color:#93A0AF">
+                <span style="width:11px;height:11px;border-radius:2px;border:1.5px solid #6E7C8C"></span>pathwise.postsv.de
+              </span>
+              <span style="width:26px;height:2px;background:#6E7C8C"></span>
+              <span style="width:12px;height:12px;border:2px solid #6E7C8C;border-radius:3px"></span>
+            </div>
+          </div>
+        </x-import>
+      </div>
+
+      <div class="station">
+        <div>
+          <span class="cap">Web · Handy</span>
+          <p class="dev-t">Android Chrome, 412 × 892</p>
+          <p class="dev-n">Der Szenario-Einstieg mit Rahmen-Chips und Vorgeschichte. Gleiche Spalte, gleiche Abstände; nur die Systemleisten kommen von Android.</p>
+        </div>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ w412 }}" height="{{ h892 }}" dark="{{ true }}" style="width:412px;height:892px;flex:none;overflow:hidden" hint-size="412px,892px">
+          <div style="height:100%;display:flex;flex-direction:column;background:#12171F">
+            <div style="flex:none;padding:6px 12px 8px;background:#161C25;display:flex;align-items:center;gap:10px">
+              <span style="flex:1;height:34px;border-radius:17px;background:#1F2733;display:flex;align-items:center;padding:0 14px;font:400 13px/1 'Nunito Sans';color:#93A0AF">pathwise.postsv.de</span>
+              <span style="display:flex;flex-direction:column;gap:2.5px">
+                <span style="width:3px;height:3px;border-radius:50%;background:#93A0AF"></span>
+                <span style="width:3px;height:3px;border-radius:50%;background:#93A0AF"></span>
+                <span style="width:3px;height:3px;border-radius:50%;background:#93A0AF"></span>
+              </span>
+            </div>
+            <div style="flex:1;min-height:0">
+              <dc-import name="PathwiseApp" theme="dark" preset="einstieg" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+            </div>
+          </div>
+        </x-import>
+      </div>
+
+      <div class="station">
+        <div>
+          <span class="cap">Native · iOS</span>
+          <p class="dev-t">iOS App, 402 × 874</p>
+          <p class="dev-n">Installiert, ohne Browserleisten: der Entscheidungspunkt mit aufgeklappter Rückmeldung. Erkennen, Absichern, Handeln erscheinen erst auf Abruf.</p>
+        </div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ w402 }}" height="{{ h874 }}" dark="{{ true }}" style="width:402px;height:874px;flex:none;overflow:hidden" hint-size="402px,874px">
+          <div style="height:100%;display:flex;flex-direction:column;background:#12171F">
+            <div style="flex:none;height:56px"></div>
+            <div style="flex:1;min-height:0">
+              <dc-import name="PathwiseApp" theme="dark" preset="feedback" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+            </div>
+            <div style="flex:none;height:30px"></div>
+          </div>
+        </x-import>
+      </div>
+
+      <div class="station">
+        <div>
+          <span class="cap">Native · Android</span>
+          <p class="dev-t">Android App, 412 × 892</p>
+          <p class="dev-n">Die Auswertung: Ampel-Einordnung aller Situationsmerkmale, Einschätzungsspiegel des Trainerteams, Ansprechpersonen. Kein Punktestand, keine Bewertung der eigenen Wahl.</p>
+        </div>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="{{ w412 }}" height="{{ h892 }}" dark="{{ true }}" style="width:412px;height:892px;flex:none;overflow:hidden" hint-size="412px,892px">
+          <div style="height:100%;background:#12171F">
+            <dc-import name="PathwiseApp" theme="dark" preset="auswertung" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+          </div>
+        </x-import>
+      </div>
+
+      <div class="station">
+        <div>
+          <span class="cap">Native · iOS</span>
+          <p class="dev-t">iOS App, 402 × 874 — Overlay</p>
+          <p class="dev-n">Das Overlay legt sich über den laufenden Entscheidungspunkt, ohne ihn zu verlassen. Externe Stellen zuerst, dann die Personen des Vereins.</p>
+        </div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ w402 }}" height="{{ h874 }}" dark="{{ true }}" style="width:402px;height:874px;flex:none;overflow:hidden" hint-size="402px,874px">
+          <div style="height:100%;display:flex;flex-direction:column;background:#12171F">
+            <div style="flex:none;height:56px"></div>
+            <div style="flex:1;min-height:0">
+              <dc-import name="PathwiseApp" theme="dark" preset="hilfe" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+            </div>
+            <div style="flex:none;height:30px"></div>
+          </div>
+        </x-import>
+      </div>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="row" style="align-items:flex-end">
+      <div class="station">
+        <div>
+          <span class="cap">Tablet · hoch</span>
+          <p class="dev-t">Tablet hoch, 1024 × 1366</p>
+          <p class="dev-n">Unter 900px logischer Breite bleibt es bei einer Spalte. Sie wächst nicht mit, sondern zentriert sich bei 640px — Zeilenlänge vor Flächenausnutzung.</p>
+        </div>
+        <div style="width:1024px;height:1366px;border:16px solid #262B33;border-radius:38px;overflow:hidden;background:#12171F;box-shadow:0 30px 80px rgba(0,0,0,.45)">
+          <dc-import name="PathwiseApp" theme="dark" preset="uebersicht" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+        </div>
+      </div>
+
+      <div class="station">
+        <div>
+          <span class="cap">Tablet · quer</span>
+          <p class="dev-t">Tablet quer, 1366 × 1024</p>
+          <p class="dev-n">Ab 900px kommt links die Szenarienliste dazu, rechts läuft der Durchlauf weiter. Die Beratungsleiste zieht in die Seitenspalte, damit sie den Durchlauf nicht verkürzt.</p>
+        </div>
+        <div style="width:1366px;height:1024px;border:16px solid #262B33;border-radius:38px;overflow:hidden;background:#12171F;box-shadow:0 30px 80px rgba(0,0,0,.45)">
+          <dc-import name="PathwiseApp" theme="dark" layout="rail" preset="punkt" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="row">
+      <div class="station">
+        <div>
+          <span class="cap">Web · Laptop</span>
+          <p class="dev-t">Desktop-Browser, 1728 × 1080 — heller Modus</p>
+          <p class="dev-n">Am Rechner sitzt man meist tagsüber, deshalb folgt der Desktop dem Systemmodus und startet hell. Dieselben Komponenten, dieselben Token — nur die semantische Ebene wechselt.</p>
+        </div>
+        <x-import component-from-global-scope="ChromeWindow" from="./browser-window.jsx" width="{{ w1728 }}" height="{{ h1080 }}" url="pathwise.postsv.de/szenarien" tabs="{{ tabs }}" style="width:1728px;height:1080px;flex:none;overflow:hidden" hint-size="1728px,1080px">
+          <div style="height:100%;background:#F6F7F9">
+            <dc-import name="PathwiseApp" theme="light" layout="rail" preset="auswertung" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+          </div>
+        </x-import>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px;max-width:1240px">
+    <div>
+      <span class="cap">Für die Umsetzung</span>
+      <h2 class="h2">Flutter-Zuordnung</h2>
+      <p class="lead">Ein Widget-Baum für alle sieben Ausgabewege. Adaptiv wird nur an einer Stelle entschieden — <code style="font:400 13px/1 'JetBrains Mono',monospace;color:#8FB2DA">LayoutBuilder</code> auf oberster Ebene, Schwelle 900px.</p>
+    </div>
+
+    <table class="map">
+      <thead>
+        <tr><th>Komponente</th><th>Flutter-Widget</th><th>Hinweis</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>App-Rahmen</td><td><code>MaterialApp.router</code> + <code>LayoutBuilder</code></td><td>Eine Schwelle bei 900px: darunter <code>_MobileShell</code>, darüber <code>_RailShell</code> mit <code>Row</code> aus Liste und Durchlauf.</td></tr>
+        <tr><td>Kopfzeile</td><td><code>SliverAppBar</code>, <code>pinned: true</code></td><td>Glas über <code>flexibleSpace: BackdropFilter(blur: 18)</code> und <code>surfaceTintColor: transparent</code>.</td></tr>
+        <tr><td>Szenarienliste</td><td><code>CustomScrollView</code> mit <code>SliverGrid</code></td><td><code>SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 320)</code> ersetzt das <code>auto-fill</code>-Grid.</td></tr>
+        <tr><td>ScenarioCard</td><td><code>Card</code> + <code>InkWell</code></td><td>3px-Markenkante als <code>Container</code> mit <code>LinearGradient(112°)</code> im <code>Column</code>-Kopf.</td></tr>
+        <tr><td>Themenfeld-Filter</td><td><code>Wrap</code> aus <code>FilterChip</code></td><td><code>showCheckmark: false</code>, Pillenradius, ausgewählt in <code>surfaceTint</code>.</td></tr>
+        <tr><td>SituationText</td><td><code>Column</code> + <code>Wrap</code> aus <code>Chip</code></td><td>Rahmen-Chips (Altersgruppe, Ort, Zeitpunkt) über dem Fließtext, <code>height: 1.5</code>.</td></tr>
+        <tr><td>StepIndicator</td><td><code>Row</code> aus <code>AnimatedContainer</code></td><td>Nie <code>LinearProgressIndicator</code> mit Prozentwert — Fortschritt, keine Leistung.</td></tr>
+        <tr><td>DecisionPoint</td><td><code>RadioGroup</code> aus <code>InkWell</code>-Karten</td><td>Genau drei Optionen, gleiche Höhe, gleiche Farbe. Nie Ampelfarben.</td></tr>
+        <tr><td>FeedbackPanel</td><td><code>ExpansionPanelList</code></td><td>Drei Abschnitte in fester Reihenfolge, zugeklappt bis zum Abruf; <code>eye</code>, <code>shield</code>, <code>footprints</code>.</td></tr>
+        <tr><td>LevelList</td><td><code>ListView</code> + <code>Icon</code></td><td>Ampelstufe über <code>Theme.of(context).extension&lt;PwLevels&gt;()</code>, nicht über <code>colorScheme</code>.</td></tr>
+        <tr><td>MirrorBar</td><td><code>TweenAnimationBuilder</code> + <code>FractionallySizedBox</code></td><td>Anteile ohne Rangfolge; bei zu wenigen Einschätzungen Hinweistext statt Balken.</td></tr>
+        <tr><td>ContactList</td><td><code>ListTile</code> mit <code>CircleAvatar</code></td><td><code>url_launcher</code> für <code>mailto:</code> und <code>tel:</code>.</td></tr>
+        <tr><td>HelpBar / Overlay</td><td><code>Material</code>-Leiste + <code>showModalBottomSheet</code></td><td>Auf Tablet und Desktop stattdessen <code>showDialog</code> mit <code>maxWidth: 520</code>.</td></tr>
+        <tr><td>Fortschritt lokal</td><td><code>shared_preferences</code></td><td>Kein Konto, kein Personenbezug. Zentral geht nur ein Zählwert je Entscheidungspunkt und Option.</td></tr>
+        <tr><td>Bewegung</td><td><code>AnimatedSwitcher</code>, 140 / 220 / 360 ms</td><td><code>MediaQuery.disableAnimations</code> respektieren; keine Belohnungsanimation.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="row plain" style="gap:24px;align-items:stretch">
+      <div class="station" style="flex:1;min-width:440px">
+        <span class="cap">theme.dart · Token als ThemeData</span>
+        <pre class="code">final _ink = ColorScheme.fromSeed(
+  seedColor: const Color(0xFF2C4A7C),
+  brightness: Brightness.dark,
+).copyWith(
+  surface:         const Color(0xFF12171F), // --surface-page
+  surfaceContainer:const Color(0xFF1A212C), // --surface-card
+  surfaceTint:     const Color(0xFF1C2A3D), // --surface-tint
+  primary:         const Color(0xFF3E6394), // --action-primary
+  secondary:       const Color(0xFFEE6070), // --action-accent
+  outlineVariant:  const Color(0xFF28323F), // --border-subtle
+  onSurface:       const Color(0xFFC3CDD9), // --text-body
+);
+
+/// Ampelstufen gehören NICHT ins ColorScheme —
+/// sie bedeuten Einordnung von Merkmalen, nicht Zustand der UI.
+@immutable
+class PwLevels extends ThemeExtension&lt;PwLevels&gt; {
+  const PwLevels({
+    this.ok = const Color(0xFF4FBF9B),
+    this.check = const Color(0xFFE9A06A),
+    this.violation = const Color(0xFFF4838F),
+    this.absent = const Color(0xFF6E7C8C),
+  });
+  final Color ok, check, violation, absent;
+  // lerp/copyWith ausgelassen
+}
+
+ThemeData pathwiseDark() => ThemeData(
+  colorScheme: _ink,
+  extensions: const [PwLevels()],
+  fontFamily: 'NunitoSans',
+  textTheme: const TextTheme(
+    displaySmall: TextStyle(fontFamily: 'Jost', fontWeight: FontWeight.w300,
+                            fontSize: 30, height: 1.22),
+    titleMedium:  TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+    bodyMedium:   TextStyle(fontSize: 15, height: 1.5),
+    labelSmall:   TextStyle(fontSize: 11.5, letterSpacing: 1.1,
+                            fontWeight: FontWeight.w700),
+  ),
+  cardTheme: CardThemeData(
+    color: _ink.surfaceContainer,
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(14),
+      side: BorderSide(color: _ink.outlineVariant),
+    ),
+  ),
+  filledButtonTheme: FilledButtonThemeData(
+    style: FilledButton.styleFrom(
+      minimumSize: const Size.fromHeight(48), // --touch-min + Luft
+      backgroundColor: _ink.secondary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10)),
+    ),
+  ),
+);</pre>
+      </div>
+
+      <div class="station" style="flex:1;min-width:440px">
+        <span class="cap">router.dart · go_router</span>
+        <pre class="code">// Ein Pfad je Bildschirm, damit der Link im Vereinschat
+// direkt in ein Szenario führen kann. Kein Login, keine Guards.
+final router = GoRouter(
+  initialLocation: '/szenarien',
+  routes: [
+    ShellRoute(
+      builder: (c, s, child) =&gt; PathwiseShell(child: child),
+      routes: [
+        GoRoute(path: '/szenarien',
+          builder: (c, s) =&gt; const UebersichtPage()),
+        GoRoute(path: '/szenario/:id',
+          builder: (c, s) =&gt; EinstiegPage(id: s.pathParameters['id']!),
+          routes: [
+            // Entscheidungspunkt 1..n — Zurück geht einen Punkt zurück,
+            // nicht aus dem Szenario heraus.
+            GoRoute(path: 'punkt/:nr',
+              builder: (c, s) =&gt; PunktPage(
+                id: s.pathParameters['id']!,
+                nr: int.parse(s.pathParameters['nr']!),
+              )),
+            GoRoute(path: 'auswertung',
+              builder: (c, s) =&gt; AuswertungPage(
+                id: s.pathParameters['id']!)),
+          ]),
+        GoRoute(path: '/verein',
+          builder: (c, s) =&gt; const VereinPage()),
+      ],
+    ),
+  ],
+);
+
+// Hilfe und Beratung ist keine Route, sondern ein Overlay:
+// der Durchlauf darf dabei nicht verloren gehen.
+void openHilfe(BuildContext c) =&gt; MediaQuery.sizeOf(c).width &lt; 900
+    ? showModalBottomSheet(context: c, builder: (_) =&gt; const HilfeSheet())
+    : showDialog(context: c, builder: (_) =&gt; const HilfeDialog());</pre>
+      </div>
+    </div>
+
+    <div class="row plain" style="gap:24px">
+      <div class="station" style="flex:1;min-width:340px">
+        <span class="cap">Breakpoints</span>
+        <dl class="bp">
+          <dt>&lt; 600</dt>
+          <dd><b style="color:#EDF2F8">Handy</b> — eine Spalte, 16px Rand, HelpBar am Fuß</dd>
+          <dt>600–899</dt>
+          <dd><b style="color:#EDF2F8">Tablet hoch</b> — eine Spalte, zentriert bei 640, 24px Rand</dd>
+          <dt>≥ 900</dt>
+          <dd><b style="color:#EDF2F8">Tablet quer, Desktop</b> — 300px Szenarienliste plus Durchlauf, HelpBar in der Seitenspalte</dd>
+          <dt>≥ 1440</dt>
+          <dd><b style="color:#EDF2F8">Desktop</b> — Spalte bleibt 640, Auswertung dreispaltig</dd>
+        </dl>
+      </div>
+      <div class="station" style="flex:1;min-width:340px">
+        <span class="cap">Zielplattformen</span>
+        <dl class="bp">
+          <dt>build web --wasm</dt>
+          <dd>Link im Vereinschat</dd>
+          <dt>build appbundle</dt>
+          <dd>Play Store</dd>
+          <dt>build ipa</dt>
+          <dd>App Store</dd>
+        </dl>
+        <p class="dev-n" style="max-width:100%">Web ist der Regelfall, nicht der Nebenweg: ohne Anmeldung, ohne Installation, sofort im Handy-Browser — entsprechend der Anforderung an Freiwilligkeit und Kontofreiheit.</p>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SK = 8;
+const GROESSEN = [
+  [402, 874, "Handy 402"],
+  [412, 892, "Handy 412"],
+  [1024, 1366, "Tablet hoch 1024"],
+  [1366, 1024, "Tablet quer 1366"],
+  [1728, 1080, "Desktop 1728"],
+];
+
+class Component extends DCLogic {
+  componentDidMount() {
+    this._fit = () => {
+      const stage = document.querySelector(".stage");
+      if (!stage) return;
+      const cs = getComputedStyle(stage);
+      const avail = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      if (avail < 200) return;
+      const rows = [];
+      document.querySelectorAll(".row:not(.plain)").forEach((row) => {
+        const gap = parseFloat(getComputedStyle(row).columnGap) || 20;
+        const items = [];
+        row.querySelectorAll(".station").forEach((st) => {
+          let el = st.lastElementChild;
+          if (!el) return;
+          if (el.classList.contains("devscale")) el = el.firstElementChild;
+          if (!el || el.classList.contains("code")) return;
+          const w = parseFloat(el.style.width);
+          const h = parseFloat(el.style.height);
+          if (!w || !h) return;
+          items.push({ st: st, el: el, w: w, h: h });
+        });
+        if (items.length) {
+          // gaps are literal px and do not scale — exclude them from the scaled part
+          const sum = items.reduce((a, i) => a + i.w, 0);
+          rows.push({ items: items, cand: (avail - gap * (items.length - 1)) / sum });
+        }
+      });
+      if (!rows.length) return;
+
+      // one shared factor, so every device stays comparable across rows
+      const f = Math.min.apply(null, [1].concat(rows.map((r) => r.cand)));
+
+      rows.forEach((row) => {
+        row.items.forEach((it) => {
+          let wrap = it.el.parentElement;
+          if (!wrap.classList.contains("devscale")) {
+            wrap = document.createElement("div");
+            wrap.className = "devscale";
+            it.el.parentElement.appendChild(wrap);
+            wrap.appendChild(it.el);
+          }
+          wrap.style.width = Math.round(it.w * f) + "px";
+          wrap.style.height = Math.round(it.h * f) + "px";
+          it.el.style.transformOrigin = "top left";
+          it.el.style.transform = "scale(" + f + ")";
+          it.st.style.width = Math.round(it.w * f) + "px";
+          it.st.style.minWidth = "0";
+        });
+      });
+    };
+    this._timers = [300, 900, 1800].map((ms) => setTimeout(this._fit, ms));
+    window.addEventListener("resize", this._fit);
+  }
+  componentWillUnmount() {
+    (this._timers || []).forEach(clearTimeout);
+    window.removeEventListener("resize", this._fit);
+  }
+  renderVals() {
+    return {
+      tabs: [{ title: "Pathwise — Szenarien" }, { title: "Post SV Nürnberg" }],
+      w402: 402, h874: 874, w412: 412, h892: 892, w1728: 1728, h1080: 1080,
+      groessen: GROESSEN.map(([w, h, label]) => ({ w: Math.round(w / SK) + "px", h: Math.round(h / SK) + "px", label })),
+    };
+  }
+}
+</script>
+</body>
+</html>

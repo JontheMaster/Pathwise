@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/colors.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/typography.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/radius.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/motion.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/base.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/tokens/dark.css">
+<link rel="stylesheet" href="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/styles.css">
+<link rel="stylesheet" href="theme-scope.css">
+<script src="https://unpkg.com/lucide@0.441.0/dist/umd/lucide.min.js"></script>
+<script src="_ds/pathwise-design-system-1690f0f0-989d-4b18-acc7-1b733322b8a9/_ds_bundle.js"></script>
+<style>html,body{margin:0;height:100%;background:var(--surface-page)}
+@keyframes pwRing{0%{transform:scale(.6);opacity:.55}70%{opacity:0}100%{transform:scale(1.9);opacity:0}}
+@keyframes pwFloat{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes pwFwdA{from{transform:translate3d(16px,0,0)}to{transform:none}}
+@keyframes pwFwdB{from{transform:translate3d(16px,0,0)}to{transform:none}}
+@keyframes pwUpA{from{transform:translate3d(0,22px,0)}to{transform:none}}
+@keyframes pwUpB{from{transform:translate3d(0,22px,0)}to{transform:none}}
+@keyframes pwDownA{from{transform:translate3d(0,-14px,0)}to{transform:none}}
+@keyframes pwDownB{from{transform:translate3d(0,-14px,0)}to{transform:none}}
+@keyframes pwFade{from{opacity:0}to{opacity:1}}
+@keyframes pwSheet{from{transform:translate3d(0,100%,0)}to{transform:none}}
+@keyframes pwUnfold{from{opacity:0;transform:translate3d(0,-6px,0)}to{opacity:1;transform:none}}
+@keyframes pwOpenA{from{transform:scale(.94) translate3d(0,12px,0)}to{transform:none}}
+@keyframes pwOpenB{from{transform:scale(.94) translate3d(0,12px,0)}to{transform:none}}
+@keyframes pwCloseA{from{transform:scale(1.04)}to{transform:none}}
+@keyframes pwCloseB{from{transform:scale(1.04)}to{transform:none}}
+@keyframes pwBackA{from{transform:translate3d(-16px,0,0)}to{transform:none}}
+@keyframes pwBackB{from{transform:translate3d(-16px,0,0)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){[data-pw-screen]{animation:none!important}}
+@keyframes pwRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+[data-pw-levels]{container-type:inline-size}
+[data-pw-levels-row]{display:grid;gap:20px;align-items:start;grid-template-columns:1fr}
+@container (min-width:900px){[data-pw-levels-row]{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@keyframes pwHint{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 5px color-mix(in oklch, var(--text-link) 34%, transparent)}}
+@media (prefers-reduced-motion:reduce){[data-pw-hint]{animation:none!important}}
+@keyframes pwDot{0%,80%,100%{opacity:.25}40%{opacity:1}}</style>
+</helmet>
+
+<div data-theme="{{ theme }}" style="height:100%;display:flex;background:var(--surface-page);color:var(--text-body);font:var(--type-body);overflow:hidden;position:relative">
+
+  <sc-if value="{{ railAn }}" hint-placeholder-val="{{ false }}">
+  <aside style="flex:none;width:300px;display:flex;flex-direction:column;gap:14px;padding:18px 16px;border-right:1px solid var(--border-subtle);background:var(--surface-card);overflow:auto">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="assets/logo-mark.png" alt="" width="26" height="26" style="border-radius:50%;flex:none">
+      <span style="flex:1;font:var(--fw-medium) 17px/1.2 var(--font-display);color:var(--text-heading)">Pathwise</span>
+      <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.IconButton" icon="settings" label="Vereinsangaben" size="sm" on-click="{{ oeffneVerein }}" hint-size="30px,30px"></x-import>
+    </div>
+    <span class="pw-label">Szenarien</span>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ railListe }}" as="r" hint-placeholder-count="3">
+        <div onClick="{{ r.oeffnen }}" style="display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-radius:var(--radius-control);cursor:pointer;border:1px solid var(--border-subtle);background:var(--surface-page)" style-hover="border-color:var(--border-strong)">
+          <span style="flex:none;width:7px;height:7px;border-radius:50%;margin-top:7px;background:var(--border-strong)"></span>
+          <span style="flex:1;min-width:0">
+            <span style="display:block;font:var(--fw-semibold) 14px/1.35 var(--font-sans);color:var(--text-heading)">{{ r.titel }}</span>
+            <span style="display:block;margin-top:3px;font:var(--type-small);color:var(--text-muted)">{{ r.status }}</span>
+          </span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+      <div onClick="{{ hilfeAuf }}" style="cursor:pointer">
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.HelpBar" hint-size="100%,66px"></x-import>
+      </div>
+      <div onClick="{{ infoAuf }}" style="display:flex;align-items:center;gap:8px;cursor:pointer;font:var(--type-small);color:var(--text-link)">
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="info" size="{{ ikon14 }}" hint-size="14px,14px"></x-import>
+        So funktioniert Pathwise
+      </div>
+      <div onClick="{{ rmAuf }}" style="display:flex;align-items:center;gap:8px;cursor:pointer;font:var(--type-small);color:var(--text-link)">
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="message-square" size="{{ ikon14 }}" hint-size="14px,14px"></x-import>
+        Rückmeldung geben
+      </div>
+      <p style="font:var(--type-small);color:var(--text-faint)">Freiwillig, ohne Anmeldung, kein Nachweis.</p>
+    </div>
+  </aside>
+  </sc-if>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+    <header style="flex:none;display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--glass-bg);backdrop-filter:var(--blur-glass);border-bottom:1px solid var(--border-subtle)">
+      <sc-if value="{{ zeigtZurueck }}" hint-placeholder-val="{{ false }}">
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.IconButton" icon="chevron-left" label="Zur Übersicht" size="sm" on-click="{{ zurueck }}" hint-size="30px,30px"></x-import>
+      </sc-if>
+      <sc-if value="{{ zeigtLogo }}" hint-placeholder-val="{{ true }}">
+        <img src="assets/logo-mark.png" alt="" width="28" height="28" style="border-radius:50%;flex:none">
+      </sc-if>
+      <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--fw-medium) 17px/1.2 var(--font-display);color:var(--text-heading)">{{ kopfTitel }}</span>
+      <sc-if value="{{ istPunkt }}" hint-placeholder-val="{{ false }}">
+        <span style="flex:none;font:400 13px/1 var(--font-mono);color:var(--text-faint)">{{ epZaehler }}</span>
+      </sc-if>
+      <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.IconButton" icon="info" label="So funktioniert Pathwise" size="sm" on-click="{{ infoAuf }}" hint-size="30px,30px"></x-import>
+      <sc-if value="{{ zeigtEinstellungen }}" hint-placeholder-val="{{ true }}">
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.IconButton" icon="settings" label="Vereinsangaben" size="sm" on-click="{{ oeffneVerein }}" hint-size="30px,30px"></x-import>
+      </sc-if>
+    </header>
+
+    <main style="flex:1;min-height:0;overflow:auto;padding:16px">
+     <div data-pw-screen="1" onAnimationEnd="{{ screenAnimFertig }}" style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px;animation:{{ screenAnim }}">
+
+      <sc-if value="{{ istUebersicht }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ erststartAn }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Card" padding="lg" accent="sweep" hint-size="100%,300px">
+            <span class="pw-label">Zum Anfangen</span>
+            <h2 style="margin:10px 0 12px;font:var(--fw-light) 27px/1.25 var(--font-display);color:var(--text-heading);text-wrap:pretty">Die meisten Situationen im Training sind nicht eindeutig.</h2>
+            <p style="margin:0 0 8px;font:var(--type-body);color:var(--text-body)">Hier kannst du sie einmal durchdenken, bevor du in der Halle entscheiden musst. Du liest eine Situation, entscheidest dich für eine von drei Möglichkeiten und bekommst auf Abruf eine fachliche Einordnung.</p>
+            <p style="margin:0 0 18px;font:var(--type-small);color:var(--text-muted)">Keine der Möglichkeiten ist richtig oder falsch. Eingeordnet wird nur die Situation und nicht deine Entscheidung. Es gibt keine Zeitbegrenzung, du kannst jederzeit unterbrechen.</p>
+            <div style="display:flex;flex-direction:column;gap:14px;padding:16px 0 18px;border-top:1px solid var(--border-subtle)">
+              <sc-for list="{{ infos }}" as="f" hint-placeholder-count="4">
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                  <span style="flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface-tint);color:var(--icon-on-tint)">
+                    <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="{{ f.ikon }}" size="{{ ikon14 }}" hint-size="14px,14px"></x-import>
+                  </span>
+                  <span style="flex:1;min-width:0">
+                    <span style="display:block;font:var(--fw-semibold) 15px/1.3 var(--font-sans);color:var(--text-heading)">{{ f.titel }}</span>
+                    <span style="display:block;margin-top:3px;font:var(--type-small);color:var(--text-muted);text-wrap:pretty">{{ f.text }}</span>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="accent" full-width="{{ true }}" icon-after="arrow-right" on-click="{{ ersterStart }}" hint-size="100%,48px">Erstes Szenario ansehen</x-import>
+          </x-import>
+        </sc-if>
+
+        <sc-if value="{{ hatFortschritt }}" hint-placeholder-val="{{ true }}">
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Card" padding="md" accent="sweep" hint-size="100%,200px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+              <span class="pw-label">Weiter machen</span>
+              <span style="font:var(--type-small);color:var(--text-faint)">{{ fortThemenfeld }}</span>
+            </div>
+            <h3 style="margin:8px 0 14px;font:var(--fw-medium) 21px/1.25 var(--font-display);color:var(--text-heading)">{{ fortTitel }}</h3>
+            <div style="margin-bottom:16px">
+              <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.StepIndicator" total="{{ fortTotal }}" current="{{ fortAktuell }}" hint-size="100%,20px"></x-import>
+            </div>
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="accent" full-width="{{ true }}" icon-after="arrow-right" on-click="{{ fortsetzen }}" hint-size="100%,48px">Fortsetzen</x-import>
+          </x-import>
+        </sc-if>
+
+        <p style="margin:0;font:var(--type-small);color:var(--text-muted)">Erfundene, realitätsnahe Situationen aus dem Trainingsalltag. Höchstens fünf Minuten, jederzeit unterbrechbar.</p>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <sc-for list="{{ themenfelder }}" as="t" hint-placeholder-count="4">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Tag" selected="{{ t.aktiv }}" on-click="{{ t.waehlen }}" hint-size="auto,28px">{{ t.name }}</x-import>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:12px">
+          <sc-for list="{{ szenarien }}" as="s" hint-placeholder-count="3">
+            <div onClick="{{ s.oeffnen }}" style="display:flex;flex-direction:column;gap:10px;padding:var(--card-pad);cursor:pointer;background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);box-shadow:var(--shadow-sm);transition:var(--transition-surface)" style-hover="box-shadow:var(--shadow-md);transform:var(--lift-hover)">
+              <div style="display:flex;align-items:flex-start;gap:8px;justify-content:space-between;flex-wrap:wrap">
+                <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Tag" style="flex:none" hint-size="auto,28px">{{ s.themenfeld }}</x-import>
+                <span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font:var(--type-small);color:{{ s.statusFarbe }}">
+                  <sc-if value="{{ s.hatIkon }}" hint-placeholder-val="{{ false }}">
+                    <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="{{ s.statusIkon }}" size="{{ ikon13 }}" hint-size="13px,13px"></x-import>
+                  </sc-if>
+                  {{ s.statusLabel }}
+                </span>
+              </div>
+              <h3 style="margin:0;font:var(--fw-medium) var(--text-h3)/1.35 var(--font-display);color:var(--text-heading)">{{ s.titel }}</h3>
+              <p style="margin:0;font:var(--type-small);color:var(--text-muted)">{{ s.kurz }}</p>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:6px;padding-top:18px;border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+            <span class="pw-label">Weitere Bereiche</span>
+            <span style="font:var(--type-small);color:var(--text-faint)">in Vorbereitung</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+            <sc-for list="{{ module }}" as="m" hint-placeholder-count="3">
+              <div onClick="{{ m.oeffnen }}" style="display:flex;align-items:center;gap:11px;padding:13px 14px;cursor:pointer;border:1px dashed var(--border-strong);border-radius:var(--radius-card);background:var(--surface-page);transition:var(--transition-surface)" style-hover="background:var(--surface-tint);border-color:var(--text-faint)">
+                <span style="flex:none;width:32px;height:32px;border-radius:var(--radius-control);display:flex;align-items:center;justify-content:center;background:var(--surface-tint);color:var(--icon-on-tint)">
+                  <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="{{ m.ikon }}" size="{{ ikon16 }}" hint-size="16px,16px"></x-import>
+                </span>
+                <span style="flex:1;min-width:0">
+                  <span style="display:block;font:var(--fw-semibold) 14px/1.3 var(--font-sans);color:var(--text-heading)">{{ m.titel }}</span>
+                  <span style="display:block;margin-top:2px;font:var(--type-small);color:var(--text-muted)">{{ m.zusatz }}</span>
+                </span>
+                <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="arrow-up-right" size="{{ ikon14 }}" style="flex:none;color:var(--text-faint)" hint-size="14px,14px"></x-import>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div onClick="{{ rmAuf }}" style="display:flex;align-items:flex-start;gap:12px;padding:16px;cursor:pointer;background:var(--surface-tint);border-radius:var(--radius-card);transition:var(--transition-surface)" style-hover="box-shadow:var(--shadow-sm)">
+          <span style="flex:none;color:var(--icon-on-tint);margin-top:2px">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="message-square" size="{{ ikon16 }}" hint-size="16px,16px"></x-import>
+          </span>
+          <span style="flex:1;min-width:0">
+            <span style="display:block;font:var(--fw-semibold) 14px/1.35 var(--font-sans);color:var(--text-on-tint)">Rückmeldung geben oder eine Situation einschicken</span>
+            <span style="display:block;margin-top:3px;font:var(--type-small);color:var(--text-on-tint-muted)">Was unklar war, was fehlt — oder eine Situation aus deinem Trainingsalltag, die als Szenario aufgenommen werden könnte.</span>
+          </span>
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="chevron-right" size="{{ ikon16 }}" style="flex:none;color:var(--icon-on-tint);margin-top:2px" hint-size="16px,16px"></x-import>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ istEinstieg }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <span class="pw-label">{{ aktThemenfeld }}</span>
+          <h2 style="margin:8px 0 0;font:var(--fw-light) 27px/1.22 var(--font-display);color:var(--text-heading);text-wrap:pretty">{{ aktTitel }}</h2>
+        </div>
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.SituationText" rahmen="{{ aktRahmen }}" hint-size="100%,170px">{{ aktAusgangssituation }}</x-import>
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Card" tone="tint" padding="md" hint-size="100%,130px">
+          <span class="pw-label">Vorgeschichte</span>
+          <p style="margin:8px 0 0;font:var(--type-body);color:var(--text-on-tint)">{{ aktVorgeschichte }}</p>
+        </x-import>
+      </sc-if>
+
+      <sc-if value="{{ istPunkt }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px">
+          <sc-if value="{{ zeigtEpZurueck }}" hint-placeholder-val="{{ false }}">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.IconButton" icon="chevron-left" label="Vorheriger Entscheidungspunkt" size="sm" on-click="{{ epZurueck }}" hint-size="30px,30px"></x-import>
+          </sc-if>
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.StepIndicator" total="{{ epTotal }}" current="{{ epNummer }}" hint-size="auto,20px"></x-import>
+        </div>
+
+        <div style="background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);overflow:hidden">
+          <div onClick="{{ situationUmschalten }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:11px 16px;cursor:pointer" style-hover="background:var(--surface-tint)">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="file-text" size="{{ ikon16 }}" hint-size="16px,16px"></x-import>
+            <span style="flex:1;min-width:0;font:var(--fw-semibold) 14px/1.35 var(--font-sans);color:var(--text-heading)">Situation nachlesen</span>
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="{{ situationIkon }}" size="{{ ikon16 }}" hint-size="16px,16px"></x-import>
+          </div>
+          <sc-if value="{{ situationOffen }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--border-subtle);padding-top:14px;animation:pwUnfold 240ms var(--ease-out) forwards">
+              <div>
+                <span class="pw-label">{{ aktTitel }}</span>
+                <p style="margin:8px 0 0;font:var(--type-body);color:var(--text-body)">{{ aktAusgangssituation }}</p>
+              </div>
+              <div>
+                <span class="pw-label">Vorgeschichte</span>
+                <p style="margin:8px 0 0;font:var(--type-small);color:var(--text-muted)">{{ aktVorgeschichte }}</p>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="padding:var(--card-pad);background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);box-shadow:var(--shadow-sm)">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;color:var(--text-faint)">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="corner-down-right" size="{{ ikon14 }}" hint-size="14px,14px"></x-import>
+            <span class="pw-label">{{ punktLabel }}</span>
+          </div>
+          <p style="margin:0;font:var(--type-body);color:var(--text-body);text-wrap:pretty">{{ punktText }}</p>
+        </div>
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.DecisionPoint" leitfrage="{{ leitfrage }}" optionen="{{ optionen }}" gewaehlt="{{ gewaehlt }}" on-waehlen="{{ waehlen }}" hint-size="100%,300px"></x-import>
+        <sc-if value="{{ hatGewaehlt }}" hint-placeholder-val="{{ false }}">
+          <div data-pw-hint="{{ fbHint }}" style="border-radius:var(--radius-card);animation:{{ fbAnim }}"><div style="animation:{{ fbUnfold }}">
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.FeedbackPanel" offen="{{ fbOffen }}" on-toggle="{{ fbUmschalten }}" erkennen="{{ fbErkennen }}" absichern="{{ fbAbsichern }}" handeln="{{ fbHandeln }}" hint-size="100%,60px"></x-import>
+          </div></div>
+        </sc-if>
+        <sc-if value="{{ nochNichtGewaehlt }}" hint-placeholder-val="{{ true }}">
+          <p style="margin:0;font:var(--type-small);color:var(--text-faint)">Eine fachliche Einordnung erscheint, sobald du dich entschieden hast.</p>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ istAuswertung }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h2 style="margin:0;font:var(--fw-light) 26px/1.25 var(--font-display);color:var(--text-heading);text-wrap:pretty">Was war unbedenklich, was klärungsbedürftig?</h2>
+          <p style="margin:8px 0 0;font:var(--type-small);color:var(--text-muted)">Alle Merkmale dieses Szenarios, auch die, die hier nicht eingetreten sind.</p>
+        </div>
+        <div data-pw-levels="1"><div data-pw-levels-row="1">
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.LevelList" stufe="unbedenklich" merkmale="{{ merkmaleOk }}" hint-size="100%,120px"></x-import>
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.LevelList" stufe="klaerungsbeduerftig" merkmale="{{ merkmaleCheck }}" hint-size="100%,150px"></x-import>
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.LevelList" stufe="grenzverletzend" merkmale="{{ merkmaleViol }}" hint-size="100%,150px"></x-import>
+        </div></div>
+        <div style="height:1px;background:var(--divider)"></div>
+        <div>
+          <span class="pw-label">Einschätzungsspiegel</span>
+          <p style="margin:8px 0 0;font:var(--type-small);color:var(--text-muted)">So haben die Trainerinnen und Trainer deines Vereins entschieden.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ spiegel }}" as="sp" hint-placeholder-count="3">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Card" padding="md" hint-size="100%,200px">
+              <div style="display:flex;align-items:baseline;gap:10px">
+                <span class="pw-label" style="flex:1">{{ sp.label }}</span>
+                <span onClick="{{ sp.umschalten }}" style="display:inline-flex;align-items:center;gap:5px;flex:none;cursor:pointer;font:var(--type-small);color:var(--text-link)">
+                  <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="file-text" size="{{ ikon13 }}" hint-size="13px,13px"></x-import>
+                  {{ sp.lesenLabel }}
+                </span>
+              </div>
+              <p style="margin:6px 0 14px;font:var(--type-small);color:var(--text-body)">{{ sp.frage }}</p>
+              <sc-if value="{{ sp.offen }}" hint-placeholder-val="{{ false }}">
+                <div style="margin:0 0 14px;padding:13px 14px;background:var(--surface-tint);border-radius:var(--radius-control);animation:pwRise 220ms var(--ease-out) forwards">
+                  <p style="margin:0;font:var(--type-small);color:var(--text-on-tint);text-wrap:pretty">{{ sp.situation }}</p>
+                </div>
+              </sc-if>
+              <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.MirrorBar" optionen="{{ sp.optionen }}" eigene-wahl="{{ sp.eigeneWahl }}" zu-wenige="{{ sp.zuWenige }}" hint-size="100%,140px"></x-import>
+            </x-import>
+          </sc-for>
+        </div>
+        <div style="height:1px;background:var(--divider)"></div>
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.ContactList" verein="{{ verein }}" personen="{{ personen }}" hint-size="100%,190px"></x-import>
+        <p style="margin:0;font:var(--type-small);color:var(--text-faint)">Dieser Prototyp gehört zur Prävention. Er ersetzt keine Meldung und keine Beratung.</p>
+      </sc-if>
+
+      <sc-if value="{{ istVerein }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <h2 style="margin:0;font:var(--fw-light) 26px/1.25 var(--font-display);color:var(--text-heading)">{{ verein }}</h2>
+          <p style="margin:8px 0 0;font:var(--type-small);color:var(--text-muted)">Die Angaben pflegt der Verein. Sie stehen in jedem Szenario am Ende und jederzeit über die Beratungsleiste.</p>
+        </div>
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.ContactList" verein="{{ verein }}" personen="{{ personen }}" hint-size="100%,190px"></x-import>
+        <div>
+          <span class="pw-label">Externe Beratung</span>
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ beratung }}" as="b" hint-placeholder-count="2">
+              <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Card" padding="sm" hint-size="100%,88px">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <span style="flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface-tint);color:var(--icon-on-tint)">
+                    <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="life-buoy" size="{{ ikon16 }}" hint-size="16px,16px"></x-import>
+                  </span>
+                  <span style="flex:1;min-width:0">
+                    <span style="display:block;font:var(--fw-semibold) 15px/1.3 var(--font-sans);color:var(--text-heading)">{{ b.titel }}</span>
+                    <span style="display:block;font:var(--type-small);color:var(--text-muted)">{{ b.zusatz }}</span>
+                  </span>
+                  <span style="flex:none;font:var(--type-mono);color:var(--text-link)">{{ b.nummer }}</span>
+                </div>
+              </x-import>
+            </sc-for>
+          </div>
+        </div>
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Card" tone="tint" padding="md" hint-size="100%,150px">
+          <span class="pw-label">Was gespeichert wird</span>
+          <p style="margin:8px 0 0;font:var(--type-body);color:var(--text-on-tint)">Dein Fortschritt und deine Entscheidungen bleiben auf diesem Gerät. An den Verein geht nichts. Gespeichert wird nur ein Zählwert je Entscheidungspunkt und Handlungsoption.</p>
+        </x-import>
+      </sc-if>
+
+     </div>
+    </main>
+
+    <footer style="flex:none;display:grid;gap:10px;padding:12px 16px 14px;background:var(--glass-bg);backdrop-filter:var(--blur-glass);border-top:1px solid var(--border-subtle)">
+     <div style="max-width:640px;width:100%;margin:0 auto;display:grid;gap:10px">
+      <sc-if value="{{ istEinstieg }}" hint-placeholder-val="{{ false }}">
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="accent" full-width="{{ true }}" icon-after="arrow-right" on-click="{{ starten }}" hint-size="100%,48px">Szenario beginnen</x-import>
+      </sc-if>
+      <sc-if value="{{ istPunkt }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:10px">
+          <div style="flex:1">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="secondary" full-width="{{ true }}" icon="rotate-ccw" on-click="{{ wahlAendern }}" hint-size="100%,48px">Antwort ändern</x-import>
+          </div>
+          <div style="flex:1.2">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="accent" full-width="{{ true }}" icon-after="arrow-right" disabled="{{ nochNichtGewaehlt }}" on-click="{{ weiter }}" hint-size="100%,48px">{{ weiterLabel }}</x-import>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ istAuswertung }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:10px">
+          <div style="flex:1">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="secondary" full-width="{{ true }}" icon="rotate-ccw" on-click="{{ nochmal }}" hint-size="100%,48px">Nochmal</x-import>
+          </div>
+          <div style="flex:1.2">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="accent" full-width="{{ true }}" icon-after="arrow-right" on-click="{{ zurUebersicht }}" hint-size="100%,48px">Zur Übersicht</x-import>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ istVerein }}" hint-placeholder-val="{{ false }}">
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="secondary" full-width="{{ true }}" icon="chevron-left" on-click="{{ zurUebersicht }}" hint-size="100%,48px">Zurück zur Übersicht</x-import>
+      </sc-if>
+      <sc-if value="{{ helpBarAn }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ hilfeAuf }}" style="cursor:pointer">
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.HelpBar" hint-size="100%,66px"></x-import>
+        </div>
+      </sc-if>
+     </div>
+    </footer>
+  </div>
+
+  <sc-if value="{{ rmOffen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ rmZu }}" style="animation:pwFade 200ms var(--ease-out) forwards;position:fixed;inset:0;z-index:75;display:flex;align-items:flex-end;justify-content:center;background:var(--surface-overlay);backdrop-filter:blur(3px)">
+      <div onClick="{{ schlucken }}" style="width:100%;max-width:520px;max-height:94%;overflow:auto;padding:22px 20px 20px;background:var(--surface-card);border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;box-shadow:var(--shadow-xl);animation:pwSheet 300ms var(--ease-out) forwards">
+        <sc-if value="{{ rmGesendet }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:14px 0 4px;animation:pwRise 320ms var(--ease-out) forwards">
+            <span style="display:inline-flex;width:46px;height:46px;align-items:center;justify-content:center;border-radius:50%;background:var(--surface-tint);color:var(--level-ok);margin-bottom:14px">
+              <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="check" size="{{ ikon20 }}" hint-size="20px,20px"></x-import>
+            </span>
+            <h2 style="margin:0 0 10px;font:var(--fw-light) 23px/1.25 var(--font-display);color:var(--text-heading)">Angekommen</h2>
+            <p style="margin:0 0 18px;font:var(--type-small);color:var(--text-muted);text-wrap:pretty">Deine Rückmeldung wird gelesen und bearbeitet. Das geschieht von Hand, es kann also etwas dauern. Eine Antwort erhältst du nur, wenn du eine Adresse hinterlassen hast.</p>
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="secondary" full-width="{{ true }}" on-click="{{ rmZu }}" hint-size="100%,48px">Schließen</x-import>
+          </div>
+        </sc-if>
+        <sc-if value="{{ rmFormular }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px">
+            <h2 style="flex:1;margin:0;font:var(--fw-medium) 22px/1.25 var(--font-display);color:var(--text-heading)">Rückmeldung</h2>
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.IconButton" icon="x" label="Schließen" size="sm" on-click="{{ rmZu }}" hint-size="30px,30px"></x-import>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+            <sc-for list="{{ rmArten }}" as="a" hint-placeholder-count="2">
+              <div onClick="{{ a.waehlen }}" style="display:flex;gap:11px;align-items:flex-start;padding:13px 14px;cursor:pointer;border:1px solid {{ a.rand }};border-radius:var(--radius-control);background:{{ a.flaeche }};transition:var(--transition-surface)">
+                <span style="flex:none;margin-top:2px;color:{{ a.ikonFarbe }}">
+                  <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="{{ a.ikon }}" size="{{ ikon16 }}" hint-size="16px,16px"></x-import>
+                </span>
+                <span style="flex:1;min-width:0">
+                  <span style="display:block;font:var(--fw-semibold) 14px/1.35 var(--font-sans);color:var(--text-heading)">{{ a.titel }}</span>
+                  <span style="display:block;margin-top:2px;font:var(--type-small);color:var(--text-muted)">{{ a.zusatz }}</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Field" label="{{ rmLabel }}" hint="{{ rmHinweis }}" hint-size="100%,140px">
+              <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Textarea" rows="{{ rmZeilen }}" placeholder="{{ rmPlatzhalter }}" value="{{ rmText }}" on-change="{{ rmTextAendern }}" hint-size="100%,110px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Field" label="E-Mail, falls du eine Antwort möchtest" hint="Freiwillig. Ohne Adresse bleibt die Rückmeldung anonym." hint-size="100%,100px">
+              <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Input" type="email" placeholder="name@verein.de" value="{{ rmMail }}" on-change="{{ rmMailAendern }}" hint-size="100%,44px"></x-import>
+            </x-import>
+            <div style="display:flex;gap:10px;align-items:flex-start;padding:13px 14px;background:var(--surface-tint);border-radius:var(--radius-control)">
+              <span style="flex:none;margin-top:1px;color:var(--icon-on-tint)">
+                <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="info" size="{{ ikon14 }}" hint-size="14px,14px"></x-import>
+              </span>
+              <span style="font:var(--type-small);color:var(--text-on-tint-muted);text-wrap:pretty">Jede Rückmeldung wird gelesen und bearbeitet. Das geschieht von Hand, es kann also etwas dauern. Bitte schreibe keine echten Namen — eingeschickte Situationen werden vor der Aufnahme ohnehin verfremdet.</span>
+            </div>
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="accent" full-width="{{ true }}" icon-after="arrow-right" disabled="{{ rmLeer }}" on-click="{{ rmSenden }}" hint-size="100%,48px">Abschicken</x-import>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ soonOffen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ soonZu }}" style="animation:pwFade 200ms var(--ease-out) forwards;position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--surface-overlay);backdrop-filter:blur(4px)">
+      <div onClick="{{ schlucken }}" style="width:100%;max-width:400px;padding:30px 24px 22px;text-align:center;background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-sheet);box-shadow:var(--shadow-xl);animation:pwRise var(--dur-slow,320ms) var(--ease-out) forwards">
+        <div style="position:relative;width:74px;height:74px;margin:0 auto 20px">
+          <span style="position:absolute;inset:0;border-radius:50%;border:1px solid var(--text-link);animation:pwRing 2.6s var(--ease-out) infinite"></span>
+          <span style="position:absolute;inset:0;border-radius:50%;border:1px solid var(--text-link);animation:pwRing 2.6s var(--ease-out) .9s infinite"></span>
+          <span style="position:absolute;inset:0;border-radius:50%;border:1px solid var(--text-link);animation:pwRing 2.6s var(--ease-out) 1.8s infinite"></span>
+          <span style="position:absolute;inset:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface-tint);color:var(--icon-on-tint);animation:pwFloat 3.4s var(--ease-standard,ease-in-out) infinite">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="{{ soonIkon }}" size="{{ ikon20 }}" hint-size="20px,20px"></x-import>
+          </span>
+        </div>
+        <span class="pw-label">{{ soonTitel }}</span>
+        <h2 style="margin:10px 0 10px;font:var(--fw-light) 25px/1.25 var(--font-display);color:var(--text-heading)">Kommt bald</h2>
+        <p style="margin:0 0 18px;font:var(--type-small);color:var(--text-muted);text-wrap:pretty">{{ soonText }} Der Bereich wird als eigenes Modul ergänzt — deine bisherigen Szenarien bleiben dabei unverändert.</p>
+        <div style="display:flex;gap:6px;justify-content:center;margin-bottom:20px">
+          <span style="width:5px;height:5px;border-radius:50%;background:var(--text-link);animation:pwDot 1.4s infinite"></span>
+          <span style="width:5px;height:5px;border-radius:50%;background:var(--text-link);animation:pwDot 1.4s .2s infinite"></span>
+          <span style="width:5px;height:5px;border-radius:50%;background:var(--text-link);animation:pwDot 1.4s .4s infinite"></span>
+        </div>
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="secondary" full-width="{{ true }}" on-click="{{ soonZu }}" hint-size="100%,48px">Zurück zur Übersicht</x-import>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ infoOffen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ infoZu }}" style="animation:pwFade 200ms var(--ease-out) forwards;position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;background:var(--surface-overlay);backdrop-filter:blur(3px)">
+      <div onClick="{{ schlucken }}" style="width:100%;max-width:520px;max-height:92%;overflow:auto;padding:22px 20px 20px;background:var(--surface-card);border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;box-shadow:var(--shadow-xl);animation:pwSheet 300ms var(--ease-out) forwards">
+        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:18px">
+          <div style="flex:1">
+            <h2 style="margin:0;font:var(--fw-medium) 22px/1.25 var(--font-display);color:var(--text-heading)">So funktioniert Pathwise</h2>
+          </div>
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.IconButton" icon="x" label="Schließen" size="sm" on-click="{{ infoZu }}" hint-size="30px,30px"></x-import>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <sc-for list="{{ infos }}" as="f" hint-placeholder-count="5">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface-tint);color:var(--icon-on-tint)">
+                <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="{{ f.ikon }}" size="{{ ikon16 }}" hint-size="16px,16px"></x-import>
+              </span>
+              <span style="flex:1;min-width:0">
+                <span style="display:block;font:var(--fw-semibold) 15px/1.3 var(--font-sans);color:var(--text-heading)">{{ f.titel }}</span>
+                <span style="display:block;margin-top:4px;font:var(--type-small);color:var(--text-muted);text-wrap:pretty">{{ f.text }}</span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:18px 0 14px;font:var(--type-small);color:var(--text-faint)">Pathwise ersetzt keine Beratung und nimmt keine Meldung entgegen. Bei einem konkreten Verdacht führt der Weg über die Ansprechpersonen im Verein.</p>
+        <div onClick="{{ rmAuf }}" style="display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer;font:var(--type-small);color:var(--text-link)">
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="message-square" size="{{ ikon14 }}" hint-size="14px,14px"></x-import>
+          Rückmeldung geben oder eine Situation einschicken
+        </div>
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="secondary" full-width="{{ true }}" on-click="{{ infoZu }}" hint-size="100%,48px">Verstanden</x-import>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hilfeOffen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ hilfeZu }}" style="animation:pwFade 200ms var(--ease-out) forwards;position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;background:var(--surface-overlay);backdrop-filter:blur(3px)">
+      <div onClick="{{ schlucken }}" style="width:100%;max-width:520px;max-height:92%;overflow:auto;padding:22px 20px 20px;background:var(--surface-card);border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;box-shadow:var(--shadow-xl);animation:pwSheet 300ms var(--ease-out) forwards">
+        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px">
+          <div style="flex:1">
+            <h2 style="margin:0;font:var(--fw-medium) 22px/1.25 var(--font-display);color:var(--text-heading)">Hilfe und Beratung</h2>
+            <p style="margin:6px 0 0;font:var(--type-small);color:var(--text-muted)">Erreichbar auf jedem Bildschirm, ohne dass du das Szenario verlässt.</p>
+          </div>
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.IconButton" icon="x" label="Schließen" size="sm" on-click="{{ hilfeZu }}" hint-size="30px,30px"></x-import>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ beratung }}" as="b" hint-placeholder-count="2">
+            <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Card" padding="sm" hint-size="100%,88px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface-tint);color:var(--icon-on-tint)">
+                  <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Icon" name="life-buoy" size="{{ ikon16 }}" hint-size="16px,16px"></x-import>
+                </span>
+                <span style="flex:1;min-width:0">
+                  <span style="display:block;font:var(--fw-semibold) 15px/1.3 var(--font-sans);color:var(--text-heading)">{{ b.titel }}</span>
+                  <span style="display:block;font:var(--type-small);color:var(--text-muted)">{{ b.zusatz }}</span>
+                </span>
+                <span style="flex:none;font:var(--type-mono);color:var(--text-link)">{{ b.nummer }}</span>
+              </div>
+            </x-import>
+          </sc-for>
+        </div>
+        <div style="margin:16px 0 14px">
+          <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.ContactList" verein="{{ verein }}" personen="{{ personen }}" hint-size="100%,190px"></x-import>
+        </div>
+        <p style="margin:0 0 14px;font:var(--type-small);color:var(--text-faint)">Bei einem konkreten Verdacht wende dich an den Kinderschutzbeauftragten. Der Prototyp nimmt keine Meldung entgegen.</p>
+        <x-import component-from-global-scope="PathwiseDesignSystem_1690f0.Button" variant="secondary" full-width="{{ true }}" on-click="{{ hilfeZu }}" hint-size="100%,48px">Zurück zum Szenario</x-import>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;mobile&quot;,&quot;rail&quot;],&quot;default&quot;:&quot;mobile&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;preset&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;&quot;,&quot;start&quot;,&quot;uebersicht&quot;,&quot;einstieg&quot;,&quot;punkt&quot;,&quot;feedback&quot;,&quot;auswertung&quot;,&quot;hilfe&quot;,&quot;verein&quot;],&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Startzustand&quot;},&quot;szenario&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:2,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Startzustand&quot;},&quot;gewaehlt&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;&quot;,&quot;a&quot;,&quot;b&quot;,&quot;c&quot;],&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Startzustand&quot;}}">
+const VEREIN = "Post SV Nürnberg";
+const PERSONEN = [
+  { name: "Michael Brandt", rolle: "Kinderschutzbeauftragter", kontakt: "kinderschutz@postsv.de" },
+  { name: "Sabine Reuter", rolle: "Abteilungsleitung", kontakt: "0911 55 00 12", kontaktart: "telefon" },
+];
+const MODULE = [
+  { id: "eltern", ikon: "message-square", titel: "Gespräche mit Eltern", zusatz: "Konflikte und Rückmeldungen", text: "Szenarien zu schwierigen Elterngesprächen." },
+  { id: "wettkampf", ikon: "flag", titel: "Wettkampf und Fahrten", zusatz: "Übernachtung, Aufsicht", text: "Situationen auf Fahrten und bei Übernachtungen." },
+  { id: "schutzkonzept", ikon: "shield", titel: "Schutzkonzept des Vereins", zusatz: "Regeln nachschlagen", text: "Das Schutzkonzept deines Vereins zum Nachschlagen." },
+];
+const INFOS = [
+  { ikon: "user-x", titel: "Kein Konto, keine Anmeldung", text: "Du brauchst keine E-Mail-Adresse und kein Passwort. Die App startet direkt, ohne Registrierung." },
+  { ikon: "smartphone", titel: "Alles bleibt auf deinem Gerät", text: "Deine Entscheidungen und dein Fortschritt werden nur lokal gespeichert. Nichts wird an den Verein übertragen." },
+  { ikon: "eye-off", titel: "Anonym, auch gegenüber dem Verein", text: "Niemand kann nachvollziehen, welche Möglichkeit du gewählt hast, ob du ein Szenario abgebrochen hast oder wie oft du die App öffnest. Es gibt keinen Nachweis und keine Auswertung über dich." },
+  { ikon: "list-checks", titel: "Auswertung nach jedem Szenario", text: "Am Ende siehst du, welche Merkmale in der Situation eine Rolle gespielt haben: was fachlich in Ordnung war, was aufmerksam machen sollte und was eine Grenze verletzt hätte." },
+  { ikon: "users", titel: "Wie andere entschieden haben", text: "In der Auswertung siehst du zusätzlich, wie sich andere Trainerinnen und Trainer an derselben Stelle entschieden haben — als Einordnung, nicht als Bewertung." },
+  { ikon: "rotate-ccw", titel: "Jederzeit unterbrechen und wiederholen", text: "Du kannst mitten im Szenario zur Übersicht zurück und später weitermachen. Jedes Szenario lässt sich beliebig oft neu durchspielen." },
+];
+const BERATUNG = [
+  { titel: "Hilfetelefon Sexueller Missbrauch", zusatz: "anonym und kostenfrei, bundesweit", nummer: "0800 22 55 530" },
+  { titel: "Nummer gegen Kummer", zusatz: "für Kinder, Jugendliche und Eltern", nummer: "116 111" },
+];
+
+const SZENARIEN = [
+  {
+    id: "heimspiel",
+    titel: "Vor dem Heimspiel",
+    themenfeld: "Umkleide, Duschen und Räume",
+    kurz: "Ein Vater bleibt in der Kabine, während sich die Kinder umziehen. Er gehört seit Jahren zum Verein und hilft regelmäßig aus.",
+    dauer: "ca. 5 Min.",
+    rahmen: ["U12, 10 bis 12 Jahre", "Kabine der Vereinshalle", "vor dem Training"],
+    vorgeschichte: "Heimspieltag. Der Vater fährt seit zwei Jahren Auswärtsfahrten mit und verteilt vor den Spielen die Trikots. Eine Regel, wer sich während des Umziehens in der Kabine aufhalten darf, gibt es im Team nicht.",
+    ausgangssituation: "Zwanzig Minuten vor dem Anpfiff. Deine U12 zieht sich in der Kabine um, du gehst die Aufstellung durch. Ein Vater, der seit zwei Jahren Fahrdienste übernimmt, steht mit dem Trikotsatz im Raum und unterhält sich mit zwei Jungen über deren Wochenende. Die Tür steht offen, draußen auf dem Gang laufen andere Eltern vorbei.",
+    punkte: [
+      {
+        text: "Der Vater bleibt stehen, während die beiden fertig werden. Ein Junge dreht sich zur Wand. Der Vater merkt es nicht und erzählt weiter.",
+        leitfrage: "Wie verhältst du dich?",
+        optionen: [
+          { id: "a", text: "Du bittest ihn, vor der Tür zu warten, und sagst dazu, dass das für alle Erwachsenen gilt, dich eingeschlossen." },
+          { id: "b", text: "Du sagst nichts, gehst aber zu den beiden Jungen hinüber und stellst dich zwischen sie und den Rest des Raumes." },
+          { id: "c", text: "Du lässt die Situation laufen und sprichst ihn nach dem Spiel unter vier Augen an." },
+        ],
+        anteile: { a: 58, b: 21, c: 21 },
+        erkennen: "Nicht der Vater ist hier das Auffällige, sondern der fehlende Anlass: Er hat in dem Moment keine Aufgabe mehr im Raum. Das Zurückdrehen des Jungen ist das einzige Signal, das du bekommst, und es ist leicht zu übersehen.",
+        absichern: "Eine Regel, die für alle Erwachsenen gleich gilt, nimmt dir die Einzelfallentscheidung ab. Sie schützt auch dich, weil dann niemand fragen muss, warum ausgerechnet du dich in der Kabine aufhältst.",
+        handeln: "Sprich es im Moment an, nicht später. Kurz, sachlich und ohne Vorwurf. Wenn im Team keine Regel dazu existiert, ist das der eigentliche Punkt für die nächste Trainerbesprechung.",
+      },
+      {
+        text: "Zwei Wochen später spricht dich eine Mutter nach dem Training an. Ihre Tochter ziehe sich zu Hause um und wolle die Kabine nicht mehr betreten. Einen Grund nenne sie nicht. Die Mutter fragt dich, ob dir etwas aufgefallen sei.",
+        leitfrage: "Was tust du?",
+        optionen: [
+          { id: "a", text: "Du sagst, dass dir nichts aufgefallen ist, und bittest die Mutter, ihre Tochter nach dem Anlass zu fragen." },
+          { id: "b", text: "Du fragst das Mädchen selbst, in Ruhe und ohne die anderen, ob ihr etwas in der Kabine unangenehm ist." },
+          { id: "c", text: "Du notierst, was die Mutter gesagt hat, und meldest die Beobachtung weiter, ohne selbst nachzufragen." },
+        ],
+        anteile: { a: 24, b: 47, c: 29 },
+        erkennen: "Ein Kind, das einen Raum meidet und keinen Grund nennt, sagt damit schon etwas. Der Grund kann alles sein, von Scham über die eigene Entwicklung bis zu einem Vorfall. Du weißt an dieser Stelle nicht, welches von beidem zutrifft.",
+        absichern: "Wenn du selbst nachfragst, dann so, dass es jemand mitbekommt: in der Halle, bei offener Tür, mit einer zweiten erwachsenen Person in Sicht- oder Hörweite.",
+        handeln: "Frag offen und ohne Vermutung im Satz. Halte fest, wer dir was wann gesagt hat. Wenn du nach dem Gespräch unsicher bleibst, ist das der Punkt, an dem der Kinderschutzbeauftragte dazukommt.",
+      },
+      {
+        text: "Du bringst das Thema in der Trainerrunde auf. Ein Kollege, der seit fünfzehn Jahren im Verein ist, winkt ab: Den Vater kenne man doch, und wenn man jetzt jeden Helfer aus der Kabine schicke, könne man den Spielbetrieb gleich einstellen.",
+        leitfrage: "Wie reagierst du?",
+        optionen: [
+          { id: "a", text: "Du stimmst zu, dass es nicht um diesen Vater geht, und schlägst genau deshalb eine Regel für alle vor." },
+          { id: "b", text: "Du lässt es stehen und hältst es in deiner eigenen Mannschaft künftig anders." },
+          { id: "c", text: "Du bittest den Kinderschutzbeauftragten, das Thema in der nächsten Sitzung anzusprechen." },
+        ],
+        zuWenige: true,
+        erkennen: "Das Argument „den kennen wir doch“ ist kein Argument über die Situation, sondern über eine Person. Genau diese Umkehrung ist der Punkt, an dem ein Team aufhört, über Regeln zu sprechen.",
+        absichern: "Eine Regel, die für alle gilt, macht die Diskussion unpersönlich. Du musst dann niemanden verdächtigen, um sie durchzusetzen, und niemand muss sich verteidigen.",
+        handeln: "Eine Regel bringt nur etwas, wenn sie ausgesprochen und den Eltern mitgeteilt wird. Halte das Ergebnis der Besprechung kurz schriftlich fest, und zwar dort, wo es auch neue Trainerinnen und Trainer finden.",
+      },
+    ],
+    merkmale: [
+      { text: "Ein Elternteil hält sich regelmäßig in der Halle auf und übernimmt Aufgaben.", stufe: "ok" },
+      { text: "Die Kabinentür steht offen, andere Erwachsene gehen vorbei.", stufe: "ok" },
+      { text: "Ein Kind zieht sich beim Umziehen zur Wand.", stufe: "ok" },
+      { text: "Eine erwachsene Person hält sich ohne Aufgabe im Raum auf, während Kinder sich umziehen.", stufe: "check" },
+      { text: "Für die Kabine gibt es keine im Team abgestimmte Regel.", stufe: "check" },
+      { text: "Ein Kind meidet einen Raum und nennt dafür keinen Grund.", stufe: "check" },
+      { text: "Eine Beobachtung wird im Trainerteam mit dem Hinweis auf die Person abgetan.", stufe: "check" },
+      { text: "Eine erwachsene Person hat in der Umkleide das Handy in der Hand.", stufe: "check", nichtEingetreten: true },
+      { text: "In der Umkleide werden Fotos oder Videos aufgenommen.", stufe: "viol", nichtEingetreten: true },
+      { text: "Eine erwachsene Person äußert sich über den Körper eines Kindes.", stufe: "viol", nichtEingetreten: true },
+      { text: "Ein Kind wird gebeten, über einen Vorfall in der Kabine nichts zu sagen.", stufe: "viol", nichtEingetreten: true },
+    ],
+  },
+  {
+    id: "hilfestellung",
+    titel: "Die Hilfestellung",
+    themenfeld: "Körperkontakt und Hilfestellung",
+    kurz: "Beim Üben eines Sprungs ist Körperkontakt nötig. Eine Turnerin weicht zurück, sagt aber nichts, und bittet später um eine Einheit allein.",
+    dauer: "ca. 5 Min.",
+    rahmen: ["Turngruppe, 12 bis 14 Jahre", "Gerätebahn am Sprungkasten", "im Training"],
+    vorgeschichte: "Du übernimmst die Gruppe seit vier Wochen vertretungsweise. Eine 13-Jährige arbeitet seit Wochen an einem Sprung, den sie ohne Hilfestellung noch nicht schafft. Ein zweiter Trainer betreut die andere Hälfte der Gruppe am anderen Hallenende.",
+    ausgangssituation: "Stationsbetrieb, acht Kinder an der Bahn. Der Sprung verlangt, dass du am Rücken und am Oberschenkel fasst und mitdrehst, sonst kommt die Turnerin nicht sicher auf. Sie stellt sich seit zwei Wochen immer wieder neu hinten an, auch wenn sie schon dran war. Du hast bisher nichts dazu gesagt, weil es nach Ehrgeiz aussieht.",
+    punkte: [
+      {
+        text: "Beim dritten Versuch zuckt sie zurück, als du ansetzt, macht den Sprung dann aber trotzdem. Danach sagt sie nichts und stellt sich wieder an.",
+        leitfrage: "Wie gehst du weiter vor?",
+        optionen: [
+          { id: "a", text: "Du unterbrichst kurz und erklärst der ganzen Gruppe, wo du beim Helfen fasst und warum das nötig ist." },
+          { id: "b", text: "Du bietest ihr die Variante mit Kasten und Weichbodenmatte an, bei der du nicht mitfassen musst." },
+          { id: "c", text: "Du machst weiter wie bisher, sagst ihr aber, dass sie jederzeit Bescheid geben kann." },
+        ],
+        anteile: { a: 44, b: 38, c: 18 },
+        erkennen: "Ein Zurückzucken ist ein Signal, mehr aber auch nicht. Es kann Anspannung vor dem Sprung sein, eine schmerzende Stelle oder Unbehagen beim Angefasstwerden. Aussagekräftig wird es erst, wenn es sich wiederholt oder wenn nichts dazu gesagt wird.",
+        absichern: "Wer vorher ansagt, wo er fasst, macht den Griff überprüfbar. Das ist der einfachste Weg, dem Vorwurf zuvorzukommen, man habe irgendwo angefasst, wo man nicht hätte anfassen dürfen.",
+        handeln: "Sag den Griff an, bevor du ihn machst, und biete eine Variante ohne Körperkontakt an. Wenn dir dasselbe bei demselben Kind mehrfach auffällt, gehört das ins Trainerteam.",
+      },
+      {
+        text: "Am Ende der Stunde fragt sie, ob sie freitags eine halbe Stunde früher kommen kann, um den Sprung mit dir allein zu üben. Vor den anderen sei ihr das zu langsam.",
+        leitfrage: "Was antwortest du?",
+        optionen: [
+          { id: "a", text: "Du sagst zu und legst die halbe Stunde so, dass die Gruppe vor ihr noch in der Halle ist." },
+          { id: "b", text: "Du sagst zu und schreibst vorher dem zweiten Trainer und ihren Eltern, worum es geht." },
+          { id: "c", text: "Du sagst ab und richtest im regulären Training eine Station mit einer Partnerin ein." },
+        ],
+        anteile: { a: 31, b: 52, c: 17 },
+        erkennen: "Zusätzliches Einzeltraining ist im Sport normal und zugleich die Situation, über die Nähe am leichtesten entsteht. Entscheidend ist nicht, ob es stattfindet, sondern ob es sichtbar ist und wer davon weiß.",
+        absichern: "Zwei Angaben genügen: Wer weiß davon, und wer ist noch in der Halle. Fehlen beide, entsteht eine Situation, für die es hinterher keine Zeugen gibt, und das trifft dich genauso wie das Kind.",
+        handeln: "Leg die Einheit in ein Zeitfenster mit anderen Anwesenden und sag den Eltern und dem zweiten Trainer vorher Bescheid. Wenn im Verein keine Regel für Einzeltraining existiert, ist das eine Frage für den Kinderschutzbeauftragten.",
+      },
+      {
+        text: "Beim Aufräumen erzählt der zweite Trainer, der frühere Übungsleiter habe das mit den Einzelstunden jahrelang so gemacht, freitags nach dem Training, und dabei die Hallentür zugemacht, damit niemand stört. Beschwert habe sich nie jemand.",
+        leitfrage: "Wie gehst du damit um?",
+        optionen: [
+          { id: "a", text: "Du sagst, dass du es anders handhabst, und nennst kurz den Grund." },
+          { id: "b", text: "Du fragst nach, wie das damals genau ablief, und behältst die Antwort zunächst für dich." },
+          { id: "c", text: "Du gibst die Beobachtung an den Kinderschutzbeauftragten weiter, ohne einen Vorwurf zu erheben." },
+        ],
+        zuWenige: true,
+        erkennen: "Dass sich nie jemand beschwert hat, sagt nichts darüber, ob etwas passiert ist. Eine abgeschlossene Halle bei einem Einzeltraining ist unabhängig davon eine Bedingung, unter der niemand mehr etwas sehen kann.",
+        absichern: "Du bewertest hier keine Person, sondern eine Bedingung. Wer das so formuliert, kann es aussprechen, ohne jemanden zu beschuldigen.",
+        handeln: "Gib die Beobachtung weiter und beschreibe dabei die Umstände, nicht deine Vermutung. Das ist keine Meldung eines Verdachts, sondern der Hinweis auf eine Gepflogenheit, die geändert gehört.",
+      },
+    ],
+    merkmale: [
+      { text: "Hilfestellung mit Körperkontakt ist für den Bewegungsablauf nötig.", stufe: "ok" },
+      { text: "Ein Kind sucht von sich aus wiederholt die Nähe zur trainierenden Person.", stufe: "ok" },
+      { text: "Das Training findet in der Halle statt, eine zweite erwachsene Person ist anwesend.", stufe: "ok" },
+      { text: "Der Griff wird weder angekündigt noch erklärt.", stufe: "check" },
+      { text: "Ein Kind reagiert körperlich abwehrend und sagt nichts dazu.", stufe: "check" },
+      { text: "Eine Einheit außerhalb der regulären Trainingszeit wird verabredet.", stufe: "check" },
+      { text: "Für Einzeltraining gibt es im Verein keine Regel.", stufe: "check" },
+      { text: "Eine gewachsene Gepflogenheit wird damit begründet, dass sich nie jemand beschwert hat.", stufe: "check" },
+      { text: "Eine Verabredung bleibt zwischen zwei Personen, ohne dass jemand davon weiß.", stufe: "check", nichtEingetreten: true },
+      { text: "Die Halle wird während eines Einzeltrainings abgeschlossen.", stufe: "viol", nichtEingetreten: true },
+      { text: "Die Hilfestellung wird fortgesetzt, obwohl ein Kind sie ausdrücklich ablehnt.", stufe: "viol", nichtEingetreten: true },
+      { text: "Der Körper eines Kindes wird vor der Gruppe bewertet.", stufe: "viol", nichtEingetreten: true },
+    ],
+  },
+  {
+    id: "cotrainer",
+    titel: "Der zuverlässige Co-Trainer",
+    themenfeld: "Elternkontakt und Wege",
+    kurz: "Ein Co-Trainer kümmert sich auffällig um einen einzelnen Spieler. Die Mutter ist dankbar, im Team gilt er als Glücksfall.",
+    dauer: "ca. 5 Min.",
+    rahmen: ["U15 männlich, 13 bis 15 Jahre", "Sportgelände und Parkplatz", "nach dem Training"],
+    vorgeschichte: "Seit der Saisonvorbereitung hilft ein 24-jähriger Co-Trainer, der selbst im Verein groß geworden ist. Er ist zuverlässig und bei den Jungen beliebt. Einen 14-jährigen Spieler, dessen Mutter im Schichtdienst arbeitet, fährt er nach dem Training regelmäßig nach Hause.",
+    ausgangssituation: "Dienstagabend, das Training ist zu Ende, ihr räumt die Tore weg. Der Co-Trainer erzählt dir nebenbei, er habe dem Jungen seine alten Schuhe geschenkt, die passten ihm genau, und sie seien danach noch eine Pizza essen gewesen, zu Hause sei ja ohnehin niemand.",
+    punkte: [
+      {
+        text: "Er erzählt das offen und ohne jede Verlegenheit. Aus seiner Sicht hat er einem Jungen geholfen, dem sonst niemand hilft.",
+        leitfrage: "Wie reagierst du?",
+        optionen: [
+          { id: "a", text: "Du sagst, dass du das gut findest, und bittest ihn, solche Sachen künftig vorher in der Trainerrunde anzusprechen." },
+          { id: "b", text: "Du fragst nach, ob die Mutter davon weiß und einverstanden war." },
+          { id: "c", text: "Du bringst Fahrdienste, Geschenke und private Treffen beim nächsten Trainertreffen allgemein zur Sprache." },
+        ],
+        anteile: { a: 36, b: 41, c: 23 },
+        erkennen: "Jeder einzelne Punkt hier ist harmlos: Schuhe weitergeben, jemanden mitnehmen, etwas essen gehen. Auffällig ist die Häufung auf ein einzelnes Kind und dass alles außerhalb des Trainings stattfindet.",
+        absichern: "Wer Zuwendung über den Verein laufen lässt statt privat, kommt gar nicht erst in die Lage, sie erklären zu müssen. Ausrüstung geht an die Mannschaft, nicht an ein Kind.",
+        handeln: "Sprich es an, solange es klein ist. Je später du es ansprichst, desto mehr klingt es nach einem Vorwurf. Und halte fest, wann dir was erzählt wurde.",
+      },
+      {
+        text: "In den Wochen danach fällt dir auf, dass der Junge in der Kabine kaum noch mit den anderen redet und sich vor allem an den Co-Trainer hält. Bei einer Auswechslung nimmt der ihn ausdrücklich vor der Mannschaft in Schutz. Die Mutter schreibt dir, wie gut ihm der Kontakt tue.",
+        leitfrage: "Was tust du?",
+        optionen: [
+          { id: "a", text: "Du suchst ein Gespräch mit dem Jungen und fragst, wie es ihm in der Mannschaft geht." },
+          { id: "b", text: "Du sprichst den Co-Trainer auf das an, was dir aufgefallen ist." },
+          { id: "c", text: "Du hältst deine Beobachtungen mit Datum fest und wendest dich an den Kinderschutzbeauftragten." },
+        ],
+        anteile: { a: 33, b: 28, c: 39 },
+        erkennen: "Nicht die Zuwendung ist das Auffällige, sondern dass sich das Kind von den anderen löst und nur noch eine Bezugsperson hat. Dass die Mutter dankbar ist, macht Nachfragen schwerer und ist deshalb selbst Teil des Bildes.",
+        absichern: "Notiere, was du wann beobachtet hast, in eigenen Worten und ohne Bewertung. Das schützt dich davor, dich später auf Erinnerung verlassen zu müssen.",
+        handeln: "Du musst nicht entscheiden, ob etwas dahintersteckt. Das ist genau der Punkt, an dem der Kinderschutzbeauftragte gebraucht wird, und dafür reicht eine Beobachtung ohne Verdacht.",
+      },
+      {
+        text: "Der Co-Trainer fragt, ob er den Jungen und zwei weitere am Samstag privat zu einem Auswärtsspiel mitnehmen darf, mit dem eigenen Auto. Am Freitagabend sagen die beiden anderen ab.",
+        leitfrage: "Wie entscheidest du?",
+        optionen: [
+          { id: "a", text: "Du fährst selbst mit oder organisierst eine zweite erwachsene Person für die Fahrt." },
+          { id: "b", text: "Du sagst die Fahrt ab und begründest es damit, dass sie als Gruppenfahrt geplant war." },
+          { id: "c", text: "Du lässt die Fahrt zu und bittest darum, dass die Mutter über Abfahrt und Rückkehr informiert wird." },
+        ],
+        zuWenige: true,
+        erkennen: "Eine Gruppenfahrt, die auf ein Kind zusammenschrumpft, ist keine Gruppenfahrt mehr. Der Anlass bleibt derselbe, die Bedingungen sind andere geworden.",
+        absichern: "Die einfachste Regel ist die, die keine Einzelfallabwägung braucht: keine Fahrt allein mit einem Kind. Sie nimmt auch dem Co-Trainer die Diskussion ab.",
+        handeln: "Entscheide vor der Fahrt und nicht danach. Wenn eine Regel dazu im Verein fehlt, ist das der Punkt, an dem sie entstehen sollte, und zwar für alle Mannschaften.",
+      },
+    ],
+    merkmale: [
+      { text: "Ein Co-Trainer übernimmt Fahrdienste, die Eltern wissen davon und sind einverstanden.", stufe: "ok" },
+      { text: "Eine trainierende Person nimmt Anteil an der Lebenssituation eines Spielers.", stufe: "ok" },
+      { text: "Gebrauchte Ausrüstung wird über den Verein an mehrere Kinder weitergegeben.", stufe: "ok", nichtEingetreten: true },
+      { text: "Ein einzelnes Kind erhält Geschenke und Einladungen, die die anderen nicht bekommen.", stufe: "check" },
+      { text: "Der Kontakt findet regelmäßig außerhalb des Trainings und ohne weitere Anwesende statt.", stufe: "check" },
+      { text: "Ein Kind löst sich von der Mannschaft und hält sich nur noch an eine erwachsene Person.", stufe: "check" },
+      { text: "Die Dankbarkeit der Eltern macht das Nachfragen unangenehm.", stufe: "check" },
+      { text: "Eine als Gruppe geplante Fahrt schrumpft auf ein einzelnes Kind zusammen.", stufe: "check" },
+      { text: "Zwischen trainierender Person und Kind entsteht ein privater Nachrichtenkontakt, den sonst niemand sieht.", stufe: "viol", nichtEingetreten: true },
+      { text: "Ein Kind übernachtet bei einer trainierenden Person oder wird mit nach Hause genommen.", stufe: "viol", nichtEingetreten: true },
+      { text: "Ein Kind wird gebeten, etwas davon für sich zu behalten.", stufe: "viol", nichtEingetreten: true },
+    ],
+  },
+];
+
+class Component extends DCLogic {
+  state = {};
+
+  static PRESETS = {
+    start: { screen: "uebersicht", begonnen: [] },
+    uebersicht: { screen: "uebersicht" },
+    einstieg: { screen: "einstieg" },
+    punkt: { screen: "punkt", ep: 0 },
+    feedback: { screen: "punkt", ep: 1, wahlen: { "0:0": "a", "0:1": "b" }, fbOffen: true },
+    auswertung: { screen: "auswertung", wahlen: { "0:0": "a", "0:1": "b", "0:2": "a" } },
+    hilfe: { screen: "punkt", ep: 0, wahlen: { "0:0": "c" }, hilfe: true },
+    verein: { screen: "verein" },
+  };
+
+  get view() {
+    const s = this.state;
+    const p = Component.PRESETS[this.props.preset] || {};
+    const sz = s.sz ?? p.sz ?? this.props.szenario ?? 0;
+    return {
+      screen: s.screen ?? p.screen ?? this.props.screen ?? "uebersicht",
+      sz,
+      ep: s.ep ?? p.ep ?? this.props.punkt ?? 0,
+      wahlen: s.wahlen ?? p.wahlen ?? (this.props.gewaehlt ? { [sz + ":" + (this.props.punkt ?? 0)]: this.props.gewaehlt } : {}),
+      fbOffen: s.fbOffen ?? p.fbOffen ?? this.props.feedbackOffen ?? false,
+      hilfe: s.hilfe ?? p.hilfe ?? this.props.hilfeOffen ?? false,
+      filter: s.filter ?? "Alle",
+      begonnen: s.begonnen ?? p.begonnen ?? (this.props.erststart ? [] : [sz]),
+      situationOffen: s.situationOffen ?? false,
+      info: s.info ?? false,
+      soon: s.soon ?? null,
+      rm: s.rm ?? null,
+      spiegelOffen: s.spiegelOffen ?? null,
+      rmText: s.rmText ?? "",
+      rmMail: s.rmMail ?? "",
+    };
+  }
+
+  set(patch) { this.setState({ ...this.view, ...patch }); }
+
+  screenAnim(v) {
+    const rang = { uebersicht: 0, einstieg: 1, verein: 1, punkt: 2, auswertung: 3 };
+    const stelle = v.screen + ":" + (v.screen === "punkt" ? v.ep : 0);
+    if (stelle !== this._stelle) {
+      const vorher = this._screen || "uebersicht";
+      const tiefer = v.screen === vorher ? v.ep >= (this._ep ?? 0) : rang[v.screen] >= rang[vorher];
+      if (v.screen === "verein") this._dir = "Up";
+      else if (vorher === "verein") this._dir = "Down";
+      else if (vorher === "uebersicht" && v.screen !== "uebersicht") this._dir = "Open";
+      else if (v.screen === "uebersicht" && vorher !== "uebersicht") this._dir = "Close";
+      else this._dir = tiefer ? "Fwd" : "Back";
+      this._takt = ((this._takt || 0) + 1) % 2;
+      this._stelle = stelle;
+      this._screen = v.screen;
+      this._ep = v.ep;
+      this._aus = null;
+    }
+    if (this._aus === stelle) return "none";
+    const lang = this._dir === "Open" ? 340 : this._dir === "Up" ? 300 : 260;
+    return "pw" + (this._dir || "Fwd") + (this._takt ? "A" : "B") + " " + lang + "ms var(--ease-out)";
+  }
+
+  get railAn() { return this.props.layout === "rail" || this.props.rail === true; }
+
+  renderVals() {
+    const v = this.view;
+    const sz = SZENARIEN[v.sz];
+    const punkt = sz.punkte[v.ep];
+    const key = v.sz + ":" + v.ep;
+    const gewaehlt = v.wahlen[key];
+    // Nicht eingetretene Merkmale tragen die Farbe ihrer Ampelstufe (nicht Grau),
+    // damit die grenzverletzenden auch dann rot bleiben, wenn sie nicht eingetreten sind.
+    const mk = (stufe) => sz.merkmale.filter((m) => m.stufe === stufe)
+      .map((m) => (m.nichtEingetreten ? m.text + " — in diesem Durchlauf nicht eingetreten, hier würde die Situation kippen." : m.text));
+    const themen = ["Alle", ...SZENARIEN.map((s) => s.themenfeld)];
+    const sichtbar = SZENARIEN.map((s, i) => ({ s, i })).filter(({ s }) => v.filter === "Alle" || s.themenfeld === v.filter);
+    const statusVon = (i) => (v.begonnen.includes(i) ? (v.wahlen[i + ":2"] ? "abgeschlossen" : "angefangen") : "offen");
+    const statusText = { offen: "Noch nicht bearbeitet", angefangen: "Angefangen", abgeschlossen: "Abgeschlossen" };
+    const oeffnen = (i) => () => this.set({ screen: v.begonnen.includes(i) ? "punkt" : "einstieg", sz: i, ep: v.begonnen.includes(i) ? this.letzterPunkt(v, i) : 0, fbOffen: false, hilfe: false });
+    const laufend = v.begonnen.filter((i) => !v.wahlen[i + ":2"]);
+    const fortIndex = laufend.length ? laufend[0] : null;
+    const titelJeScreen = { uebersicht: "Pathwise", einstieg: sz.titel, punkt: sz.titel, auswertung: "Auswertung", verein: "Vereinsangaben" };
+    const kettenTitel = { erkennen: punkt.erkennen };
+
+    return {
+      theme: this.props.theme ?? "dark",
+      ikon16: 16,
+      ikon13: 13,
+      ikon14: 14,
+      punktLabel: ["Was gerade passiert", "Wie es weitergeht", "Was danach geschieht"][v.ep] || "Wie es weitergeht",
+      screenAnim: this.screenAnim(v),
+      screenAnimFertig: (e) => {
+        if (e && e.target !== e.currentTarget) return;
+        this._aus = this._stelle;
+        this.forceUpdate();
+      },
+      railAn: this.railAn,
+      railListe: SZENARIEN.map((s, i) => ({ titel: s.titel, status: statusText[statusVon(i)], oeffnen: oeffnen(i) })),
+      istUebersicht: v.screen === "uebersicht",
+      istEinstieg: v.screen === "einstieg",
+      istPunkt: v.screen === "punkt",
+      istAuswertung: v.screen === "auswertung",
+      istVerein: v.screen === "verein",
+      zeigtZurueck: v.screen !== "uebersicht",
+      zeigtLogo: v.screen === "uebersicht" && !this.railAn,
+      zeigtEinstellungen: v.screen === "uebersicht" && !this.railAn,
+      helpBarAn: v.screen !== "verein",
+      kopfTitel: titelJeScreen[v.screen],
+      epZaehler: v.ep + 1 + "/" + sz.punkte.length,
+
+      erststartAn: v.begonnen.length === 0,
+      hatFortschritt: fortIndex !== null,
+      fortTitel: fortIndex !== null ? SZENARIEN[fortIndex].titel : "",
+      fortThemenfeld: fortIndex !== null ? SZENARIEN[fortIndex].themenfeld : "",
+      fortTotal: 3,
+      fortAktuell: fortIndex !== null ? this.letzterPunkt(v, fortIndex) + 1 : 1,
+      fortsetzen: fortIndex !== null ? oeffnen(fortIndex) : () => {},
+      ersterStart: () => this.set({ screen: "einstieg", sz: 0, ep: 0 }),
+
+      themenfelder: themen.map((t) => ({ name: t, aktiv: v.filter === t, waehlen: () => this.set({ filter: t }) })),
+      szenarien: sichtbar.map(({ s, i }) => {
+        const st = statusVon(i);
+        return {
+          titel: s.titel, themenfeld: s.themenfeld, kurz: s.kurz,
+          status: st,
+          statusLabel: statusText[st],
+          startLabel: st === "abgeschlossen" ? "Nochmal" : st === "angefangen" ? "Weitermachen" : "Loslegen",
+          punkte: s.punkte.map((p, k) => ({
+            farbe: v.wahlen[i + ":" + k] ? "var(--text-link)" : "var(--border-strong)",
+            groesse: v.wahlen[i + ":" + k] ? "7px" : "5px",
+          })),
+          statusFarbe: st === "abgeschlossen" ? "var(--level-ok)" : st === "angefangen" ? "var(--blue-700)" : "var(--text-faint)",
+          statusIkon: st === "abgeschlossen" ? "check" : st === "angefangen" ? "rotate-ccw" : "",
+          hatIkon: st !== "offen",
+          oeffnen: oeffnen(i),
+        };
+      }),
+
+      aktTitel: sz.titel,
+      aktThemenfeld: sz.themenfeld,
+      aktRahmen: sz.rahmen,
+      aktVorgeschichte: sz.vorgeschichte,
+      aktAusgangssituation: sz.ausgangssituation,
+
+      epTotal: sz.punkte.length,
+      epNummer: v.ep + 1,
+      punktText: punkt.text,
+      leitfrage: punkt.leitfrage,
+      optionen: punkt.optionen,
+      gewaehlt: gewaehlt,
+      hatGewaehlt: !!gewaehlt,
+      nochNichtGewaehlt: !gewaehlt,
+      waehlen: (id) => { const w = { ...v.wahlen }; w[key] = id; this.set({ wahlen: w, fbOffen: false, begonnen: v.begonnen.includes(v.sz) ? v.begonnen : [...v.begonnen, v.sz] }); },
+      wahlAendern: () => { const w = { ...v.wahlen }; delete w[key]; this.set({ wahlen: w, fbOffen: false }); },
+      fbOffen: v.fbOffen,
+      fbUmschalten: (auf) => this.set({ fbOffen: auf }),
+      fbErkennen: punkt.erkennen,
+      fbAbsichern: punkt.absichern,
+      fbHandeln: punkt.handeln,
+      weiterLabel: v.ep + 1 < sz.punkte.length ? "Weiter" : "Auswertung",
+      weiter: () => (v.ep + 1 < sz.punkte.length ? this.set({ ep: v.ep + 1, fbOffen: false }) : this.set({ screen: "auswertung" })),
+      starten: () => this.set({ screen: "punkt", ep: 0, begonnen: v.begonnen.includes(v.sz) ? v.begonnen : [...v.begonnen, v.sz] }),
+
+      merkmaleOk: mk("ok"),
+      merkmaleCheck: mk("check"),
+      merkmaleViol: mk("viol"),
+      spiegel: sz.punkte.map((p, i) => ({
+        label: "Entscheidungspunkt " + (i + 1),
+        frage: p.leitfrage,
+        zuWenige: !!p.zuWenige,
+        eigeneWahl: v.wahlen[v.sz + ":" + i],
+        offen: v.spiegelOffen === i,
+        umschalten: () => this.set({ spiegelOffen: v.spiegelOffen === i ? null : i }),
+        lesenLabel: v.spiegelOffen === i ? "Schließen" : "Situation nachlesen",
+        situation: (i === 0 ? sz.ausgangssituation : sz.punkte[i].text),
+        eigeneZeile: (() => {
+          const w = v.wahlen[v.sz + ":" + i];
+          const o = p.optionen.find((x) => x.id === w);
+          return o ? "Du hast gewählt: " + o.text : "Hier hast du keine Möglichkeit gewählt.";
+        })(),
+        optionen: p.zuWenige ? [] : p.optionen.map((o) => ({ id: o.id, text: o.text, anteil: p.anteile[o.id] })),
+      })),
+      verein: VEREIN,
+      personen: PERSONEN,
+      beratung: BERATUNG,
+
+      nochmal: () => { const w = { ...v.wahlen }; [0, 1, 2].forEach((i) => delete w[v.sz + ":" + i]); this.set({ screen: "einstieg", ep: 0, wahlen: w, fbOffen: false }); },
+      zurUebersicht: () => this.set({ screen: "uebersicht", hilfe: false }),
+      oeffneVerein: () => this.set({ screen: "verein" }),
+      zurueck: () => this.set({ screen: "uebersicht", hilfe: false, fbOffen: false }),
+      zeigtEpZurueck: v.screen === "punkt" && v.ep > 0,
+      epZurueck: () => this.set({ ep: Math.max(0, v.ep - 1), fbOffen: false }),
+      situationOffen: !!v.situationOffen,
+      situationIkon: v.situationOffen ? "chevron-up" : "chevron-down",
+      situationUmschalten: () => this.set({ situationOffen: !v.situationOffen }),
+      ikon20: 20,
+      fbHint: v.fbOffen ? null : "1",
+      fbUnfold: v.fbOffen ? "pwUnfold 260ms var(--ease-out) forwards" : "none",
+      fbAnim: v.fbOffen ? "none" : "pwHint 2.6s ease-in-out 0.6s 4",
+      module: MODULE.map((m) => ({ ...m, oeffnen: () => this.set({ soon: m.id }) })),
+      soonOffen: !!v.soon,
+      soonTitel: (MODULE.find((m) => m.id === v.soon) || {}).titel || "",
+      soonText: (MODULE.find((m) => m.id === v.soon) || {}).text || "",
+      soonIkon: (MODULE.find((m) => m.id === v.soon) || {}).ikon || "sparkles",
+      soonZu: () => this.set({ soon: null }),
+      rmOffen: !!v.rm,
+      rmGesendet: v.rm === "gesendet",
+      rmFormular: !!v.rm && v.rm !== "gesendet",
+      rmAuf: (e) => { if (e && e.preventDefault) e.preventDefault(); this.set({ rm: "feedback", info: false }); },
+      rmZu: () => this.set({ rm: null, rmText: "", rmMail: "" }),
+      rmArten: [
+        { id: "feedback", ikon: "message-square", titel: "Rückmeldung zur App", zusatz: "Was unklar war, was fehlt, was gut funktioniert." },
+        { id: "szenario", ikon: "plus", titel: "Situation einschicken", zusatz: "Eine Situation aus deinem Alltag, die als Szenario passen würde." },
+      ].map((a) => ({
+        ...a,
+        waehlen: () => this.set({ rm: a.id }),
+        rand: v.rm === a.id ? "var(--border-focus)" : "var(--border-subtle)",
+        flaeche: v.rm === a.id ? "var(--surface-tint)" : "var(--surface-page)",
+        ikonFarbe: v.rm === a.id ? "var(--icon-on-tint)" : "var(--text-faint)",
+      })),
+      rmLabel: v.rm === "szenario" ? "Die Situation" : "Deine Rückmeldung",
+      rmHinweis: v.rm === "szenario"
+        ? "Was ist passiert, wer war beteiligt, was hat die Situation mehrdeutig gemacht?"
+        : "Zwei bis drei Sätze genügen.",
+      rmPlatzhalter: v.rm === "szenario"
+        ? "Nach dem Training bleibt ein Kind allein in der Kabine zurück …"
+        : "Mir ist aufgefallen, dass …",
+      rmZeilen: v.rm === "szenario" ? 6 : 4,
+      rmText: v.rmText || "",
+      rmMail: v.rmMail || "",
+      rmLeer: !(v.rmText || "").trim(),
+      rmTextAendern: (e) => this.set({ rmText: e.target.value }),
+      rmMailAendern: (e) => this.set({ rmMail: e.target.value }),
+      rmSenden: () => this.set({ rm: "gesendet" }),
+      infos: INFOS,
+      infoOffen: !!v.info,
+      infoAuf: (e) => { if (e && e.preventDefault) e.preventDefault(); this.set({ info: true }); },
+      infoZu: () => this.set({ info: false }),
+      hilfeOffen: v.hilfe,
+      hilfeAuf: (e) => { if (e && e.preventDefault) e.preventDefault(); this.set({ hilfe: true }); },
+      hilfeZu: () => this.set({ hilfe: false }),
+      schlucken: (e) => { if (e && e.stopPropagation) e.stopPropagation(); },
+      kettenTitel,
+    };
+  }
+
+  letzterPunkt(v, i) {
+    for (let p = 2; p >= 0; p--) if (v.wahlen[i + ":" + p]) return Math.min(p + 1, 2);
+    return 0;
+  }
+}
+</script>
+</body>
+</html>
