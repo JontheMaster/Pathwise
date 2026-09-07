@@ -252,27 +252,24 @@ class _SzenarioKarte extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Themenfeld links, Status rechts; passt beides nicht in eine Zeile,
-          // rutscht der Status darunter (im Prototyp flex-wrap: wrap).
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            spacing: PwSpace.s4,
-            runSpacing: PwSpace.s3,
+          // Themenfeld, darunter der Status — immer, unabhaengig von der Laenge
+          // des Themenfeldnamens. Ein Wrap mit spaceBetween stellte den Status
+          // mal daneben und mal darunter, je nachdem ob beides in eine Zeile
+          // passte; auf der Uebersicht standen dann Karten unterschiedlich da.
+          PwTag(label: szenario.themenfeld),
+          const SizedBox(height: PwSpace.s3),
+          Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              PwTag(label: szenario.themenfeld),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (statusIkon != null) ...[
-                    Icon(statusIkon, size: 13, color: statusFarbe),
-                    const SizedBox(width: 5),
-                  ],
-                  Text(
-                    status.label,
-                    style: t.bodyMedium?.copyWith(color: statusFarbe),
-                  ),
-                ],
+              if (statusIkon != null) ...[
+                Icon(statusIkon, size: 13, color: statusFarbe),
+                const SizedBox(width: 5),
+              ],
+              Flexible(
+                child: Text(
+                  status.label,
+                  style: t.bodyMedium?.copyWith(color: statusFarbe),
+                ),
               ),
             ],
           ),
