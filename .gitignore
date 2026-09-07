@@ -49,3 +49,6 @@ app.*.map.json
 
 # Golden-Diffs aus fehlgeschlagenen Testlaeufen
 test/failures/
+
+# Fertige Builds zum Weitergeben — gehoeren nicht ins Repo
+dist/

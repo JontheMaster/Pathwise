@@ -5,10 +5,7 @@
 // der Preview-Groesse des Entwurfs.
 //
 // Bilder erneuern:  flutter test --update-goldens test/screens_golden_test.dart
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pathwise/data/fortschritt_speicher.dart';
@@ -25,6 +22,8 @@ import 'package:pathwise/screens/uebersicht_screen.dart';
 import 'package:pathwise/screens/verein_screen.dart';
 import 'package:pathwise/state/durchlauf_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'schriften.dart';
 
 /// Preview-Groesse aus PathwiseApp.dc.html ($preview: 390 x 844).
 const _geraet = Size(390, 844);
@@ -46,63 +45,13 @@ class _FesterSpiegel implements SpiegelRepository {
   }) async {}
 }
 
-Future<void> _schriftenLaden() async {
-  const familien = {
-    'Jost': ['Jost-Light.ttf', 'Jost-Medium.ttf'],
-    'NunitoSans': [
-      'NunitoSans-Regular.ttf',
-      'NunitoSans-SemiBold.ttf',
-      'NunitoSans-Bold.ttf',
-    ],
-    'JetBrainsMono': ['JetBrainsMono-Regular.ttf'],
-  };
-  for (final eintrag in familien.entries) {
-    final loader = FontLoader(eintrag.key);
-    for (final datei in eintrag.value) {
-      final bytes = await File('assets/fonts/$datei').readAsBytes();
-      loader.addFont(Future.value(bytes.buffer.asByteData()));
-    }
-    await loader.load();
-  }
-  // Lucide liegt im Paket, nicht im Projekt. Der Pfad wird aus
-  // .dart_tool/package_config.json aufgeloest, damit der Test nicht an einer
-  // fest verdrahteten Cache-Adresse haengt.
-  final wurzel = _paketWurzel('lucide_icons_flutter');
-  final lucide = File(
-    '$wurzel${wurzel.endsWith(Platform.pathSeparator) ? '' : Platform.pathSeparator}'
-    'assets${Platform.pathSeparator}lucide.ttf',
-  );
-  if (lucide.existsSync()) {
-    // Schriften aus einem Paket tragen im Test das Praefix packages/<paket>/.
-    final loader = FontLoader('packages/lucide_icons_flutter/Lucide')
-      ..addFont(lucide.readAsBytes().then((b) => b.buffer.asByteData()));
-    await loader.load();
-  } else {
-    // Ohne die Datei zeichnet der Test leere Kaestchen statt Icons.
-    // ignore: avoid_print
-    print('Hinweis: Lucide-Schrift nicht gefunden unter ${lucide.path}');
-  }
-}
-
-/// file:-URI des Paketverzeichnisses aus dem package_config.
-String _paketWurzel(String paket) {
-  final datei = File('.dart_tool/package_config.json');
-  final roh = datei.readAsStringSync();
-  final treffer = RegExp(
-    '"name"\\s*:\\s*"$paket".*?"rootUri"\\s*:\\s*"([^"]+)"',
-    dotAll: true,
-  ).firstMatch(roh);
-  if (treffer == null) return '';
-  final uri = Uri.parse(treffer.group(1)!);
-  return uri.hasScheme ? uri.toFilePath() : treffer.group(1)!;
-}
 
 void main() {
   late PwInhalt inhalt;
 
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    await _schriftenLaden();
+    await schriftenLaden();
     SharedPreferences.setMockInitialValues({});
     inhalt = await const SzenarioRepository().laden();
   });
@@ -190,6 +139,106 @@ void main() {
             Fortschritt.schluessel(sz.id, i): ['a', 'b', 'a'][i],
         },
       );
+
+  // Aufnahmen der drei Geraeteklassen, gegen die im Browser geprueft wird.
+  // Der Layouttest in responsive_test.dart deckt alle Groessen ab; diese
+  // Bilder sind fuer die Sichtprobe.
+  group('Geraeteklassen', () {
+    Future<void> beiGroesse(
+      WidgetTester tester,
+      String name,
+      Size groesse,
+      Widget screen, {
+      Fortschritt fortschritt = const Fortschritt(erststartGesehen: true),
+      SpiegelDaten spiegel =
+          const SpiegelDaten(status: SpiegelStatus.ohneBackend),
+    }) async {
+      tester.view.physicalSize = groesse;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(huelle(
+        screen: screen,
+        fortschritt: fortschritt,
+        spiegel: spiegel,
+      ));
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byType(MaterialApp),
+        matchesGoldenFile('goldens/$name.png'),
+      );
+    }
+
+    testWidgets('Laptop 1440x900 — Übersicht mit Seitenleiste',
+        (tester) async {
+      await beiGroesse(
+        tester,
+        'G-laptop-1440-uebersicht',
+        const Size(1440, 900),
+        const UebersichtScreen(),
+      );
+    });
+
+    testWidgets('Laptop 1440x900 — Auswertung', (tester) async {
+      await beiGroesse(
+        tester,
+        'G-laptop-1440-auswertung',
+        const Size(1440, 900),
+        AuswertungScreen(szenarioId: inhalt.szenarien.first.id),
+        fortschritt: Fortschritt(
+          erststartGesehen: true,
+          begonnen: {inhalt.szenarien.first.id},
+          gefeiert: {inhalt.szenarien.first.id},
+          wahlen: {
+            for (var i = 0; i < 3; i++)
+              Fortschritt.schluessel(inhalt.szenarien.first.id, i): 'a',
+          },
+        ),
+        spiegel: const SpiegelDaten(
+          status: SpiegelStatus.da,
+          werte: {
+            0: {'a': 34, 'b': 12, 'c': 12},
+            1: {'a': 14, 'b': 27, 'c': 17},
+            2: {'a': 9, 'b': 11, 'c': 6},
+          },
+        ),
+      );
+    });
+
+    testWidgets('Tablet 834x1112 — Übersicht', (tester) async {
+      await beiGroesse(
+        tester,
+        'G-tablet-834-uebersicht',
+        const Size(834, 1112),
+        const UebersichtScreen(),
+      );
+    });
+
+    testWidgets('Tablet quer 1112x834 — Übersicht', (tester) async {
+      await beiGroesse(
+        tester,
+        'G-tablet-quer-1112-uebersicht',
+        const Size(1112, 834),
+        const UebersichtScreen(),
+      );
+    });
+
+    testWidgets('Handy klein 320x568 — Entscheidungspunkt', (tester) async {
+      await beiGroesse(
+        tester,
+        'G-handy-320-punkt',
+        const Size(320, 568),
+        PunktScreen(szenarioId: inhalt.szenarien.first.id, startPunkt: 0),
+        fortschritt: Fortschritt(
+          erststartGesehen: true,
+          begonnen: {inhalt.szenarien.first.id},
+          wahlen: {
+            Fortschritt.schluessel(inhalt.szenarien.first.id, 0): 'a',
+          },
+        ),
+      );
+    });
+  });
 
   testWidgets('S1 Uebersicht — Erststart', (tester) async {
     await aufnehmen(

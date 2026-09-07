@@ -59,17 +59,19 @@ class _PwTagState extends State<PwTag> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Bewusst ohne Flexible: die Pille bemisst sich am Text. Sie steht in
-          // Wrap-Reihen, deren Kinder ihre natuerliche Breite bekommen — ein
-          // Flex-Kind wuerde dort in unbeschraenkte Constraints laufen.
-          Text(
-            widget.label,
-            style: TextStyle(
-              fontFamily: 'NunitoSans',
-              fontSize: 13.5,
-              height: 1.35,
-              fontWeight: FontWeight.w600,
-              color: schrift,
+          // Flexible, damit lange Themenfeldnamen in der Pille umbrechen statt
+          // ueberzulaufen. Voraussetzung: PwTag steht in einem Kontext mit
+          // begrenzter Breite — in der App immer ein Wrap.
+          Flexible(
+            child: Text(
+              widget.label,
+              style: TextStyle(
+                fontFamily: 'NunitoSans',
+                fontSize: 13.5,
+                height: 1.35,
+                fontWeight: FontWeight.w600,
+                color: schrift,
+              ),
             ),
           ),
           if (widget.onEntfernen != null) ...[

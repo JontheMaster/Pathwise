@@ -31,6 +31,7 @@ Eine Flutter-Codebasis für **Web, iOS und Android**.
 - [Einrichten und starten](#einrichten-und-starten)
 - [Backend](#backend)
 - [Qualitätssicherung](#qualitätssicherung)
+- [Getestete Plattformen](#getestete-plattformen)
 - [Anforderungen und ihr Umsetzungsstand](#anforderungen-und-ihr-umsetzungsstand)
 - [Grenzen](#grenzen)
 - [Herkunft, Lizenzen, Quellen](#herkunft-lizenzen-quellen)
@@ -525,3 +526,23 @@ Vollständige Angaben im Literaturverzeichnis der Bachelor-Arbeit.
 **Pathwise gehört zur Prävention. Es ersetzt keine Meldung und keine Beratung.**
 Bei einem konkreten Verdacht führt der Weg über die Ansprechpersonen im Verein.
 Hilfetelefon Sexueller Missbrauch: **0800 22 55 530**, anonym und kostenfrei.
+
+## Getestete Plattformen
+
+| Ziel | Wie geprüft | Stand |
+|---|---|---|
+| **Android** (nativ) | Integrationstests im Emulator, Android 14 / API 34, x86_64; Release-APK installiert und gestartet | ✅ läuft |
+| **Web** (Browser) | Release-Build ausgeliefert und im Browser gerendert; 45 Layoutprüfungen über sechs Fenstergrößen | ✅ läuft |
+| **iOS** (nativ) | Konfiguration gesetzt, aber auf Windows nicht baubar — Xcode ist Pflicht | ⚠️ ungeprüft |
+
+Die Layoutprüfung deckt 320×568, 390×844, 844×390, 834×1112, 1112×834 und 1440×900 ab,
+jeweils über alle Screens. Sie schlägt fehl, sobald ein `RenderFlex` überläuft.
+
+```bash
+flutter test test/responsive_test.dart          # Layout über alle Größen
+flutter test integration_test -d <geraet>       # Durchlauf in echter Laufzeit
+```
+
+`integration_test/durchlauf_test.dart` spielt ein Szenario komplett durch, öffnet alle vier
+Overlays und prüft Vereinsangaben samt „Kommt bald"-Dialog. Es läuft auf jedem Ziel, das
+Flutter ansteuern kann — im Emulator, auf einem angeschlossenen Gerät oder auf dem Desktop.
