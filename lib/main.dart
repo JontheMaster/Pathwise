@@ -58,8 +58,8 @@ class PathwiseApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final modus =
         ref.watch(durchlaufProvider.select((s) => s.fortschritt.themeMode));
-    final bewegungAus = ref
-        .watch(durchlaufProvider.select((s) => s.fortschritt.bewegungReduziert));
+    final bewegungAus = ref.watch(
+        durchlaufProvider.select((s) => s.fortschritt.bewegung.istReduziert));
 
     return MaterialApp(
       title: 'Pathwise',

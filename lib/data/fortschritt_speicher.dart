@@ -6,6 +6,34 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Wie viel Bewegung die App zeigt.
+///
+/// Eine Achse mit drei Stufen statt mehrerer Schalter: mehr Bewegung heisst
+/// immer auch alles darunter.
+enum PwBewegung {
+  /// Alles sofort im Endzustand, keine Animation.
+  reduziert('reduziert'),
+
+  /// Die Bewegungen aus DESIGN.md 5 — die Vorgabe.
+  normal('normal'),
+
+  /// Zusaetzlich die Gesten, die nichts erklaeren, sondern schmuecken.
+  /// Bewusst abschaltbar und bewusst nicht die Vorgabe: DESIGN.md 1 schliesst
+  /// Feier- und Belohnungsanimationen aus.
+  verspielt('verspielt');
+
+  const PwBewegung(this.schluessel);
+  final String schluessel;
+
+  static PwBewegung vonSchluessel(String? s) => values.firstWhere(
+        (e) => e.schluessel == s,
+        orElse: () => PwBewegung.normal,
+      );
+
+  bool get istReduziert => this == PwBewegung.reduziert;
+  bool get zeigtExtras => this == PwBewegung.verspielt;
+}
+
 @immutable
 class Fortschritt {
   const Fortschritt({
@@ -15,7 +43,7 @@ class Fortschritt {
     this.gefeiert = const {},
     this.erststartGesehen = false,
     this.themeMode = ThemeMode.dark,
-    this.bewegungReduziert = false,
+    this.bewegung = PwBewegung.normal,
   });
 
   /// "szenarioId:punktIndex" -> "a" | "b" | "c"
@@ -39,10 +67,9 @@ class Fortschritt {
   /// Dunkel ist der Standard der App, nicht `system` (DESIGN.md 3).
   final ThemeMode themeMode;
 
-  /// Bewegung in der App abschalten, unabhaengig von der Systemeinstellung.
-  /// Wer die Systemeinstellung schon gesetzt hat, braucht das nicht — die
-  /// gilt weiterhin (DESIGN.md 5).
-  final bool bewegungReduziert;
+  /// Wie viel Bewegung die App zeigt. Die Systemeinstellung "Bewegung
+  /// reduzieren" gilt unabhaengig davon weiter (DESIGN.md 5).
+  final PwBewegung bewegung;
 
   static String schluessel(String szenarioId, int punkt) => '$szenarioId:$punkt';
 
@@ -56,7 +83,7 @@ class Fortschritt {
     Set<String>? gefeiert,
     bool? erststartGesehen,
     ThemeMode? themeMode,
-    bool? bewegungReduziert,
+    PwBewegung? bewegung,
   }) =>
       Fortschritt(
         wahlen: wahlen ?? this.wahlen,
@@ -65,7 +92,7 @@ class Fortschritt {
         gefeiert: gefeiert ?? this.gefeiert,
         erststartGesehen: erststartGesehen ?? this.erststartGesehen,
         themeMode: themeMode ?? this.themeMode,
-        bewegungReduziert: bewegungReduziert ?? this.bewegungReduziert,
+        bewegung: bewegung ?? this.bewegung,
       );
 }
 
@@ -78,7 +105,9 @@ class FortschrittSpeicher {
   static const _kGefeiert = 'pw_gefeiert';
   static const _kErststart = 'pw_erststart_gesehen';
   static const _kTheme = 'pw_theme_mode';
-  static const _kBewegung = 'pw_bewegung_reduziert';
+  static const _kBewegung = 'pw_bewegung';
+  /// Vorgaenger: ein blosser Schalter. Wird beim Laden uebernommen.
+  static const _kBewegungAlt = 'pw_bewegung_reduziert';
 
   Future<Fortschritt> laden() async {
     final p = await SharedPreferences.getInstance();
@@ -92,7 +121,11 @@ class FortschrittSpeicher {
       gezaehlt: (p.getStringList(_kGezaehlt) ?? const []).toSet(),
       gefeiert: (p.getStringList(_kGefeiert) ?? const []).toSet(),
       erststartGesehen: p.getBool(_kErststart) ?? false,
-      bewegungReduziert: p.getBool(_kBewegung) ?? false,
+      bewegung: p.containsKey(_kBewegung)
+          ? PwBewegung.vonSchluessel(p.getString(_kBewegung))
+          : (p.getBool(_kBewegungAlt) ?? false)
+              ? PwBewegung.reduziert
+              : PwBewegung.normal,
       themeMode: switch (p.getString(_kTheme)) {
         'light' => ThemeMode.light,
         'system' => ThemeMode.system,
@@ -113,6 +146,7 @@ class FortschrittSpeicher {
       _kErststart,
       _kTheme,
       _kBewegung,
+      _kBewegungAlt,
     ]) {
       await p.remove(k);
     }
@@ -126,6 +160,6 @@ class FortschrittSpeicher {
     await p.setStringList(_kGefeiert, f.gefeiert.toList());
     await p.setBool(_kErststart, f.erststartGesehen);
     await p.setString(_kTheme, f.themeMode.name);
-    await p.setBool(_kBewegung, f.bewegungReduziert);
+    await p.setString(_kBewegung, f.bewegung.schluessel);
   }
 }

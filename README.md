@@ -24,7 +24,7 @@ Eine Flutter-Codebasis für **Web, iOS und Android**.
 - [Abgrenzung zu bestehenden Angeboten](#abgrenzung-zu-bestehenden-angeboten)
 - [Die sechs Grundfunktionen](#die-sechs-grundfunktionen)
 - [Die fünf Regeln, die nicht gebrochen werden](#die-fünf-regeln-die-nicht-gebrochen-werden)
-  - [Die eine bewusste Ausnahme](#die-eine-bewusste-ausnahme)
+  - [Die eine bewusste Ausnahme](#die-eine-bewusste-ausnahme--abschaltbar-und-standardmäßig-aus)
 - [Einstellungen](#einstellungen)
 - [Der Durchlauf im Bild](#der-durchlauf-im-bild)
 - [Datenschutz: was gespeichert wird](#datenschutz-was-gespeichert-wird)
@@ -198,8 +198,8 @@ Szenarioende und die Beratungsleiste mit dem Hilfetelefon auf jedem Bildschirm.
 
 1. **Keine Bewertung der Wahl als richtig oder falsch.** Keine Punkte, Ränge, Abzeichen,
    Streaks, Fristen, Nachweise.
-2. **Keine Feier- oder Belohnungsanimation als Reaktion auf eine Entscheidung.** Kein Sound,
-   kein Haptic-Feedback als Belohnung. *(Zu der einen bewussten Ausnahme siehe unten.)*
+2. **Keine Feier- oder Belohnungsanimation.** Kein Sound, kein Haptic-Feedback als Belohnung.
+   *(In der Vorgabe erfüllt; zur abschaltbaren Ausnahme siehe unten.)*
 3. **Ampelfarben ausschließlich für Situationsmerkmale** — nie an Buttons, Optionen oder
    Fortschritt.
 4. **Kein Konto, kein Personenbezug.** Fortschritt bleibt lokal; zentral geht nur ein Zählwert.
@@ -213,21 +213,19 @@ Die Szenarien sind **erfunden, aber realitätsnah**. Reale Vorfälle aus dem Ver
 abgebildet: Die fiktionale Rahmung ermöglicht die Auseinandersetzung, ohne dass persönliche
 Erfahrungen offengelegt werden müssen.
 
-### Die eine bewusste Ausnahme
+### Die eine bewusste Ausnahme — abschaltbar und standardmäßig aus
 
-Beim **ersten** Abschluss eines Szenarios läuft in dessen Karte auf der Übersicht eine kurze
-Konfetti-Geste — rund eine Sekunde, kleine Teilchen, kein Ton, einmalig je Szenario und auch
-nach „Nochmal" nie wieder. Bei reduzierter Bewegung entfällt sie ganz.
+Wer in den Einstellungen **Bewegung → Verspielt** wählt, bekommt beim **ersten** Abschluss eines
+Szenarios in dessen Karte auf der Übersicht eine kurze Konfetti-Geste: rund eine Sekunde, kleine
+Teilchen, kein Ton, einmalig je Szenario und auch nach „Nochmal" nie wieder.
 
-Das weicht von Regel 2 und von NF10 ab und ist eine ausdrückliche Produktentscheidung. Zwei
-Dinge halten die Abweichung eng: Die Geste reagiert auf das **Abschließen**, nicht auf eine
-Entscheidung — bewertet wird weiterhin nichts. Und sie verwendet die Markenfarben der
-Drei-Bogen-Folge, **nicht** die Ampelfarben; deren Signalbedeutung bleibt der Einordnung von
-Situationsmerkmalen vorbehalten.
+In der Vorgabe *Normal* passiert das **nicht**. Regel 2 gilt also, solange niemand sie
+ausdrücklich abwählt — das ist der Unterschied zwischen einer Ausnahme und einem Bruch.
 
-Herausnehmen lässt sie sich an einer Stelle: in
-[`lib/screens/uebersicht_screen.dart`](lib/screens/uebersicht_screen.dart) das Feld `feiern` der
-Szenariokarte auf `false` setzen. Dann fällt der gesamte Zweig weg.
+Auch in der Stufe *Verspielt* bleibt die Abweichung eng: Die Geste reagiert auf das
+**Abschließen**, nicht auf eine Entscheidung — bewertet wird weiterhin nichts. Und sie verwendet
+die Markenfarben der Drei-Bogen-Folge, **nicht** die Ampelfarben; deren Signalbedeutung bleibt
+der Einordnung von Situationsmerkmalen vorbehalten.
 
 ![Abschluss-Geste](docs/screenshots/S1-uebersicht-konfetti.png)
 
@@ -236,9 +234,9 @@ Szenariokarte auf `false` setzen. Dann fällt der gesamte Zweig weg.
 Erreichbar über das Zahnrad auf der Übersicht.
 
 - **Darstellung** — Hell, Dunkel oder wie das System. Dunkel bleibt die Vorgabe.
-- **Bewegung** — normale Bewegung oder alles sofort im Endzustand. Hat das Gerät „Bewegung
-  reduzieren" gesetzt, gilt das ohnehin; die Einstellung ist ein zusätzlicher Weg für alle,
-  die die Systemeinstellung nicht kennen.
+- **Bewegung** — drei Stufen auf einer Achse: *Reduziert* (alles sofort im Endzustand),
+  *Normal* (die Bewegungen aus `DESIGN.md` §5, Vorgabe) und *Verspielt* (dazu Gesten, die
+  nichts erklären). Hat das Gerät „Bewegung reduzieren" gesetzt, gilt das ohnehin.
 - **Vereinsangaben** — Ansprechpersonen, externe Beratung und was gespeichert wird. Steht
   vorerst hier, bis geklärt ist, wie ein Gerät seinen Verein erfährt (`DESIGN.md` §11, Punkt 2).
 - **Alle lokalen Daten löschen** — mit Rückfrage. `DESIGN.md` §11 führt das als fehlend und
@@ -463,7 +461,7 @@ auf die Grundfunktion.
 | NF07 | Schematische Darstellung | Muss | ✅ |
 | NF08 | Ohne Anmeldung und ohne Installation im Browser nutzbar | Soll | ✅ **übererfüllt** — Web plus native iOS- und Android-App |
 | NF09 | Szenarien erfunden, aber realitätsnah; keine realen Vorfälle | Muss | ✅ |
-| NF10 | Spielelemente ordnen sich dem Inhalt unter; keine Richtig-Falsch-Bewertung | Muss | ⚠️ **bewusst abgewichen** — keine Richtig-Falsch-Bewertung, aber eine einmalige Abschluss-Geste je Szenario ([Begründung](#die-eine-bewusste-ausnahme)) |
+| NF10 | Spielelemente ordnen sich dem Inhalt unter; keine Richtig-Falsch-Bewertung | Muss | ✅ in der Vorgabe — eine Abschluss-Geste gibt es nur, wenn man sie in den Einstellungen einschaltet ([Begründung](#die-eine-bewusste-ausnahme--abschaltbar-und-standardmäßig-aus)) |
 | NF11 | Freiwillig, ohne Nachweis-, Abschluss- oder Fristenpflicht | Muss | ✅ |
 | NF12 | Vereinsangaben in wenigen Minuten ohne technische Kenntnisse pflegbar | Kann | ❌ **offen** — siehe F15 |
 | NF13 | Szenarienbestand erweiterbar, ohne Aufbau oder Ablauf zu ändern | Soll | ✅ Neue Szenarien nur in `assets/szenarien.json` eintragen |

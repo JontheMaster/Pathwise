@@ -119,8 +119,8 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
     _setzen(state.fortschritt.copyWith(themeMode: m));
   }
 
-  void bewegungSetzen(bool reduziert) {
-    _setzen(state.fortschritt.copyWith(bewegungReduziert: reduziert));
+  void bewegungSetzen(PwBewegung b) {
+    _setzen(state.fortschritt.copyWith(bewegung: b));
   }
 
   /// Loescht alles, was auf dem Geraet liegt: Entscheidungen, Fortschritt und

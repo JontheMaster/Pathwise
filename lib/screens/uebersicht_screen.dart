@@ -78,8 +78,11 @@ class UebersichtScreen extends ConsumerWidget {
                 szenario: sz,
                 status: s.status(sz),
                 onTap: () => szenarioOeffnen(context, ref, sz),
-                // Einmalig, beim ersten Abschluss eines Szenarios.
-                feiern: s.status(sz) == SzenarioStatus.abgeschlossen &&
+                // Einmalig, beim ersten Abschluss — und nur, wenn die
+                // zusaetzlichen Animationen eingeschaltet sind. Ohne sie
+                // bleibt die App bei DESIGN.md 1: keine Feiergeste.
+                feiern: s.fortschritt.bewegung.zeigtExtras &&
+                    s.status(sz) == SzenarioStatus.abgeschlossen &&
                     !s.fortschritt.gefeiert.contains(sz.id),
                 onGefeiert: () => notifier.gefeiert(sz),
               ),

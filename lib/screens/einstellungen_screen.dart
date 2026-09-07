@@ -13,6 +13,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/fortschritt_speicher.dart';
 import '../design/components/pw_button.dart';
 import '../design/components/pw_card.dart';
 import '../design/components/pw_contact_list.dart';
@@ -96,16 +97,23 @@ class EinstellungenScreen extends ConsumerWidget {
               'ohnehin — unabhängig von dieser Einstellung.',
           kinder: [
             _Wahlfeld(
-              titel: 'Normale Bewegung',
-              zusatz: 'Übergänge und Aufklappen laufen wie vorgesehen.',
-              gewaehlt: !s.fortschritt.bewegungReduziert,
-              onTap: () => notifier.bewegungSetzen(false),
+              titel: 'Reduziert',
+              zusatz: 'Alles erscheint sofort im Endzustand, ohne Animation.',
+              gewaehlt: s.fortschritt.bewegung == PwBewegung.reduziert,
+              onTap: () => notifier.bewegungSetzen(PwBewegung.reduziert),
             ),
             _Wahlfeld(
-              titel: 'Bewegung reduzieren',
-              zusatz: 'Alles erscheint sofort im Endzustand, ohne Animation.',
-              gewaehlt: s.fortschritt.bewegungReduziert,
-              onTap: () => notifier.bewegungSetzen(true),
+              titel: 'Normal',
+              zusatz: 'Übergänge und Aufklappen laufen wie vorgesehen.',
+              gewaehlt: s.fortschritt.bewegung == PwBewegung.normal,
+              onTap: () => notifier.bewegungSetzen(PwBewegung.normal),
+            ),
+            _Wahlfeld(
+              titel: 'Verspielt',
+              zusatz: 'Dazu kleine Gesten, die nichts erklären — etwa beim '
+                  'ersten Abschluss eines Szenarios.',
+              gewaehlt: s.fortschritt.bewegung == PwBewegung.verspielt,
+              onTap: () => notifier.bewegungSetzen(PwBewegung.verspielt),
             ),
           ],
         ),
