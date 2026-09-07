@@ -1,14 +1,17 @@
 // Tests zu den Regeln, die DESIGN.md festlegt — nicht zum Aussehen.
 // Das Aussehen wird gegen design_reference/.../screenshots geprueft.
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pathwise/data/fortschritt_speicher.dart';
 import 'package:pathwise/data/szenario_modelle.dart';
+import 'package:pathwise/data/spiegel_repository.dart';
 import 'package:pathwise/data/szenario_repository.dart';
 import 'package:pathwise/design/components/pw_decision_point.dart';
 import 'package:pathwise/design/pathwise_theme.dart';
 import 'package:pathwise/design/pathwise_tokens.dart';
 import 'package:pathwise/state/durchlauf_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -121,6 +124,71 @@ void main() {
     });
   });
 
+  group('Zählwerte', () {
+    late PwInhalt inhalt;
+
+    setUpAll(() async {
+      inhalt = await const SzenarioRepository().laden();
+      SharedPreferences.setMockInitialValues({});
+    });
+
+    DurchlaufNotifier notifier(_ZaehlerSpion spion) {
+      final container = ProviderContainer(
+        overrides: [
+          durchlaufProvider.overrideWith(
+            () => DurchlaufNotifier(
+              DurchlaufState(
+                inhalt: inhalt,
+                fortschritt: const Fortschritt(),
+              ),
+              const FortschrittSpeicher(),
+              spion,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      return container.read(durchlaufProvider.notifier);
+    }
+
+    test('zählt je Entscheidungspunkt genau einmal', () {
+      final spion = _ZaehlerSpion();
+      final n = notifier(spion);
+      final sz = inhalt.szenarien.first;
+
+      n.waehlen(sz, 0, 'a');
+      expect(spion.rufe, hasLength(1));
+
+      // "Antwort ändern" und eine neue Wahl am selben Punkt zählen nicht noch
+      // einmal — sonst misst der Spiegel das Ändern statt das Entscheiden.
+      n.wahlLoeschen(sz, 0);
+      n.waehlen(sz, 0, 'c');
+      expect(spion.rufe, hasLength(1));
+      expect(spion.rufe.single, (sz.id, 0, 'a'));
+
+      // Ein weiterer Punkt zählt eigenständig.
+      n.waehlen(sz, 1, 'b');
+      expect(spion.rufe, hasLength(2));
+    });
+
+    test('"Nochmal" zählt den Durchlauf nicht erneut', () {
+      final spion = _ZaehlerSpion();
+      final n = notifier(spion);
+      final sz = inhalt.szenarien.first;
+
+      for (var i = 0; i < sz.punkte.length; i++) {
+        n.waehlen(sz, i, 'a');
+      }
+      expect(spion.rufe, hasLength(sz.punkte.length));
+
+      n.nochmal(sz);
+      for (var i = 0; i < sz.punkte.length; i++) {
+        n.waehlen(sz, i, 'b');
+      }
+      expect(spion.rufe, hasLength(sz.punkte.length));
+    });
+  });
+
   group('Theme', () {
     test('baut in Light und Dark und traegt PwColors', () {
       for (final dunkel in [false, true]) {
@@ -192,4 +260,21 @@ void main() {
       expect(find.text('A'), findsNothing);
     });
   });
+}
+
+/// Merkt sich, welche Zaehlwerte gesendet wurden.
+class _ZaehlerSpion implements SpiegelRepository {
+  final List<(String, int, String)> rufe = [];
+
+  @override
+  Future<void> zaehlen({
+    required String szenarioId,
+    required int punktIndex,
+    required String optionId,
+  }) async {
+    rufe.add((szenarioId, punktIndex, optionId));
+  }
+
+  @override
+  Future<SpiegelDaten> laden(String szenarioId) async => SpiegelDaten.fehler;
 }

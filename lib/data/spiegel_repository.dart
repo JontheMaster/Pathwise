@@ -56,8 +56,18 @@ class SpiegelDaten {
 class SpiegelRepository {
   const SpiegelRepository();
 
-  SupabaseClient? get _client =>
-      SupabaseConfig.vorhanden ? Supabase.instance.client : null;
+  /// Null, solange kein Backend eingerichtet oder erreichbar ist. main.dart
+  /// faengt einen gescheiterten Supabase.initialize ab und laeuft weiter —
+  /// dann wirft der Zugriff auf die Instanz, und genau das faengt dieser
+  /// Getter: Netzfehler duerfen nie blockieren (DESIGN.md 8).
+  SupabaseClient? get _client {
+    if (!SupabaseConfig.vorhanden) return null;
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Beim Waehlen. Fehler werden geschluckt — ein nicht gezaehlter Wert darf
   /// den Durchlauf nie stoeren (DESIGN.md 8).

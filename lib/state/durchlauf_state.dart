@@ -119,14 +119,26 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
 
   /// Eine Option waehlen. Der Zaehlwert geht nebenher ins Netz; scheitert das,
   /// merkt der Durchlauf nichts davon (DESIGN.md 8).
+  ///
+  /// Gezaehlt wird nur die *erste* Entscheidung je Entscheidungspunkt: sonst
+  /// wuerde der Spiegel messen, wie oft jemand seine Antwort aendert oder ein
+  /// Szenario wiederholt, statt wie sich das Trainerteam entscheidet.
   void waehlen(PwSzenario s, int punkt, String optionId) {
-    final wahlen = {...state.fortschritt.wahlen};
-    wahlen[Fortschritt.schluessel(s.id, punkt)] = optionId;
+    final schluessel = Fortschritt.schluessel(s.id, punkt);
+    final wahlen = {...state.fortschritt.wahlen}..[schluessel] = optionId;
+    final erstmals = !state.fortschritt.gezaehlt.contains(schluessel);
+
     _setzen(state.fortschritt.copyWith(
       wahlen: wahlen,
       begonnen: {...state.fortschritt.begonnen, s.id},
+      gezaehlt: erstmals
+          ? {...state.fortschritt.gezaehlt, schluessel}
+          : state.fortschritt.gezaehlt,
     ));
-    _spiegel.zaehlen(szenarioId: s.id, punktIndex: punkt, optionId: optionId);
+
+    if (erstmals) {
+      _spiegel.zaehlen(szenarioId: s.id, punktIndex: punkt, optionId: optionId);
+    }
   }
 
   /// "Antwort ändern" — loescht nur die Wahl an diesem Punkt. Der bereits
@@ -138,6 +150,8 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
   }
 
   /// "Nochmal" — loescht nur die Wahlen dieses Szenarios (DESIGN.md 8).
+  /// `gezaehlt` bleibt absichtlich stehen: der Wiederholungsdurchlauf soll den
+  /// Spiegel nicht ein zweites Mal hochzaehlen.
   void nochmal(PwSzenario s) {
     final wahlen = {...state.fortschritt.wahlen};
     for (var p = 0; p < s.punkte.length; p++) {

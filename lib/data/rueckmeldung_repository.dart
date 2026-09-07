@@ -28,8 +28,11 @@ class RueckmeldungRepository {
     if (!SupabaseConfig.vorhanden) {
       throw StateError('Kein Backend eingerichtet.');
     }
+    // Wirft auch, wenn Supabase.initialize gescheitert ist — S8 zeigt dann
+    // seinen Fehlertext und laesst die Eingaben stehen.
+    final client = Supabase.instance.client;
     final sauber = email?.trim();
-    await Supabase.instance.client.from('rueckmeldungen').insert({
+    await client.from('rueckmeldungen').insert({
       'art': art.schluessel,
       'text': text.trim(),
       if (sauber != null && sauber.isNotEmpty) 'email': sauber,

@@ -112,7 +112,14 @@ class _OverlayRoute<T> extends PageRouteBuilder<T> {
           // Tippen auf den Inhalt darf nicht bis zum Schleier durchschlagen.
           child: GestureDetector(
             onTap: () {},
-            child: inhalt(context, animation),
+            // Material-Widgets im Sheet — allen voran TextField in S8 —
+            // brauchen einen Material-Vorfahren. Die Route bringt keinen mit,
+            // deshalb hier ein transparenter: die Flaeche zeichnet das Sheet
+            // selbst.
+            child: Material(
+              type: MaterialType.transparency,
+              child: inhalt(context, animation),
+            ),
           ),
         ),
       ],

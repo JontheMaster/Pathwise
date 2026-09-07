@@ -108,9 +108,9 @@ class _Zeile extends StatelessWidget {
                 border: Border.all(color: c.borderSubtle),
                 boxShadow: PwShadow.sm(context.isDark),
               ),
-              child: Row(
-                children: [
-                  Container(
+              child: LayoutBuilder(
+                builder: (ctx, constraints) {
+                  final kreis = Container(
                     width: 34,
                     height: 34,
                     alignment: Alignment.center,
@@ -119,53 +119,81 @@ class _Zeile extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(PwIcons.user, size: 16, color: c.iconOnTint),
-                  ),
-                  const SizedBox(width: PwSpace.gapTight),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          person.name,
-                          style: TextStyle(
-                            fontFamily: 'NunitoSans',
-                            fontSize: 15,
-                            height: 1.3,
-                            fontWeight: FontWeight.w600,
-                            color: c.textHeading,
-                          ),
+                  );
+
+                  final namensblock = Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        person.name,
+                        style: TextStyle(
+                          fontFamily: 'NunitoSans',
+                          fontSize: 15,
+                          height: 1.3,
+                          fontWeight: FontWeight.w600,
+                          color: c.textHeading,
                         ),
-                        Text(
-                          person.rolle,
-                          style: t.bodyMedium?.copyWith(color: c.textMuted),
+                      ),
+                      Text(
+                        person.rolle,
+                        style: t.bodyMedium?.copyWith(color: c.textMuted),
+                      ),
+                    ],
+                  );
+
+                  final kontaktzeile = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        person.perTelefon ? PwIcons.phone : PwIcons.mail,
+                        size: 14,
+                        color: c.textLink,
+                      ),
+                      const SizedBox(width: PwSpace.s3),
+                      Flexible(
+                        child: Text(
+                          person.kontakt,
+                          style: kontaktStil,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: PwSpace.gapTight),
-                  Flexible(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          person.perTelefon ? PwIcons.phone : PwIcons.mail,
-                          size: 14,
-                          color: c.textLink,
-                        ),
-                        const SizedBox(width: PwSpace.s3),
-                        Flexible(
-                          child: Text(
-                            person.kontakt,
-                            style: kontaktStil,
-                            softWrap: false,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                    ],
+                  );
+
+                  // Auf schmalen Geraeten steht der Kontakt unter Name und
+                  // Rolle. Nebeneinander wuerde beides umbrechen und die
+                  // Adresse abgeschnitten.
+                  final eng = constraints.maxWidth < 330;
+
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      kreis,
+                      const SizedBox(width: PwSpace.gapTight),
+                      Expanded(
+                        child: eng
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  namensblock,
+                                  const SizedBox(height: PwSpace.s3),
+                                  kontaktzeile,
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  Expanded(child: namensblock),
+                                  const SizedBox(width: PwSpace.gapTight),
+                                  Flexible(child: kontaktzeile),
+                                ],
+                              ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
