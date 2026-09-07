@@ -4,15 +4,19 @@
 // Nach dem Senden tauscht der Inhalt gegen die Bestaetigung; scheitert es,
 // bleiben die Eingaben stehen und der Fehler steht unter dem Textfeld.
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/rueckmeldung_repository.dart';
 import '../design/components/pw_button.dart';
 import '../design/components/pw_field.dart';
+import '../design/components/pw_haken.dart';
 import '../design/components/pw_icons.dart';
+import '../design/components/pw_lottie.dart';
 import '../design/components/pw_press_scale.dart';
 import '../design/pathwise_theme.dart';
 import '../design/pathwise_tokens.dart';
 import '../design/pw_motion.dart';
+import '../state/durchlauf_state.dart';
 
 class RueckmeldungInhalt extends StatefulWidget {
   const RueckmeldungInhalt({super.key});
@@ -103,7 +107,23 @@ class _RueckmeldungInhaltState extends State<RueckmeldungInhalt> {
             alignment: Alignment.center,
             decoration:
                 BoxDecoration(color: c.surfaceTint, shape: BoxShape.circle),
-            child: Icon(PwIcons.check, size: 20, color: c.levelOk),
+            // In der Stufe "Verspielt" zeichnet sich der Haken selbst — eine
+            // Quittung fuer eine Handlung, keine Belohnung. Liegt eine
+            // Lottie-Datei bereit, hat die Vorrang.
+            child: Consumer(
+              builder: (ctx, ref, _) {
+                final extras = ref.watch(durchlaufProvider
+                    .select((s) => s.fortschritt.bewegung.zeigtExtras));
+                return PwLottie(
+                  stelle: PwLottieStelle.angekommen,
+                  an: extras,
+                  groesse: 30,
+                  ersatz: extras
+                      ? PwHaken(farbe: c.levelOk, groesse: 22)
+                      : Icon(PwIcons.check, size: 20, color: c.levelOk),
+                );
+              },
+            ),
           ),
         ),
         const SizedBox(height: 14),

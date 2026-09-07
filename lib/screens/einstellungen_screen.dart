@@ -10,6 +10,9 @@
 //   Textgröße — dafür ist die Systemeinstellung da, und die App trägt sie bis
 //   200 % ohne Überlauf (DESIGN.md 9). Eine zweite Stellschraube danebenzusetzen
 //   verwirrt mehr, als sie hilft.
+//
+// Die Stufe „Verspielt" schaltet die zusätzlichen Gesten frei. Welche das
+// sind und woher ihre Dateien kommen, steht in assets/lottie/LIESMICH.md.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
