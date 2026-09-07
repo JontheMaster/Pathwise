@@ -1,5 +1,5 @@
 // Die Overlays: Hilfe (S6), Info (S7), Rueckmeldung (S8), "Kommt bald" (S9)
-// sowie der Weg in die Vereinsangaben (S5).
+// sowie der Weg in die Einstellungen.
 //
 // Alle vier Overlays sind von jedem Screen aus erreichbar, ohne den Durchlauf
 // zu verlassen: der Zustand des Szenarios bleibt vollstaendig erhalten
@@ -20,9 +20,9 @@ import '../design/pathwise_routes.dart';
 import '../design/pathwise_theme.dart';
 import '../design/pathwise_tokens.dart';
 import '../state/durchlauf_state.dart';
+import 'einstellungen_screen.dart';
 import 'kommt_bald_dialog.dart';
 import 'rueckmeldung_sheet.dart';
-import 'verein_screen.dart';
 
 /// S6 — Hilfe und Beratung.
 Future<void> hilfeSheetZeigen(BuildContext context) {
@@ -136,10 +136,11 @@ Future<void> kommtBaldZeigen(BuildContext context, PwModul modul) {
   );
 }
 
-/// S5 — Vereinsangaben, Motion M10 hinein, M11 zurueck.
-void vereinOeffnen(BuildContext context) {
+/// Einstellungen, Motion M10 hinein, M11 zurueck. Die Vereinsangaben
+/// stehen dort weiter unten.
+void einstellungenOeffnen(BuildContext context) {
   Navigator.of(context).push(
-    pwRoute(const VereinScreen(), PwTransition.hoch),
+    pwRoute(const EinstellungenScreen(), PwTransition.hoch),
   );
 }
 

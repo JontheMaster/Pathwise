@@ -35,7 +35,7 @@ class UebersichtScreen extends ConsumerWidget {
       titel: 'Pathwise',
       zeigtLogo: true,
       zeigtEinstellungen: true,
-      onEinstellungen: () => vereinOeffnen(context),
+      onEinstellungen: () => einstellungenOeffnen(context),
       onSzenarioOeffnen: (ziel) => szenarioOeffnen(context, ref, ziel),
       inhalt: [
         if (erststart)

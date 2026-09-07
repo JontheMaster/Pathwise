@@ -119,6 +119,20 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
     _setzen(state.fortschritt.copyWith(themeMode: m));
   }
 
+  void bewegungSetzen(bool reduziert) {
+    _setzen(state.fortschritt.copyWith(bewegungReduziert: reduziert));
+  }
+
+  /// Loescht alles, was auf dem Geraet liegt: Entscheidungen, Fortschritt und
+  /// die Einstellungen. Danach steht die App wie beim ersten Oeffnen da.
+  Future<void> allesLoeschen() async {
+    await _speicher.allesLoeschen();
+    state = state.copyWith(
+      fortschritt: const Fortschritt(),
+      themenfeldFilter: 'Alle',
+    );
+  }
+
   void begonnen(PwSzenario s) {
     if (state.fortschritt.begonnen.contains(s.id)) return;
     _setzen(state.fortschritt

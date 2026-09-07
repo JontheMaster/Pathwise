@@ -1,11 +1,11 @@
-{
+﻿{
     "name": "Pathwise",
     "short_name": "Pathwise",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#12171F",
     "theme_color": "#12171F",
-    "description": "Szenariobasiertes Lernformat für ehrenamtliche Trainerinnen und Trainer im Sportverein.",
+    "description": "Szenariobasiertes Lernformat fÃ¼r ehrenamtliche Trainerinnen und Trainer im Sportverein.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

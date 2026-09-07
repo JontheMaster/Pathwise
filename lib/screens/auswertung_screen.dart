@@ -63,7 +63,7 @@ class _AuswertungScreenState extends ConsumerState<AuswertungScreen> {
     return PwScaffold(
       titel: 'Auswertung',
       onZurueck: () => Navigator.of(context).popUntil((r) => r.isFirst),
-      onEinstellungen: () => vereinOeffnen(context),
+      onEinstellungen: () => einstellungenOeffnen(context),
       onSzenarioOeffnen: (ziel) => szenarioOeffnen(context, ref, ziel),
       aktionen: [
         Row(

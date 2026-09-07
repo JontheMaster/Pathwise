@@ -151,14 +151,25 @@ void main() {
     expect(find.text('Die Situation'), findsOneWidget);
   });
 
-  testWidgets('Vereinsangaben und Kommt-bald-Dialog', (tester) async {
+  testWidgets('Einstellungen und Kommt-bald-Dialog', (tester) async {
     await app.main();
     await tester.pumpAndSettle(const Duration(seconds: 5));
 
-    await tippen(tester, find.byTooltip('Vereinsangaben'));
+    await tippen(tester, find.byTooltip('Einstellungen'));
+    expect(find.text('DARSTELLUNG'), findsOneWidget);
+    expect(find.text('BEWEGUNG'), findsOneWidget);
+    // Die Vereinsangaben stehen weiter unten auf derselben Seite.
     expect(find.text('Post SV Nürnberg'), findsWidgets);
     expect(find.text('EXTERNE BERATUNG'), findsOneWidget);
     expect(find.text('WAS GESPEICHERT WIRD'), findsOneWidget);
+
+    // Der Hell-Modus muss wirklich umschalten.
+    await tippen(tester, find.text('Hell'));
+    expect(Theme.of(tester.element(find.text('Hell'))).brightness,
+        Brightness.light);
+    await tippen(tester, find.text('Dunkel'));
+    expect(Theme.of(tester.element(find.text('Dunkel'))).brightness,
+        Brightness.dark);
     await tippen(tester, find.text('Zurück zur Übersicht'));
 
     // Der Dialog traegt drei Dauerschleifen (M17-M19) und wird nie ruhig.

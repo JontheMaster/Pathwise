@@ -15,6 +15,7 @@ class Fortschritt {
     this.gefeiert = const {},
     this.erststartGesehen = false,
     this.themeMode = ThemeMode.dark,
+    this.bewegungReduziert = false,
   });
 
   /// "szenarioId:punktIndex" -> "a" | "b" | "c"
@@ -38,6 +39,11 @@ class Fortschritt {
   /// Dunkel ist der Standard der App, nicht `system` (DESIGN.md 3).
   final ThemeMode themeMode;
 
+  /// Bewegung in der App abschalten, unabhaengig von der Systemeinstellung.
+  /// Wer die Systemeinstellung schon gesetzt hat, braucht das nicht — die
+  /// gilt weiterhin (DESIGN.md 5).
+  final bool bewegungReduziert;
+
   static String schluessel(String szenarioId, int punkt) => '$szenarioId:$punkt';
 
   String? wahl(String szenarioId, int punkt) =>
@@ -50,6 +56,7 @@ class Fortschritt {
     Set<String>? gefeiert,
     bool? erststartGesehen,
     ThemeMode? themeMode,
+    bool? bewegungReduziert,
   }) =>
       Fortschritt(
         wahlen: wahlen ?? this.wahlen,
@@ -58,6 +65,7 @@ class Fortschritt {
         gefeiert: gefeiert ?? this.gefeiert,
         erststartGesehen: erststartGesehen ?? this.erststartGesehen,
         themeMode: themeMode ?? this.themeMode,
+        bewegungReduziert: bewegungReduziert ?? this.bewegungReduziert,
       );
 }
 
@@ -70,6 +78,7 @@ class FortschrittSpeicher {
   static const _kGefeiert = 'pw_gefeiert';
   static const _kErststart = 'pw_erststart_gesehen';
   static const _kTheme = 'pw_theme_mode';
+  static const _kBewegung = 'pw_bewegung_reduziert';
 
   Future<Fortschritt> laden() async {
     final p = await SharedPreferences.getInstance();
@@ -83,12 +92,30 @@ class FortschrittSpeicher {
       gezaehlt: (p.getStringList(_kGezaehlt) ?? const []).toSet(),
       gefeiert: (p.getStringList(_kGefeiert) ?? const []).toSet(),
       erststartGesehen: p.getBool(_kErststart) ?? false,
+      bewegungReduziert: p.getBool(_kBewegung) ?? false,
       themeMode: switch (p.getString(_kTheme)) {
         'light' => ThemeMode.light,
         'system' => ThemeMode.system,
         _ => ThemeMode.dark,
       },
     );
+  }
+
+  /// Loescht alles, was die App auf dem Geraet abgelegt hat. Danach steht
+  /// die App wie beim ersten Oeffnen da.
+  Future<void> allesLoeschen() async {
+    final p = await SharedPreferences.getInstance();
+    for (final k in [
+      _kWahlen,
+      _kBegonnen,
+      _kGezaehlt,
+      _kGefeiert,
+      _kErststart,
+      _kTheme,
+      _kBewegung,
+    ]) {
+      await p.remove(k);
+    }
   }
 
   Future<void> sichern(Fortschritt f) async {
@@ -99,5 +126,6 @@ class FortschrittSpeicher {
     await p.setStringList(_kGefeiert, f.gefeiert.toList());
     await p.setBool(_kErststart, f.erststartGesehen);
     await p.setString(_kTheme, f.themeMode.name);
+    await p.setBool(_kBewegung, f.bewegungReduziert);
   }
 }

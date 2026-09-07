@@ -25,6 +25,7 @@ Eine Flutter-Codebasis für **Web, iOS und Android**.
 - [Die sechs Grundfunktionen](#die-sechs-grundfunktionen)
 - [Die fünf Regeln, die nicht gebrochen werden](#die-fünf-regeln-die-nicht-gebrochen-werden)
   - [Die eine bewusste Ausnahme](#die-eine-bewusste-ausnahme)
+- [Einstellungen](#einstellungen)
 - [Der Durchlauf im Bild](#der-durchlauf-im-bild)
 - [Datenschutz: was gespeichert wird](#datenschutz-was-gespeichert-wird)
 - [Technik](#technik)
@@ -230,15 +231,32 @@ Szenariokarte auf `false` setzen. Dann fällt der gesamte Zweig weg.
 
 ![Abschluss-Geste](docs/screenshots/S1-uebersicht-konfetti.png)
 
+## Einstellungen
+
+Erreichbar über das Zahnrad auf der Übersicht.
+
+- **Darstellung** — Hell, Dunkel oder wie das System. Dunkel bleibt die Vorgabe.
+- **Bewegung** — normale Bewegung oder alles sofort im Endzustand. Hat das Gerät „Bewegung
+  reduzieren" gesetzt, gilt das ohnehin; die Einstellung ist ein zusätzlicher Weg für alle,
+  die die Systemeinstellung nicht kennen.
+- **Vereinsangaben** — Ansprechpersonen, externe Beratung und was gespeichert wird. Steht
+  vorerst hier, bis geklärt ist, wie ein Gerät seinen Verein erfährt (`DESIGN.md` §11, Punkt 2).
+- **Alle lokalen Daten löschen** — mit Rückfrage. `DESIGN.md` §11 führt das als fehlend und
+  datenschutzrechtlich wahrscheinlich nötig.
+
+Bewusst **nicht** enthalten: eine Sprachauswahl (die App gibt es nur auf Deutsch — eine Liste
+mit einem Eintrag wäre Schaufenster) und eine Textgröße (dafür ist die Systemeinstellung da,
+und die App trägt sie bis 200 % ohne Überlauf).
+
 ## Der Durchlauf im Bild
 
 | Einstieg | Ohne Wahl | Weiter machen | Hell |
 |---|---|---|---|
 | ![Einstieg](docs/screenshots/S2-einstieg.png) | ![Ohne Wahl](docs/screenshots/S3-punkt-ohne-wahl.png) | ![Weiter machen](docs/screenshots/S1-uebersicht-fortschritt.png) | ![Hell](docs/screenshots/S1-uebersicht-hell.png) |
 
-| Vereinsangaben | Hilfe und Beratung | So funktioniert Pathwise | Rückmeldung |
+| Einstellungen | Hilfe und Beratung | So funktioniert Pathwise | Rückmeldung |
 |---|---|---|---|
-| ![Verein](docs/screenshots/S5-verein.png) | ![Hilfe](docs/screenshots/S6-hilfe-sheet.png) | ![Info](docs/screenshots/S7-info-sheet.png) | ![Rückmeldung](docs/screenshots/S8-rueckmeldung-sheet.png) |
+| ![Einstellungen](docs/screenshots/S5-einstellungen.png) | ![Hilfe](docs/screenshots/S6-hilfe-sheet.png) | ![Info](docs/screenshots/S7-info-sheet.png) | ![Rückmeldung](docs/screenshots/S8-rueckmeldung-sheet.png) |
 
 Dunkel ist der Standard, nicht die Systemeinstellung — die App wird überwiegend abends auf dem
 Handy genutzt.
@@ -247,7 +265,11 @@ Handy genutzt.
 
 **Auf dem Gerät** (`shared_preferences`, im Web `localStorage`): getroffene Entscheidungen,
 begonnene Szenarien, welche Entscheidungspunkte bereits gezählt wurden, welche Szenarien ihre
-Abschluss-Geste schon hatten, ob die Erststart-Karte gesehen wurde, der Theme-Wunsch.
+Abschluss-Geste schon hatten, ob die Erststart-Karte gesehen wurde, und die beiden
+Einstellungen (Darstellung, Bewegung).
+
+Über **Einstellungen → Alle lokalen Daten löschen** lässt sich das vollständig entfernen; die
+App steht danach wie beim ersten Öffnen da.
 
 **Zentral, und zwar ausschließlich das:**
 
@@ -296,7 +318,8 @@ lib/
     rueckmeldung_repository.dart   Rückmeldung einsenden
     supabase_config.dart           URL und Key, per --dart-define überschreibbar
   state/durchlauf_state.dart       Riverpod
-  screens/                         S1–S9 plus PwScaffold (Kopf, Inhalt, Fuß, Seitenleiste)
+  screens/                         Übersicht, Durchlauf, Auswertung, Einstellungen,
+                                   vier Overlays, PwScaffold (Kopf, Inhalt, Fuß, Leiste)
 assets/szenarien.json              Szenarien, Infos, Beratung, Personen, Module
 supabase/migrations/               Schema
 test/                              Regeltests und Golden-Aufnahmen aller Screens

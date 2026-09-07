@@ -22,7 +22,7 @@ import 'package:pathwise/screens/auswertung_screen.dart';
 import 'package:pathwise/screens/einstieg_screen.dart';
 import 'package:pathwise/screens/punkt_screen.dart';
 import 'package:pathwise/screens/uebersicht_screen.dart';
-import 'package:pathwise/screens/verein_screen.dart';
+import 'package:pathwise/screens/einstellungen_screen.dart';
 import 'package:pathwise/state/durchlauf_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -180,11 +180,11 @@ void main() {
         );
       });
 
-      testWidgets('S5 Vereinsangaben', (tester) async {
+      testWidgets('S5 Einstellungen', (tester) async {
         await pruefen(
           tester,
           groesse,
-          const VereinScreen(),
+          const EinstellungenScreen(),
           const Fortschritt(erststartGesehen: true),
         );
       });

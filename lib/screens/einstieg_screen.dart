@@ -36,7 +36,7 @@ class EinstiegScreen extends ConsumerWidget {
       // Der Zurueck-Weg fuehrt zur Uebersicht, nicht einen Schritt: der
       // Durchlauf ist jederzeit unterbrechbar (DESIGN.md 6).
       onZurueck: () => Navigator.of(context).popUntil((r) => r.isFirst),
-      onEinstellungen: () => vereinOeffnen(context),
+      onEinstellungen: () => einstellungenOeffnen(context),
       onSzenarioOeffnen: (ziel) => szenarioOeffnen(context, ref, ziel),
       aktionen: [
         PwButton(

@@ -19,7 +19,7 @@ import 'package:pathwise/screens/kommt_bald_dialog.dart';
 import 'package:pathwise/screens/punkt_screen.dart';
 import 'package:pathwise/screens/rueckmeldung_sheet.dart';
 import 'package:pathwise/screens/uebersicht_screen.dart';
-import 'package:pathwise/screens/verein_screen.dart';
+import 'package:pathwise/screens/einstellungen_screen.dart';
 import 'package:pathwise/state/durchlauf_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -369,12 +369,12 @@ void main() {
     );
   });
 
-  testWidgets('S5 Vereinsangaben', (tester) async {
+  testWidgets('S5 Einstellungen', (tester) async {
     await aufnehmen(
       tester,
-      'S5-verein',
+      'S5-einstellungen',
       huelle(
-        screen: const VereinScreen(),
+        screen: const EinstellungenScreen(),
         fortschritt: const Fortschritt(erststartGesehen: true),
       ),
     );

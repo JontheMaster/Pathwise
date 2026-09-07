@@ -58,6 +58,8 @@ class PathwiseApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final modus =
         ref.watch(durchlaufProvider.select((s) => s.fortschritt.themeMode));
+    final bewegungAus = ref
+        .watch(durchlaufProvider.select((s) => s.fortschritt.bewegungReduziert));
 
     return MaterialApp(
       title: 'Pathwise',
@@ -66,6 +68,16 @@ class PathwiseApp extends ConsumerWidget {
       darkTheme: pwTheme(dark: true),
       // Dunkel ist der Standard der App, nicht `system` (DESIGN.md 3).
       themeMode: modus,
+      // Wer die Bewegung in den Einstellungen abschaltet, setzt damit dasselbe
+      // Signal, das sonst vom System kommt. So greift die Einstellung ueberall,
+      // wo PwMotion oder Flutter selbst danach fragen — ohne Sonderweg.
+      builder: (context, kind) {
+        if (!bewegungAus) return kind ?? const SizedBox.shrink();
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(disableAnimations: true),
+          child: kind ?? const SizedBox.shrink(),
+        );
+      },
       home: const UebersichtScreen(),
     );
   }

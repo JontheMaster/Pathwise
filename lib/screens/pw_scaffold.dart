@@ -222,7 +222,7 @@ class _Kopfzeile extends StatelessWidget {
                   if (zeigtEinstellungen)
                     PwIconButton(
                       ikon: PwIcons.settings,
-                      label: 'Vereinsangaben',
+                      label: 'Einstellungen',
                       onPressed: onEinstellungen,
                     ),
                 ],
@@ -326,8 +326,8 @@ class _Seitenleiste extends ConsumerWidget {
                   Expanded(child: Text('Pathwise', style: t.titleMedium)),
                   PwIconButton(
                     ikon: PwIcons.settings,
-                    label: 'Vereinsangaben',
-                    onPressed: () => vereinOeffnen(context),
+                    label: 'Einstellungen',
+                    onPressed: () => einstellungenOeffnen(context),
                   ),
                 ],
               ),

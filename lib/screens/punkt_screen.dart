@@ -71,7 +71,7 @@ class _PunktScreenState extends ConsumerState<PunktScreen> {
       titel: sz.titel,
       zaehler: '${_punkt + 1}/${sz.punkte.length}',
       onZurueck: () => Navigator.of(context).popUntil((r) => r.isFirst),
-      onEinstellungen: () => vereinOeffnen(context),
+      onEinstellungen: () => einstellungenOeffnen(context),
       onSzenarioOeffnen: (ziel) => szenarioOeffnen(context, ref, ziel),
       aktionen: [
         _Fussaktionen(
