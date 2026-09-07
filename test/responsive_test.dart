@@ -17,6 +17,7 @@ import 'package:pathwise/data/fortschritt_speicher.dart';
 import 'package:pathwise/data/spiegel_repository.dart';
 import 'package:pathwise/data/szenario_modelle.dart';
 import 'package:pathwise/data/szenario_repository.dart';
+import 'package:pathwise/design/components/pw_card.dart';
 import 'package:pathwise/design/pathwise_theme.dart';
 import 'package:pathwise/screens/auswertung_screen.dart';
 import 'package:pathwise/screens/einstieg_screen.dart';
@@ -212,6 +213,49 @@ void main() {
       expect(find.text('SZENARIEN'), findsOneWidget);
       expect(find.text('Freiwillig, ohne Anmeldung, kein Nachweis.'),
           findsOneWidget);
+    });
+
+    // Der Status stand frueher mal neben und mal unter dem Themenfeld-Chip,
+    // je nachdem ob beides in eine Zeile passte. Bei den kuerzeren
+    // Themenfeldnamen fiel das auf dem Handy auf.
+    testWidgets('der Status steht immer unter dem Themenfeld-Chip',
+        (tester) async {
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      // Breiten abtasten statt raten: ob Chip und Status in eine Zeile passen,
+      // haengt an der Kartenbreite und damit an wenigen dp. Ein fester
+      // Stichprobensatz haette den Fehler je nach Geraet verfehlt.
+      for (var breite = 320.0; breite <= 900.0; breite += 10.0) {
+        tester.view.physicalSize = Size(breite, 1600);
+        await tester.pumpWidget(huelle(
+          const UebersichtScreen(),
+          const Fortschritt(erststartGesehen: true),
+        ));
+        await tester.pumpAndSettle();
+
+        for (final sz in inhalt.szenarien) {
+          // Der Themenfeldname steht auch in der Filterzeile — deshalb nur
+          // innerhalb der Karte suchen, die den Szenariotitel traegt.
+          final karte = find
+              .ancestor(of: find.text(sz.titel), matching: find.byType(PwCard))
+              .first;
+          final chip =
+              find.descendant(of: karte, matching: find.text(sz.themenfeld));
+          final status = find.descendant(
+            of: karte,
+            matching: find.text(SzenarioStatus.offen.label),
+          );
+
+          expect(chip, findsOneWidget, reason: '${sz.id} bei $breite dp');
+          expect(status, findsOneWidget, reason: '${sz.id} bei $breite dp');
+          expect(
+            tester.getRect(status).top,
+            greaterThanOrEqualTo(tester.getRect(chip).bottom),
+            reason: 'Status neben statt unter dem Chip: ${sz.id} bei $breite dp',
+          );
+        }
+      }
     });
 
     testWidgets('unter 360 dp stehen die Footer-Buttons untereinander',
