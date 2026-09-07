@@ -6,6 +6,7 @@ import '../data/szenario_modelle.dart';
 import '../design/components/pw_button.dart';
 import '../design/components/pw_card.dart';
 import '../design/components/pw_icons.dart';
+import '../design/components/pw_konfetti.dart';
 import '../design/components/pw_label.dart';
 import '../design/components/pw_press_scale.dart';
 import '../design/components/pw_step_indicator.dart';
@@ -77,6 +78,10 @@ class UebersichtScreen extends ConsumerWidget {
                 szenario: sz,
                 status: s.status(sz),
                 onTap: () => szenarioOeffnen(context, ref, sz),
+                // Einmalig, beim ersten Abschluss eines Szenarios.
+                feiern: s.status(sz) == SzenarioStatus.abgeschlossen &&
+                    !s.fortschritt.gefeiert.contains(sz.id),
+                onGefeiert: () => notifier.gefeiert(sz),
               ),
           ],
         ),
@@ -217,11 +222,17 @@ class _SzenarioKarte extends StatelessWidget {
     required this.szenario,
     required this.status,
     required this.onTap,
+    this.feiern = false,
+    this.onGefeiert,
   });
 
   final PwSzenario szenario;
   final SzenarioStatus status;
   final VoidCallback onTap;
+
+  /// Auf false gesetzt entfaellt die Abschluss-Geste vollstaendig.
+  final bool feiern;
+  final VoidCallback? onGefeiert;
 
   @override
   Widget build(BuildContext context) {
@@ -235,7 +246,7 @@ class _SzenarioKarte extends StatelessWidget {
       SzenarioStatus.offen => (c.textFaint, null),
     };
 
-    return PwCard(
+    final karte = PwCard(
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,6 +288,22 @@ class _SzenarioKarte extends StatelessWidget {
           ),
         ],
       ),
+    );
+
+    if (!feiern) return karte;
+
+    // Die Geste liegt ueber der Karte und ist auf deren Rundung beschnitten,
+    // damit nichts in die Nachbarkarten ragt.
+    return Stack(
+      children: [
+        karte,
+        Positioned.fill(
+          child: ClipRRect(
+            borderRadius: PwRadius.card,
+            child: PwKonfetti(onFertig: onGefeiert ?? () {}),
+          ),
+        ),
+      ],
     );
   }
 }

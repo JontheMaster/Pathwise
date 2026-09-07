@@ -24,6 +24,7 @@ import 'package:pathwise/screens/rueckmeldung_sheet.dart';
 import 'package:pathwise/screens/uebersicht_screen.dart';
 import 'package:pathwise/screens/verein_screen.dart';
 import 'package:pathwise/state/durchlauf_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Preview-Groesse aus PathwiseApp.dc.html ($preview: 390 x 844).
 const _geraet = Size(390, 844);
@@ -102,6 +103,7 @@ void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     await _schriftenLaden();
+    SharedPreferences.setMockInitialValues({});
     inhalt = await const SzenarioRepository().laden();
   });
 
@@ -153,13 +155,22 @@ void main() {
     String name,
     Widget app, {
     Future<void> Function(WidgetTester)? danach,
+    Duration? mitten,
   }) async {
     tester.view.physicalSize = _geraet;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(app);
-    await tester.pumpAndSettle();
+
+    if (mitten != null) {
+      // Fuer Bewegungen, die nie auslaufen oder nur unterwegs zu sehen sind:
+      // gezielt bis zu einem Zeitpunkt vorspulen statt auszusetteln.
+      await tester.pump(mitten);
+    } else {
+      await tester.pumpAndSettle();
+    }
+
     if (danach != null) {
       await danach(tester);
       await tester.pumpAndSettle();
@@ -208,6 +219,20 @@ void main() {
         fortschritt: komplett(inhalt.szenarien.first, bis: 0),
         dunkel: false,
       ),
+    );
+  });
+
+  // Die einmalige Abschluss-Geste in der Szenariokarte, unterwegs festgehalten.
+  testWidgets('S1 Uebersicht — Abschluss-Geste', (tester) async {
+    final sz = inhalt.szenarien.first;
+    await aufnehmen(
+      tester,
+      'S1-uebersicht-konfetti',
+      huelle(
+        screen: const UebersichtScreen(),
+        fortschritt: komplett(sz),
+      ),
+      mitten: const Duration(milliseconds: 430),
     );
   });
 
@@ -367,6 +392,28 @@ void main() {
         ),
         fortschritt: const Fortschritt(erststartGesehen: true),
       ),
+    );
+  });
+
+  // Die Ringe wachsen auf das 1,9-fache. Diese Aufnahme haelt sie unterwegs
+  // fest und zeigt, dass sie im reservierten Bereich bleiben und nicht in den
+  // Text darunter ragen.
+  testWidgets('S9 Kommt bald — Ringe unterwegs', (tester) async {
+    await aufnehmen(
+      tester,
+      'S9-kommt-bald-ringe',
+      huelle(
+        screen: Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: KommtBaldInhalt(modul: inhalt.module.first),
+            ),
+          ),
+        ),
+        fortschritt: const Fortschritt(erststartGesehen: true),
+      ),
+      mitten: const Duration(milliseconds: 520),
     );
   });
 

@@ -1,5 +1,11 @@
-// ignore_for_file: unnecessary_underscores  // Datei 1:1 aus dem Design-Handoff.
 // Pathwise Page-Transitions — siehe DESIGN.md, Abschnitt 6.
+//
+// Abweichung vom Handoff-Entwurf: dort baut transitionsBuilder immer die
+// Bewegung, mit der ein Screen gekommen ist — beim Schliessen laeuft sie
+// rueckwaerts. Der Weg zurueck zur Uebersicht saehe dann je nach Herkunft
+// anders aus (aus dem Einstieg anders als aus der Auswertung), obwohl M5 fuer
+// das Schliessen genau eine Bewegung vorgibt. Beim Rueckwaertslauf gilt
+// deshalb immer PwTransition.schliessen.
 import 'package:flutter/material.dart';
 import 'pathwise_tokens.dart';
 
@@ -16,33 +22,53 @@ enum PwTransition {
   final Duration reverseDur;
 }
 
+/// Versatz einer Bewegung als Anteil der Bildschirmgroesse, bei Fortschritt 0.
+Offset _startversatz(PwTransition kind) => switch (kind) {
+      PwTransition.oeffnen => const Offset(0, .03), // M4
+      PwTransition.schliessen => Offset.zero, // M5
+      PwTransition.vor => const Offset(.045, 0), // M6 vorwärts
+      PwTransition.zurueck => const Offset(-.045, 0), // M6 zurück
+      PwTransition.hoch => const Offset(0, .06), // M10
+      PwTransition.runter => const Offset(0, -.04), // M11
+    };
+
+/// Skalierung einer Bewegung bei Fortschritt 0.
+double _startskala(PwTransition kind) => switch (kind) {
+      PwTransition.oeffnen => .94, // M4
+      PwTransition.schliessen => 1.04, // M5
+      _ => 1.0,
+    };
+
 Route<T> pwRoute<T>(Widget page, PwTransition kind) => PageRouteBuilder<T>(
-  transitionDuration: kind.dur,               // M4 340 · M6/M5 260 · M10 300
-  reverseTransitionDuration: kind.reverseDur,
-  opaque: true,
-  pageBuilder: (_, __, ___) => page,
-  transitionsBuilder: (ctx, anim, sec, child) {
-    final e = CurvedAnimation(parent: anim, curve: PwCurve.out);
-    return FadeTransition(opacity: e, child: switch (kind) {
-      PwTransition.oeffnen => ScaleTransition(                    // M4
-          scale: Tween(begin: .94, end: 1.0).animate(e),
-          child: SlideTransition(
-              position: Tween(begin: const Offset(0, .03), end: Offset.zero).animate(e),
-              child: child)),
-      PwTransition.schliessen => ScaleTransition(                 // M5
-          scale: Tween(begin: 1.04, end: 1.0).animate(e), child: child),
-      PwTransition.vor => SlideTransition(                        // M6 vorwärts
-          position: Tween(begin: const Offset(.045, 0), end: Offset.zero).animate(e),
-          child: child),
-      PwTransition.zurueck => SlideTransition(                    // M6 zurück
-          position: Tween(begin: const Offset(-.045, 0), end: Offset.zero).animate(e),
-          child: child),
-      PwTransition.hoch => SlideTransition(                       // M10
-          position: Tween(begin: const Offset(0, .06), end: Offset.zero).animate(e),
-          child: child),
-      PwTransition.runter => SlideTransition(                     // M11
-          position: Tween(begin: const Offset(0, -.04), end: Offset.zero).animate(e),
-          child: child),
-    });
-  },
-);
+      transitionDuration: kind.dur, // M4 340 · M6/M5 260 · M10 300
+      reverseTransitionDuration: kind.reverseDur,
+      opaque: true,
+      pageBuilder: (_, _, _) => page,
+      transitionsBuilder: (ctx, anim, sec, child) {
+        // AnimatedBuilder statt der *Transition-Widgets, weil die Richtung
+        // erst je Frame feststeht.
+        return AnimatedBuilder(
+          animation: anim,
+          child: child,
+          builder: (ctx, inhalt) {
+            final art = anim.status == AnimationStatus.reverse
+                ? PwTransition.schliessen
+                : kind;
+
+            final t = PwCurve.out.transform(anim.value.clamp(0.0, 1.0));
+            final versatz = _startversatz(art) * (1 - t);
+            final skala = _startskala(art) + (1.0 - _startskala(art)) * t;
+
+            return Opacity(
+              opacity: t,
+              child: FractionalTranslation(
+                translation: versatz,
+                child: skala == 1.0
+                    ? inhalt
+                    : Transform.scale(scale: skala, child: inhalt),
+              ),
+            );
+          },
+        );
+      },
+    );

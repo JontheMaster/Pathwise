@@ -27,7 +27,8 @@ class KommtBaldInhalt extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Center(child: _Ringe(ikon: PwIcons.ausName(modul.ikon))),
-        const SizedBox(height: PwSpace.s7),
+        // Kein zusaetzlicher Abstand: die reservierte Ringflaeche bringt schon
+        // rund 33 dp Luft nach unten mit.
         Center(child: PwLabel(modul.titel)),
         const SizedBox(height: 10),
         Text(
@@ -54,6 +55,10 @@ class KommtBaldInhalt extends StatelessWidget {
     );
   }
 }
+
+const double _ringGroesse = 74;
+const double _ringMinScale = 0.6;
+const double _ringMaxScale = 1.9;
 
 /// M17: drei Ringe, scale 0.6 -> 1.9, Deckkraft 0.55 -> 0, Versatz 0/0.9/1.8 s.
 /// M18: das Icon atmet, scale 1 -> 1.06 -> 1 ueber 3,4 s.
@@ -105,8 +110,10 @@ class _RingeState extends State<_Ringe> with TickerProviderStateMixin {
     final laeuft = PwMotion.schleifenErlaubt(context);
 
     return SizedBox(
-      width: 74,
-      height: 74,
+      // Der Ring misst 74 dp und waechst auf das 1,9-fache (M17). Reserviert
+      // wird deshalb die volle Ausdehnung, sonst ragt er in den Text darunter.
+      width: _ringGroesse * _ringMaxScale,
+      height: _ringGroesse * _ringMaxScale,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -122,10 +129,11 @@ class _RingeState extends State<_Ringe> with TickerProviderStateMixin {
                   return Opacity(
                     opacity: deckkraft,
                     child: Transform.scale(
-                      scale: 0.6 + (1.9 - 0.6) * e,
+                      scale: _ringMinScale +
+                          (_ringMaxScale - _ringMinScale) * e,
                       child: Container(
-                        width: 74,
-                        height: 74,
+                        width: _ringGroesse,
+                        height: _ringGroesse,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: c.textLink),

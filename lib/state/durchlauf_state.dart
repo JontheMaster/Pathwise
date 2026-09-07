@@ -102,6 +102,14 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
     state = state.copyWith(themenfeldFilter: themenfeld);
   }
 
+  /// Merkt, dass die einmalige Abschluss-Geste fuer dieses Szenario gelaufen
+  /// ist — sie erscheint danach nie wieder, auch nicht nach "Nochmal".
+  void gefeiert(PwSzenario s) {
+    if (state.fortschritt.gefeiert.contains(s.id)) return;
+    _setzen(state.fortschritt
+        .copyWith(gefeiert: {...state.fortschritt.gefeiert, s.id}));
+  }
+
   void erststartGesehen() {
     if (state.fortschritt.erststartGesehen) return;
     _setzen(state.fortschritt.copyWith(erststartGesehen: true));

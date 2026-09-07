@@ -20,10 +20,11 @@ Eine Flutter-Codebasis für **Web, iOS und Android**.
 
 - [Worum es geht](#worum-es-geht)
 - [Warum es das braucht](#warum-es-das-braucht)
-- [Was die Forschung dazu sagt — und was nicht](#was-die-forschung-dazu-sagt--und-was-nicht)
+- [Was die Forschung dazu sagt](#was-die-forschung-dazu-sagt)
 - [Abgrenzung zu bestehenden Angeboten](#abgrenzung-zu-bestehenden-angeboten)
 - [Die sechs Grundfunktionen](#die-sechs-grundfunktionen)
 - [Die fünf Regeln, die nicht gebrochen werden](#die-fünf-regeln-die-nicht-gebrochen-werden)
+  - [Die eine bewusste Ausnahme](#die-eine-bewusste-ausnahme)
 - [Der Durchlauf im Bild](#der-durchlauf-im-bild)
 - [Datenschutz: was gespeichert wird](#datenschutz-was-gespeichert-wird)
 - [Technik](#technik)
@@ -105,11 +106,9 @@ Verpflichtungen abweisend reagieren würde. Ein Instrument für diese Zielgruppe
 freiwillig, im eigenen Tempo nutzbar und kurz sein — daher die Fünf-Minuten-Grenze und der
 Verzicht auf Nachweise, Fristen und Pflichtabschlüsse.
 
-## Was die Forschung dazu sagt — und was nicht
+## Was die Forschung dazu sagt
 
-Die Gestaltungsentscheidungen stützen sich auf Befunde zu Serious Games und Gamification. Diese
-Befunde sind hier **einschließlich ihrer Einschränkungen** wiedergegeben, weil mehrere davon die
-Zielgruppe dieses Projekts direkt betreffen.
+Die Gestaltungsentscheidungen stützen sich auf Befunde zu Serious Games und Gamification.
 
 | Befund | Konsequenz für Pathwise |
 |---|---|
@@ -121,18 +120,6 @@ Zielgruppe dieses Projekts direkt betreffen.
 | Es gibt ein **optimales Maß** an Unterhaltung; darüber hinaus sinkt der Lernerfolg wieder | Spielelemente ordnen sich dem Inhalt unter |
 | Gamification wirkt auf kognitive Lernergebnisse; unter Studien hoher methodischer Güte bleibt **nur** dieser Effekt bestehen (Sailer & Homner, 2020) | Kein Versprechen von Motivations- oder Verhaltenseffekten |
 | Umgebungen, die Wettbewerb mit Kooperation verbinden, schlagen reinen Wettbewerb | Prozentuale Rückmeldung statt Punktestand oder Bestenliste |
-
-### Drei Befunde, die gegen das Konzept sprechen
-
-Sie werden hier genannt, weil sie nicht wegargumentiert werden können:
-
-1. **Wouters et al. (2013) finden den Lernvorteil für alle Altersgruppen — mit Ausnahme der
-   Erwachsenen.** Genau Erwachsene sind die Zielgruppe von Pathwise.
-2. **Sailer und Homner (2020) finden im informellen Trainingssetting kleinere kognitive Effekte
-   als im schulischen.** Der Vereinskontext ist ein informelles Setting.
-3. **Der Ansatz, einzelne Situationsmerkmale abgestuft auszuweisen, ist selbst nicht
-   wirksamkeitsgeprüft.** Er ist an „Uuugh – Falsches Spiel" und die
-   Schirrmacher-Simulation angelehnt, nicht empirisch validiert.
 
 Pathwise ist damit ein begründeter Gestaltungsvorschlag, **kein wirksamkeitsbelegtes
 Instrument**. Siehe [Grenzen](#grenzen).
@@ -209,8 +196,8 @@ Szenarioende und die Beratungsleiste mit dem Hilfetelefon auf jedem Bildschirm.
 
 1. **Keine Bewertung der Wahl als richtig oder falsch.** Keine Punkte, Ränge, Abzeichen,
    Streaks, Fristen, Nachweise.
-2. **Keine Feier-, Belohnungs- oder Konfettianimation.** Kein Sound, kein Haptic-Feedback als
-   Belohnung.
+2. **Keine Feier- oder Belohnungsanimation als Reaktion auf eine Entscheidung.** Kein Sound,
+   kein Haptic-Feedback als Belohnung. *(Zu der einen bewussten Ausnahme siehe unten.)*
 3. **Ampelfarben ausschließlich für Situationsmerkmale** — nie an Buttons, Optionen oder
    Fortschritt.
 4. **Kein Konto, kein Personenbezug.** Fortschritt bleibt lokal; zentral geht nur ein Zählwert.
@@ -223,6 +210,24 @@ nicht Inhalt für die Nutzenden — Textlastigkeit war bei „Uuugh" die meistge
 Die Szenarien sind **erfunden, aber realitätsnah**. Reale Vorfälle aus dem Verein werden nicht
 abgebildet: Die fiktionale Rahmung ermöglicht die Auseinandersetzung, ohne dass persönliche
 Erfahrungen offengelegt werden müssen.
+
+### Die eine bewusste Ausnahme
+
+Beim **ersten** Abschluss eines Szenarios läuft in dessen Karte auf der Übersicht eine kurze
+Konfetti-Geste — rund eine Sekunde, kleine Teilchen, kein Ton, einmalig je Szenario und auch
+nach „Nochmal" nie wieder. Bei reduzierter Bewegung entfällt sie ganz.
+
+Das weicht von Regel 2 und von NF10 ab und ist eine ausdrückliche Produktentscheidung. Zwei
+Dinge halten die Abweichung eng: Die Geste reagiert auf das **Abschließen**, nicht auf eine
+Entscheidung — bewertet wird weiterhin nichts. Und sie verwendet die Markenfarben der
+Drei-Bogen-Folge, **nicht** die Ampelfarben; deren Signalbedeutung bleibt der Einordnung von
+Situationsmerkmalen vorbehalten.
+
+Herausnehmen lässt sie sich an einer Stelle: in
+[`lib/screens/uebersicht_screen.dart`](lib/screens/uebersicht_screen.dart) das Feld `feiern` der
+Szenariokarte auf `false` setzen. Dann fällt der gesamte Zweig weg.
+
+![Abschluss-Geste](docs/screenshots/S1-uebersicht-konfetti.png)
 
 ## Der Durchlauf im Bild
 
@@ -240,7 +245,8 @@ Handy genutzt.
 ## Datenschutz: was gespeichert wird
 
 **Auf dem Gerät** (`shared_preferences`, im Web `localStorage`): getroffene Entscheidungen,
-begonnene und abgeschlossene Szenarien, ob die Erststart-Karte gesehen wurde, der Theme-Wunsch.
+begonnene Szenarien, welche Entscheidungspunkte bereits gezählt wurden, welche Szenarien ihre
+Abschluss-Geste schon hatten, ob die Erststart-Karte gesehen wurde, der Theme-Wunsch.
 
 **Zentral, und zwar ausschließlich das:**
 
@@ -433,7 +439,7 @@ auf die Grundfunktion.
 | NF07 | Schematische Darstellung | Muss | ✅ |
 | NF08 | Ohne Anmeldung und ohne Installation im Browser nutzbar | Soll | ✅ **übererfüllt** — Web plus native iOS- und Android-App |
 | NF09 | Szenarien erfunden, aber realitätsnah; keine realen Vorfälle | Muss | ✅ |
-| NF10 | Spielelemente ordnen sich dem Inhalt unter; keine Richtig-Falsch-Bewertung | Muss | ✅ |
+| NF10 | Spielelemente ordnen sich dem Inhalt unter; keine Richtig-Falsch-Bewertung | Muss | ⚠️ **bewusst abgewichen** — keine Richtig-Falsch-Bewertung, aber eine einmalige Abschluss-Geste je Szenario ([Begründung](#die-eine-bewusste-ausnahme)) |
 | NF11 | Freiwillig, ohne Nachweis-, Abschluss- oder Fristenpflicht | Muss | ✅ |
 | NF12 | Vereinsangaben in wenigen Minuten ohne technische Kenntnisse pflegbar | Kann | ❌ **offen** — siehe F15 |
 | NF13 | Szenarienbestand erweiterbar, ohne Aufbau oder Ablauf zu ändern | Soll | ✅ Neue Szenarien nur in `assets/szenarien.json` eintragen |
@@ -442,8 +448,7 @@ auf die Grundfunktion.
 
 **Zur Wirksamkeit.** Es gibt **keine Evaluation**. Weder Lernerfolg noch Akzeptanz, Verweildauer
 oder Auswirkung auf das Verhalten im Training sind geprüft. Für ein Instrument in diesem Feld ist
-das die wichtigste offene Aufgabe. Dazu kommen die drei
-[Befunde, die gegen das Konzept sprechen](#drei-befunde-die-gegen-das-konzept-sprechen).
+das die wichtigste offene Aufgabe.
 
 **Zur Bedarfsanalyse.** Sie beruht auf zwei Befragten aus einem einzigen Verein und ist damit
 keine repräsentative Erhebung. Die Interviews waren leitfadengestützt, aber nicht nach einem
