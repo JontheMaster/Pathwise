@@ -19,11 +19,48 @@ import 'einstieg_screen.dart';
 import 'overlays.dart';
 import 'pw_scaffold.dart';
 
-class UebersichtScreen extends ConsumerWidget {
+class UebersichtScreen extends ConsumerStatefulWidget {
   const UebersichtScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UebersichtScreen> createState() => _UebersichtScreenState();
+}
+
+class _UebersichtScreenState extends ConsumerState<UebersichtScreen> {
+  /// Laeuft, solange die Vereinsfrage offen auf dem Schirm steht.
+  bool _fragtGerade = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Beim Start die zwischengespeicherten Vereinsangaben auffrischen, damit
+    // eine geaenderte Nummer ohne neue App-Fassung ankommt. Scheitert es,
+    // bleiben die alten stehen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(durchlaufProvider.notifier).vereinAuffrischen();
+    });
+  }
+
+  /// Fragt einmalig nach dem Vereinscode.
+  ///
+  /// Nicht waehrend die Erststart-Karte steht: die ist beim allerersten
+  /// Oeffnen die Einfuehrung in die App, und ein Sheet darueber verdeckt
+  /// genau den Text, der erklaert, worum es geht. Die Frage kommt, sobald
+  /// die Karte weg ist — also nach dem ersten Antippen von "Szenario
+  /// starten". Deshalb steht die Pruefung im Aufbau und nicht in initState.
+  void _vielleichtFragen(bool erststartKarteSteht) {
+    if (_fragtGerade || erststartKarteSteht) return;
+    if (!ref.read(durchlaufProvider).vereinFragen) return;
+
+    _fragtGerade = true;
+    vereinsfrageZeigen(context).then((_) {
+      _fragtGerade = false;
+      if (mounted) ref.read(durchlaufProvider.notifier).vereinsfrageErledigt();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final s = ref.watch(durchlaufProvider);
     final notifier = ref.read(durchlaufProvider.notifier);
     final c = context.pw;
@@ -31,6 +68,9 @@ class UebersichtScreen extends ConsumerWidget {
 
     final laufend = s.laufendes;
     final erststart = !s.fortschritt.erststartGesehen && s.erststartAn;
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _vielleichtFragen(erststart));
 
     return PwScaffold(
       titel: 'Pathwise',

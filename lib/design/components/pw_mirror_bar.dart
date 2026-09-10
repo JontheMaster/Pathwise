@@ -22,6 +22,10 @@ enum PwMirrorZustand {
 
   /// Abruf gescheitert. Derselbe Block wie zuWenige, anderer Text.
   fehler,
+
+  /// Kein Vereinscode eingetragen. Der Spiegel zeigt die Einschaetzungen des
+  /// eigenen Teams — ohne Verein gibt es dieses Team nicht.
+  ohneVerein,
 }
 
 class PwMirrorBar extends StatelessWidget {
@@ -43,17 +47,20 @@ class PwMirrorBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (zustand == PwMirrorZustand.zuWenige ||
-        zustand == PwMirrorZustand.fehler) {
-      return _Hinweis(
-        text: zustand == PwMirrorZustand.fehler
-            ? 'Die Einschätzungen des Teams sind gerade nicht abrufbar.'
-            : 'Für diesen Entscheidungspunkt liegen noch zu wenige '
-                'Einschätzungen vor. Sobald mehr Trainerinnen und Trainer ihn '
-                'durchgespielt haben, siehst du hier, wie sie sich entschieden '
-                'haben.',
-      );
-    }
+    final hinweis = switch (zustand) {
+      PwMirrorZustand.fehler =>
+        'Die Einschätzungen des Teams sind gerade nicht abrufbar.',
+      PwMirrorZustand.ohneVerein =>
+        'Für die Einschätzungen deines Teams fehlt der Vereinscode. Du kannst '
+            'ihn in den Einstellungen eintragen.',
+      PwMirrorZustand.zuWenige =>
+        'Für diesen Entscheidungspunkt liegen noch zu wenige '
+            'Einschätzungen vor. Sobald mehr Trainerinnen und Trainer ihn '
+            'durchgespielt haben, siehst du hier, wie sie sich entschieden '
+            'haben.',
+      _ => null,
+    };
+    if (hinweis != null) return _Hinweis(text: hinweis);
 
     return PwStaffel(
       anzahl: optionen.length,

@@ -13,6 +13,8 @@ import 'package:pathwise/design/pathwise_tokens.dart';
 import 'package:pathwise/state/durchlauf_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'verein_probe.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -139,7 +141,7 @@ void main() {
             () => DurchlaufNotifier(
               DurchlaufState(
                 inhalt: inhalt,
-                fortschritt: const Fortschritt(),
+                fortschritt: mitVerein(const Fortschritt(), inhalt),
               ),
               const FortschrittSpeicher(),
               spion,
@@ -169,6 +171,10 @@ void main() {
       // Ein weiterer Punkt zählt eigenständig.
       n.waehlen(sz, 1, 'b');
       expect(spion.rufe, hasLength(2));
+
+      // Der Zaehlwert traegt den Verein — sonst zeigt der Spiegel die Zahlen
+      // aller Vereine statt die des eigenen Teams.
+      expect(spion.vereine, everyElement(probeVerein(inhalt).id));
     });
 
     test('"Nochmal" zählt den Durchlauf nicht erneut', () {
@@ -266,15 +272,20 @@ void main() {
 class _ZaehlerSpion implements SpiegelRepository {
   final List<(String, int, String)> rufe = [];
 
+  /// Vereins-IDs der gesendeten Zaehlwerte — ohne Verein zaehlt die App nicht.
+  final List<String?> vereine = [];
+
   @override
   Future<void> zaehlen({
+    required String? vereinId,
     required String szenarioId,
     required int punktIndex,
     required String optionId,
   }) async {
     rufe.add((szenarioId, punktIndex, optionId));
+    vereine.add(vereinId);
   }
 
   @override
-  Future<SpiegelDaten> laden(String szenarioId) async => SpiegelDaten.fehler;
+  Future<SpiegelDaten> laden(String szenarioId, {String? vereinId}) async => SpiegelDaten.fehler;
 }

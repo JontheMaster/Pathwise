@@ -24,6 +24,7 @@ import 'package:pathwise/state/durchlauf_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'schriften.dart';
+import 'verein_probe.dart';
 
 /// Preview-Groesse aus PathwiseApp.dc.html ($preview: 390 x 844).
 const _geraet = Size(390, 844);
@@ -35,10 +36,11 @@ class _FesterSpiegel implements SpiegelRepository {
   final SpiegelDaten daten;
 
   @override
-  Future<SpiegelDaten> laden(String szenarioId) async => daten;
+  Future<SpiegelDaten> laden(String szenarioId, {String? vereinId}) async => daten;
 
   @override
   Future<void> zaehlen({
+    required String? vereinId,
     required String szenarioId,
     required int punktIndex,
     required String optionId,
@@ -80,7 +82,7 @@ void main() {
           () => DurchlaufNotifier(
             DurchlaufState(
               inhalt: inhalt,
-              fortschritt: fortschritt,
+              fortschritt: mitVerein(fortschritt, inhalt),
               themenfeldFilter: filter,
             ),
             const FortschrittSpeicher(),

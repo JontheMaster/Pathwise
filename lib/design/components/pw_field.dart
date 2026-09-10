@@ -3,6 +3,7 @@
 // Unter dem Feld steht entweder ein Hinweis oder ein Fehler, nie beides.
 // Kein Zeichenzaehler.
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../pathwise_theme.dart';
 import '../pathwise_tokens.dart';
@@ -80,6 +81,8 @@ class PwInput extends StatefulWidget {
     this.ungueltig = false,
     this.tastatur,
     this.onChanged,
+    this.onAbgeschickt,
+    this.grossschreibung = false,
   });
 
   final TextEditingController controller;
@@ -92,6 +95,13 @@ class PwInput extends StatefulWidget {
   final bool ungueltig;
   final TextInputType? tastatur;
   final ValueChanged<String>? onChanged;
+
+  /// Enter im einzeiligen Feld.
+  final ValueChanged<String>? onAbgeschickt;
+
+  /// Wandelt die Eingabe in Grossbuchstaben — fuer Codes, die so vergeben
+  /// werden.
+  final bool grossschreibung;
 
   @override
   State<PwInput> createState() => _PwInputState();
@@ -158,6 +168,17 @@ class _PwInputState extends State<PwInput> {
         keyboardType: widget.tastatur ??
             (widget.zeilen > 1 ? TextInputType.multiline : TextInputType.text),
         onChanged: widget.onChanged,
+        onSubmitted: widget.onAbgeschickt,
+        textCapitalization: widget.grossschreibung
+            ? TextCapitalization.characters
+            : TextCapitalization.sentences,
+        inputFormatters: widget.grossschreibung
+            ? [
+                TextInputFormatter.withFunction(
+                  (alt, neu) => neu.copyWith(text: neu.text.toUpperCase()),
+                ),
+              ]
+            : null,
         style: t.bodyLarge?.copyWith(
           color: widget.aktiv ? c.textBody : c.actionDisabledText,
         ),

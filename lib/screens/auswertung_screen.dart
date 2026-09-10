@@ -48,8 +48,10 @@ class _AuswertungScreenState extends ConsumerState<AuswertungScreen> {
   }
 
   Future<void> _spiegelLaden() async {
-    final daten =
-        await ref.read(spiegelRepositoryProvider).laden(widget.szenarioId);
+    final daten = await ref.read(spiegelRepositoryProvider).laden(
+          widget.szenarioId,
+          vereinId: ref.read(durchlaufProvider).vereinId,
+        );
     if (mounted) setState(() => _spiegel = daten);
   }
 
@@ -154,7 +156,7 @@ class _AuswertungScreenState extends ConsumerState<AuswertungScreen> {
           ],
         ),
         Divider(color: c.divider, height: 1),
-        PwContactList(verein: s.inhalt.verein, personen: s.inhalt.personen),
+        PwContactList(verein: s.vereinName, personen: s.personen),
         Text(
           'Dieser Prototyp gehört zur Prävention. Er ersetzt keine Meldung und '
           'keine Beratung.',
@@ -232,6 +234,8 @@ class _SpiegelKarte extends StatelessWidget {
         return PwMirrorZustand.laedt;
       case SpiegelStatus.fehler:
         return PwMirrorZustand.fehler;
+      case SpiegelStatus.ohneVerein:
+        return PwMirrorZustand.ohneVerein;
       case SpiegelStatus.ohneBackend:
         // Ohne Backend gelten die vorbelegten Anteile aus dem Buendel.
         return punkt.zuWenige

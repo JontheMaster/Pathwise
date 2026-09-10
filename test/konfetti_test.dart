@@ -17,6 +17,7 @@ import 'package:pathwise/state/durchlauf_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'schriften.dart';
+import 'verein_probe.dart';
 
 void main() {
   late PwInhalt inhalt;
@@ -44,7 +45,7 @@ void main() {
         overrides: [
           durchlaufProvider.overrideWith(
             () => DurchlaufNotifier(
-              DurchlaufState(inhalt: inhalt, fortschritt: f),
+              DurchlaufState(inhalt: inhalt, fortschritt: mitVerein(f, inhalt)),
               const FortschrittSpeicher(),
               const SpiegelRepository(),
             ),

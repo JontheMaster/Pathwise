@@ -28,6 +28,7 @@ import '../design/pathwise_tokens.dart';
 import '../design/pw_motion.dart';
 import '../state/durchlauf_state.dart';
 import 'overlays.dart';
+import 'verein_code_feld.dart';
 import 'pw_scaffold.dart';
 
 class EinstellungenScreen extends ConsumerWidget {
@@ -129,27 +130,33 @@ class EinstellungenScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              s.inhalt.verein,
+              s.vereinName ?? 'Vereinsangaben',
               style: t.titleLarge?.copyWith(fontSize: 21, height: 1.25),
             ),
             const SizedBox(height: PwSpace.s4),
             Text(
-              'Die Angaben pflegt der Verein. Sie stehen in jedem Szenario am '
-              'Ende und jederzeit über die Beratungsleiste.',
+              s.verein == null
+                  ? 'Trag den Code deines Vereins ein, dann stehen hier seine '
+                      'Ansprechpersonen — und der Einschätzungsspiegel zeigt, '
+                      'wie sich dein Team entschieden hat.'
+                  : 'Die Angaben pflegt der Verein. Sie stehen in jedem '
+                      'Szenario am Ende und jederzeit über die '
+                      'Beratungsleiste.',
               style: t.bodyMedium?.copyWith(color: c.textMuted),
             ),
           ],
         ),
-        PwContactList(verein: s.inhalt.verein, personen: s.inhalt.personen),
+        const PwVereinscodeFeld(),
+        PwContactList(verein: s.vereinName, personen: s.personen),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
             const PwLabel('Externe Beratung'),
             const SizedBox(height: 10),
-            for (var i = 0; i < s.inhalt.beratung.length; i++) ...[
+            for (var i = 0; i < s.beratung.length; i++) ...[
               if (i > 0) const SizedBox(height: 10),
-              PwBeratungKarte(beratung: s.inhalt.beratung[i]),
+              PwBeratungKarte(beratung: s.beratung[i]),
             ],
           ],
         ),

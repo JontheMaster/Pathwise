@@ -14,7 +14,16 @@ const int kSpiegelSchwelle = 5;
 /// Zaehlwerte eines Szenarios: punktIndex -> optionId -> Anzahl.
 typedef Zaehlwerte = Map<int, Map<String, int>>;
 
-enum SpiegelStatus { laedt, da, fehler, ohneBackend }
+enum SpiegelStatus {
+  laedt,
+  da,
+  fehler,
+  ohneBackend,
+
+  /// Kein Verein eingetragen. Der Spiegel zeigt die Zahlen des eigenen
+  /// Teams — ohne Verein gibt es dieses Team nicht.
+  ohneVerein,
+}
 
 @immutable
 class SpiegelDaten {
@@ -24,6 +33,7 @@ class SpiegelDaten {
   final Zaehlwerte werte;
 
   static const laedt = SpiegelDaten(status: SpiegelStatus.laedt);
+  static const ohneVerein = SpiegelDaten(status: SpiegelStatus.ohneVerein);
   static const fehler = SpiegelDaten(status: SpiegelStatus.fehler);
   static const ohneBackend = SpiegelDaten(status: SpiegelStatus.ohneBackend);
 
@@ -72,14 +82,17 @@ class SpiegelRepository {
   /// Beim Waehlen. Fehler werden geschluckt — ein nicht gezaehlter Wert darf
   /// den Durchlauf nie stoeren (DESIGN.md 8).
   Future<void> zaehlen({
+    required String? vereinId,
     required String szenarioId,
     required int punktIndex,
     required String optionId,
   }) async {
     final c = _client;
-    if (c == null) return;
+    // Ohne Verein wird nicht gezaehlt: die Zahl gehoert zu einem Team.
+    if (c == null || vereinId == null) return;
     try {
       await c.rpc('zaehlwert_erhoehen', params: {
+        'p_verein': vereinId,
         'p_szenario': szenarioId,
         'p_punkt': punktIndex,
         'p_option': optionId,
@@ -90,11 +103,15 @@ class SpiegelRepository {
   }
 
   /// Beim Oeffnen der Auswertung.
-  Future<SpiegelDaten> laden(String szenarioId) async {
+  Future<SpiegelDaten> laden(String szenarioId, {String? vereinId}) async {
+    if (vereinId == null) return SpiegelDaten.ohneVerein;
     final c = _client;
     if (c == null) return SpiegelDaten.ohneBackend;
     try {
-      final zeilen = await c.rpc('spiegel', params: {'p_szenario': szenarioId});
+      final zeilen = await c.rpc(
+        'spiegel',
+        params: {'p_verein': vereinId, 'p_szenario': szenarioId},
+      );
       final werte = <int, Map<String, int>>{};
       for (final z in (zeilen as List).cast<Map<String, dynamic>>()) {
         final punkt = (z['punkt_index'] as num).toInt();

@@ -13,6 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/fortschritt_speicher.dart';
 import '../data/spiegel_repository.dart';
 import '../data/szenario_modelle.dart';
+import '../data/verein_modelle.dart';
+import '../data/verein_repository.dart';
 
 /// Status einer Szenariokarte auf der Uebersicht (PathwiseApp.dc.html Z. 817).
 enum SzenarioStatus {
@@ -75,6 +77,28 @@ class DurchlaufState {
 
   bool get erststartAn => fortschritt.begonnen.isEmpty;
 
+  // Die Vereinsangaben kommen aus der Datenbank, sobald ein Code eingetragen
+  // ist. Ohne Code bleibt die App vollstaendig bedienbar (DESIGN.md 8), zeigt
+  // aber *keine* Ansprechpersonen:
+  //
+  // Im Buendel liegen die Angaben des Pilotvereins. Sie als Vorgabe
+  // anzuzeigen hiesse, jemandem aus einem anderen Verein eine fremde
+  // Kinderschutz-Adresse zu nennen — jemand koennte einen Verdacht dorthin
+  // schreiben. Lieber keine Ansprechperson als die falsche.
+  //
+  // Die externen Stellen sind davon ausgenommen: Hilfetelefon und Nummer
+  // gegen Kummer gelten bundesweit und sind ohne Verein richtig.
+  PwVerein? get verein => fortschritt.verein;
+  String? get vereinId => fortschritt.verein?.id;
+  String? get vereinName => fortschritt.verein?.name;
+  List<PwPerson> get personen => fortschritt.verein?.personen ?? const [];
+  List<PwBeratung> get beratung =>
+      fortschritt.verein?.beratung ?? inhalt.beratung;
+
+  /// Beim Erststart wird einmal nach dem Vereinscode gefragt — ueberspringbar.
+  bool get vereinFragen =>
+      fortschritt.verein == null && !fortschritt.vereinGefragt;
+
   DurchlaufState copyWith({Fortschritt? fortschritt, String? themenfeldFilter}) =>
       DurchlaufState(
         inhalt: inhalt,
@@ -113,6 +137,43 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
   void erststartGesehen() {
     if (state.fortschritt.erststartGesehen) return;
     _setzen(state.fortschritt.copyWith(erststartGesehen: true));
+  }
+
+  /// Traegt einen nachgeschlagenen Verein ein.
+  void vereinSetzen(PwVerein v) {
+    _setzen(state.fortschritt.copyWith(verein: v, vereinGefragt: true));
+  }
+
+  /// Entfernt die Vereinszuordnung. Der Fortschritt bleibt; nur die Angaben
+  /// und der Spiegel fallen auf ihre Vorgabe zurueck.
+  void vereinEntfernen() {
+    _setzen(state.fortschritt.copyWith(vereinEntfernen: true));
+  }
+
+  /// Merkt, dass beim Erststart gefragt wurde — auch wenn uebersprungen.
+  void vereinsfrageErledigt() {
+    if (state.fortschritt.vereinGefragt) return;
+    _setzen(state.fortschritt.copyWith(vereinGefragt: true));
+  }
+
+  /// Holt die Angaben zum eingetragenen Code neu. Laeuft im Hintergrund beim
+  /// Start; scheitert es, bleiben die zwischengespeicherten stehen.
+  Future<void> vereinAuffrischen() async {
+    final code = state.fortschritt.verein?.code;
+    if (code == null) return;
+
+    final antwort = await const VereinRepository().nachschlagen(code);
+    switch (antwort.ergebnis) {
+      case PwCodeErgebnis.gefunden:
+        _setzen(state.fortschritt.copyWith(verein: antwort.verein));
+      case PwCodeErgebnis.nichtErreichbar:
+        break; // Zwischenspeicher behalten
+      case PwCodeErgebnis.unbekannt:
+        // Der Verein wurde abgeschaltet oder der Code geaendert. Die Angaben
+        // stehen zu lassen waere schlechter, als auf das Buendel
+        // zurueckzufallen — sie koennten veraltete Ansprechpersonen zeigen.
+        _setzen(state.fortschritt.copyWith(vereinEntfernen: true));
+    }
   }
 
   void themeSetzen(ThemeMode m) {
@@ -159,7 +220,12 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
     ));
 
     if (erstmals) {
-      _spiegel.zaehlen(szenarioId: s.id, punktIndex: punkt, optionId: optionId);
+      _spiegel.zaehlen(
+        vereinId: state.vereinId,
+        szenarioId: s.id,
+        punktIndex: punkt,
+        optionId: optionId,
+      );
     }
   }
 

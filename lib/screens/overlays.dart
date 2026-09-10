@@ -23,6 +23,46 @@ import '../state/durchlauf_state.dart';
 import 'einstellungen_screen.dart';
 import 'kommt_bald_dialog.dart';
 import 'rueckmeldung_sheet.dart';
+import 'verein_code_feld.dart';
+
+/// Einmalige Frage nach dem Vereinscode beim ersten Start.
+///
+/// Ueberspringbar: die App laeuft ohne Code vollstaendig, nur die
+/// Ansprechpersonen und der Einschaetzungsspiegel bleiben leer. Wer "Später"
+/// waehlt, wird nicht wieder gefragt — der Code laesst sich jederzeit in den
+/// Einstellungen nachtragen.
+Future<void> vereinsfrageZeigen(BuildContext context) {
+  return pwSheetZeigen<void>(
+    context,
+    titel: 'Bist du in einem Verein?',
+    untertitel: 'Mit dem Code deines Vereins stehen am Ende jedes Szenarios '
+        'seine Ansprechpersonen — und du siehst, wie sich dein Team '
+        'entschieden hat.',
+    anteilHoehe: 0.62,
+    builder: (ctx) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        PwVereinscodeFeld(onGefunden: () => Navigator.of(ctx).maybePop()),
+        const SizedBox(height: PwSpace.gap),
+        Text(
+          'Der Code ist keine Anmeldung. Es wird nichts gespeichert, was auf '
+          'dich zurückführt.',
+          style: Theme.of(ctx)
+              .textTheme
+              .bodyMedium
+              ?.copyWith(color: ctx.pw.textFaint),
+        ),
+        const SizedBox(height: 14),
+        PwButton(
+          label: 'Später',
+          vollBreite: true,
+          onPressed: () => Navigator.of(ctx).maybePop(),
+        ),
+      ],
+    ),
+  );
+}
 
 /// S6 — Hilfe und Beratung.
 Future<void> hilfeSheetZeigen(BuildContext context) {
@@ -39,14 +79,14 @@ Future<void> hilfeSheetZeigen(BuildContext context) {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            for (final b in s.inhalt.beratung) ...[
+            for (final b in s.beratung) ...[
               PwBeratungKarte(beratung: b),
               const SizedBox(height: 10),
             ],
             const SizedBox(height: PwSpace.s3),
             PwContactList(
-              verein: s.inhalt.verein,
-              personen: s.inhalt.personen,
+              verein: s.vereinName,
+              personen: s.personen,
             ),
             const SizedBox(height: PwSpace.gap),
             Text(

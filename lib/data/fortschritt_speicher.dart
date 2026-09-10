@@ -6,6 +6,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'verein_modelle.dart';
+
 /// Wie viel Bewegung die App zeigt.
 ///
 /// Eine Achse mit drei Stufen statt mehrerer Schalter: mehr Bewegung heisst
@@ -44,6 +46,8 @@ class Fortschritt {
     this.erststartGesehen = false,
     this.themeMode = ThemeMode.dark,
     this.bewegung = PwBewegung.normal,
+    this.verein,
+    this.vereinGefragt = false,
   });
 
   /// "szenarioId:punktIndex" -> "a" | "b" | "c"
@@ -71,6 +75,14 @@ class Fortschritt {
   /// reduzieren" gilt unabhaengig davon weiter (DESIGN.md 5).
   final PwBewegung bewegung;
 
+  /// Der zugeordnete Verein, zuletzt abgerufen. Liegt lokal, damit die
+  /// Angaben auch ohne Netz stehen.
+  final PwVerein? verein;
+
+  /// Ob beim Erststart schon nach dem Vereinscode gefragt wurde. Wer
+  /// „Später" gewaehlt hat, soll nicht bei jedem Start neu gefragt werden.
+  final bool vereinGefragt;
+
   static String schluessel(String szenarioId, int punkt) => '$szenarioId:$punkt';
 
   String? wahl(String szenarioId, int punkt) =>
@@ -84,6 +96,9 @@ class Fortschritt {
     bool? erststartGesehen,
     ThemeMode? themeMode,
     PwBewegung? bewegung,
+    PwVerein? verein,
+    bool vereinEntfernen = false,
+    bool? vereinGefragt,
   }) =>
       Fortschritt(
         wahlen: wahlen ?? this.wahlen,
@@ -93,6 +108,8 @@ class Fortschritt {
         erststartGesehen: erststartGesehen ?? this.erststartGesehen,
         themeMode: themeMode ?? this.themeMode,
         bewegung: bewegung ?? this.bewegung,
+        verein: vereinEntfernen ? null : (verein ?? this.verein),
+        vereinGefragt: vereinGefragt ?? this.vereinGefragt,
       );
 }
 
@@ -105,6 +122,8 @@ class FortschrittSpeicher {
   static const _kGefeiert = 'pw_gefeiert';
   static const _kErststart = 'pw_erststart_gesehen';
   static const _kTheme = 'pw_theme_mode';
+  static const _kVerein = 'pw_verein';
+  static const _kVereinGefragt = 'pw_verein_gefragt';
   static const _kBewegung = 'pw_bewegung';
   /// Vorgaenger: ein blosser Schalter. Wird beim Laden uebernommen.
   static const _kBewegungAlt = 'pw_bewegung_reduziert';
@@ -121,6 +140,8 @@ class FortschrittSpeicher {
       gezaehlt: (p.getStringList(_kGezaehlt) ?? const []).toSet(),
       gefeiert: (p.getStringList(_kGefeiert) ?? const []).toSet(),
       erststartGesehen: p.getBool(_kErststart) ?? false,
+      verein: PwVerein.ausText(p.getString(_kVerein)),
+      vereinGefragt: p.getBool(_kVereinGefragt) ?? false,
       bewegung: p.containsKey(_kBewegung)
           ? PwBewegung.vonSchluessel(p.getString(_kBewegung))
           : (p.getBool(_kBewegungAlt) ?? false)
@@ -147,6 +168,8 @@ class FortschrittSpeicher {
       _kTheme,
       _kBewegung,
       _kBewegungAlt,
+      _kVerein,
+      _kVereinGefragt,
     ]) {
       await p.remove(k);
     }
@@ -161,5 +184,11 @@ class FortschrittSpeicher {
     await p.setBool(_kErststart, f.erststartGesehen);
     await p.setString(_kTheme, f.themeMode.name);
     await p.setString(_kBewegung, f.bewegung.schluessel);
+    await p.setBool(_kVereinGefragt, f.vereinGefragt);
+    if (f.verein == null) {
+      await p.remove(_kVerein);
+    } else {
+      await p.setString(_kVerein, f.verein!.zuText());
+    }
   }
 }

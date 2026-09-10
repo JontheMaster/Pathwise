@@ -20,7 +20,9 @@ class PwContactList extends StatelessWidget {
     required this.personen,
   });
 
-  final String verein;
+  /// Null, solange kein Verein zugeordnet ist.
+  final String? verein;
+
   final List<PwPerson> personen;
 
   @override
@@ -29,13 +31,56 @@ class PwContactList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        PwLabel('Ansprechpersonen · $verein'),
+        PwLabel(
+          verein == null ? 'Ansprechpersonen' : 'Ansprechpersonen · $verein',
+        ),
         const SizedBox(height: 10),
-        for (var i = 0; i < personen.length; i++) ...[
-          if (i > 0) const SizedBox(height: 10),
-          _Zeile(person: personen[i]),
-        ],
+        if (personen.isEmpty)
+          const _OhneVerein()
+        else
+          for (var i = 0; i < personen.length; i++) ...[
+            if (i > 0) const SizedBox(height: 10),
+            _Zeile(person: personen[i]),
+          ],
       ],
+    );
+  }
+}
+
+/// Ohne Vereinscode gibt es keine Ansprechpersonen — statt einer fremden
+/// Adresse steht hier der Weg zu den eigenen.
+class _OhneVerein extends StatelessWidget {
+  const _OhneVerein();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.pw;
+    final t = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+      decoration: BoxDecoration(
+        color: c.surfaceSunken,
+        borderRadius: PwRadius.control,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(PwIcons.users, size: 15, color: c.textMuted),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Die Ansprechpersonen deines Vereins erscheinen hier, sobald '
+              'sein Code in den Einstellungen steht. Die Nummern unten helfen '
+              'auch ohne ihn weiter.',
+              style: t.bodyMedium?.copyWith(color: c.textMuted),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
