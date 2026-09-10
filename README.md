@@ -31,6 +31,7 @@ Eine Flutter-Codebasis für **Web, iOS und Android**.
 - [Technik](#technik)
 - [Einrichten und starten](#einrichten-und-starten)
 - [Backend](#backend)
+- [Die Verwaltung](#die-verwaltung)
 - [Qualitätssicherung](#qualitätssicherung)
 - [Getestete Plattformen](#getestete-plattformen)
 - [Anforderungen und ihr Umsetzungsstand](#anforderungen-und-ihr-umsetzungsstand)
@@ -319,7 +320,12 @@ lib/
     supabase_config.dart           URL und Key, per --dart-define überschreibbar
   state/durchlauf_state.dart       Riverpod
   screens/                         Übersicht, Durchlauf, Auswertung, Einstellungen,
-                                   vier Overlays, PwScaffold (Kopf, Inhalt, Fuß, Leiste)
+                                   fünf Overlays, PwScaffold (Kopf, Inhalt, Fuß, Leiste)
+  admin/                           Die Verwaltung — eigener Einstieg, nie Teil eines App-Builds
+    main.dart                      Einstieg, prüft Schlüssel und Host, dann erst Supabase
+    admin_config.dart              Schlüssel per --dart-define, localhost-Prüfung
+    admin_repository.dart          Schnittstelle + Supabase-Umsetzung
+    seiten/                        Szenarien mit Editor, Vereine, Rückmeldungen, Zahlen
 assets/szenarien.json              Rückfallebene ohne Netz; Infos und Module stehen nur hier
 supabase/migrations/               Schema
 test/                              Regeltests und Golden-Aufnahmen aller Screens
@@ -442,11 +448,66 @@ bundesweiten Nummern (Hilfetelefon, Nummer gegen Kummer) bleiben davon unberühr
 > Alle sind **beabsichtigt** und im SQL begründet: Die App hat keine Anmeldung, `anon` muss
 > zählen und lesen dürfen, und der Direktzugriff auf die Tabellen ist genau deshalb gesperrt.
 
+## Die Verwaltung
+
+Szenarien und Vereinsangaben liegen zentral in der Datenbank. Gepflegt werden sie über ein
+eigenes Flutter-Web-Dashboard, das **nicht dauerhaft online ist**: es läuft, solange es gestartet
+ist, und nur auf dem eigenen Rechner.
+
+```bash
+flutter run -d chrome -t lib/admin/main.dart --dart-define=SUPABASE_SECRET_KEY=sb_secret_...
+```
+
+Den geheimen Schlüssel findest du in der Supabase-Konsole unter *Project Settings → API keys*.
+
+### Warum kein Login
+
+Das Dashboard schreibt in die Datenbank. Dafür reicht der publishable key der App nicht — der
+darf nur zählen, den Spiegel lesen und eine Rückmeldung einsenden. Es braucht den geheimen
+Schlüssel, und **der hebelt jede RLS-Regel aus**. Ein Login davorzusetzen würde daran nichts
+ändern: wer die Seite mit eingebackenem Schlüssel erreicht, kann alles.
+
+Deshalb ist die Absicherung eine andere, und sie steckt in
+[`admin_config.dart`](lib/admin/admin_config.dart):
+
+| Regel | Was sie verhindert |
+|---|---|
+| Der Schlüssel steht **nirgends im Repo** und hat keinen Vorgabewert | ein versehentlich mitgepushter Schlüssel |
+| Ohne Schlüssel startet nur eine Sperrseite | ein Start ohne `--dart-define`, der stillschweigend nichts täte |
+| Die Seite läuft **nur auf localhost** — exakt, nicht als Teilstring | ein hochgeladener Build, und `localhost.angreifer.de` gleich mit |
+| `build/` ist git-ignoriert | ein Build mit Schlüssel im Repo |
+
+Der Schlüssel liegt damit nur im Speicher des Rechners, auf dem gestartet wurde. Tab schließen
+beendet die Verwaltung.
+
+### Was sie kann
+
+| Bereich | |
+|---|---|
+| **Szenarien** | anlegen, bearbeiten, veröffentlichen, zurückziehen, löschen. Entwürfe bekommt die App nicht zu sehen. Der Editor prüft vor dem Speichern: Kennung, Titel, Themenfeld, genau drei Handlungsoptionen je Punkt, keine leere Leitfrage. Je Szenario der Fassungsverlauf |
+| **Vereine** | anlegen, Code und Name ändern, abschalten, löschen. Ansprechpersonen und eigene Beratungsstellen pflegen. Dazu die bundesweiten Stellen, die auch ohne Vereinscode gelten |
+| **Rückmeldungen** | lesen, als bearbeitet merken, löschen. Standardmäßig nur die offenen |
+| **Zahlen** | die Zählwerte je Verein, Szenario, Fassung und Entscheidungspunkt, als Balken und als JSON |
+
+### Was noch nicht gegengeprüft ist
+
+Eine Naht bleibt offen: der Aufruf aus dem Browser an Supabase **mit dem echten geheimen
+Schlüssel**. Beide Seiten davon sind geprüft — die Oberfläche über 22 Tests gegen eine Attrappe,
+und jede Abfrage und jeder Schreibvorgang einzeln gegen das echte Schema. Dazwischen fehlt der
+Lauf mit dem Schlüssel selbst, weil der in deiner Hand bleibt und nirgends sonst auftauchen soll.
+Der erste Start zeigt, ob er stimmt: bei falschem Schlüssel steht statt der Liste „Nicht abrufbar
+· Invalid API key".
+
+Zwei Stellen fragen ausdrücklich nach, weil sie mehr mitnehmen, als der Knopf vermuten lässt:
+Ein Szenario zu **löschen** nimmt seine Fassungen und Zählwerte mit — wer es nur aus der App
+nehmen will, zieht es zurück. Einen Verein zu **löschen** nimmt seine Ansprechpersonen und die
+Zählwerte seines Teams mit — wer ihn nur stilllegen will, schaltet ihn ab.
+
 ## Qualitätssicherung
 
 ```bash
 flutter analyze     # keine Befunde
-flutter test        # 108 Tests
+flutter test        # 135 Tests
 ```
 
 **[`test/widget_test.dart`](test/widget_test.dart)** prüft die Regeln, nicht das Aussehen:
@@ -464,6 +525,26 @@ flutter test --update-goldens test/screens_golden_test.dart
 
 Der „Kommt bald"-Dialog wird dabei mit `disableAnimations` aufgenommen — zugleich der Nachweis,
 dass die drei Dauerschleifen bei reduzierter Bewegung nicht anlaufen.
+
+**[`test/admin_test.dart`](test/admin_test.dart)** prüft die Verwaltung gegen eine Attrappe des
+Repositories — die echte braucht den geheimen Schlüssel, und der gehört nicht in einen Testlauf.
+Zuerst die Sperren: dass ohne Schlüssel nichts startet, dass `localhost` exakt geprüft wird und
+`localhost.angreifer.de` durchfällt, und dass ein fremder Host jede andere Meldung schlägt. Dann
+die Oberfläche: Entwürfe und Veröffentlichte auseinandergehalten, Rückfragen vor dem Löschen, die
+Prüfungen des Editors, und dass ein abgelehnter Schlüssel als Fehler erscheint, statt die Seite
+auf „Wird geladen …" stehen zu lassen.
+
+**[`test/verein_test.dart`](test/verein_test.dart)** und
+**[`test/szenarien_test.dart`](test/szenarien_test.dart)** decken die zentrale Datenhaltung ab:
+dass ohne Vereinscode keine fremden Ansprechpersonen erscheinen, wann die Vereinsfrage kommt und
+wann nicht, dass eine angefangene Fassung angeheftet bleibt und dass der Zählwert die Signatur
+seiner Fassung trägt.
+
+> Jeder Test, der einen Fehler festhalten soll, wurde gegen den kaputten Stand gegengeprüft — ein
+> Test, der auch ohne die Korrektur grün läuft, hält nichts fest. Zwei Fälle sind dabei
+> aufgefallen und nachgebessert worden: `tester.tap` warnt nur, wenn das Ziel außerhalb des
+> Sichtfensters liegt, statt zu scheitern, und ein Golden-Bild hing an der Testreihenfolge, weil
+> `Image.asset` asynchron dekodiert.
 
 ## Anforderungen und ihr Umsetzungsstand
 
@@ -488,7 +569,7 @@ auf die Grundfunktion.
 | F12 | Jederzeit unterbrechbar, Fortschritt auf dem Gerät, Fortsetzen am letzten Punkt | Muss | – | ✅ |
 | F13 | Abgeschlossene Szenarien erneut startbar | Kann | 4 | ✅ „Nochmal" |
 | F14 | Übersicht bearbeiteter und offener Szenarien, ohne Punktestand und Bestenliste | Kann | – | ✅ Status je Karte |
-| F15 | Ansprechpersonen, Meldewege und Szenarien ohne technische Kenntnisse pflegbar | Soll | – | ⚠️ **teilweise** — Szenarien und Vereinsangaben liegen zentral in der Datenbank und wirken ohne neue App-Fassung; die Oberfläche zum Pflegen (Dashboard) ist noch nicht gebaut |
+| F15 | Ansprechpersonen, Meldewege und Szenarien ohne technische Kenntnisse pflegbar | Soll | – | ✅ [Die Verwaltung](#die-verwaltung) — zentral in der Datenbank, ohne neue App-Fassung wirksam, mit Entwürfen und Fassungen |
 
 ### Nichtfunktional
 
@@ -505,8 +586,8 @@ auf die Grundfunktion.
 | NF09 | Szenarien erfunden, aber realitätsnah; keine realen Vorfälle | Muss | ✅ |
 | NF10 | Spielelemente ordnen sich dem Inhalt unter; keine Richtig-Falsch-Bewertung | Muss | ✅ in der Vorgabe — eine Abschluss-Geste gibt es nur, wenn man sie in den Einstellungen einschaltet ([Begründung](#die-eine-bewusste-ausnahme--abschaltbar-und-standardmäßig-aus)) |
 | NF11 | Freiwillig, ohne Nachweis-, Abschluss- oder Fristenpflicht | Muss | ✅ |
-| NF12 | Vereinsangaben in wenigen Minuten ohne technische Kenntnisse pflegbar | Kann | ⚠️ **teilweise** — zentral änderbar, aber bisher nur über SQL; siehe F15 |
-| NF13 | Szenarienbestand erweiterbar, ohne Aufbau oder Ablauf zu ändern | Soll | ✅ Neue Szenarien als Zeile in `szenarien` — erst als Entwurf, dann veröffentlicht |
+| NF12 | Vereinsangaben in wenigen Minuten ohne technische Kenntnisse pflegbar | Kann | ✅ [Die Verwaltung](#die-verwaltung) → Vereine |
+| NF13 | Szenarienbestand erweiterbar, ohne Aufbau oder Ablauf zu ändern | Soll | ✅ [Die Verwaltung](#die-verwaltung) → Szenarien: erst Entwurf, dann veröffentlicht |
 
 ## Grenzen
 
@@ -600,9 +681,14 @@ Hilfetelefon Sexueller Missbrauch: **0800 22 55 530**, anonym und kostenfrei.
 
 | Ziel | Wie geprüft | Stand |
 |---|---|---|
-| **Android** (nativ) | Integrationstests im Emulator, Android 14 / API 34, x86_64; Release-APK installiert und gestartet | ✅ läuft |
-| **Web** (Browser) | Release-Build ausgeliefert und im Browser gerendert; 45 Layoutprüfungen über sechs Fenstergrößen | ✅ läuft |
+| **Android** (nativ) | Integrationstests im Emulator, Android 14 / API 34, x86_64; dazu von Hand durchgespielt: Vereinsfrage, Codeeingabe gegen die echte Datenbank, Ansprechpersonen | ✅ läuft |
+| **Web** (Browser) | Release-Build ausgeliefert und im Browser durchgespielt; 51 Layoutprüfungen über sechs Fenstergrößen | ✅ läuft |
+| **Verwaltung** (Flutter Web, lokal) | Sperrseiten im Browser geprüft, jede Datenbankabfrage gegen das echte Schema gegengeprüft, Oberfläche über 22 Tests gegen eine Attrappe | ⚠️ [ein Rest offen](#die-verwaltung) |
 | **iOS** (nativ) | Konfiguration gesetzt, aber auf Windows nicht baubar — Xcode ist Pflicht | ⚠️ ungeprüft |
+
+Die iOS-Seite ist von der zentralen Datenhaltung **nicht berührt**: es kam kein Plugin dazu, und
+unter `ios/` hat sich seither keine Datei geändert. Was dort noch aussteht, ist derselbe
+Xcode-Build wie vorher.
 
 Die Layoutprüfung deckt 320×568, 390×844, 844×390, 834×1112, 1112×834 und 1440×900 ab,
 jeweils über alle Screens. Sie schlägt fehl, sobald ein `RenderFlex` überläuft.

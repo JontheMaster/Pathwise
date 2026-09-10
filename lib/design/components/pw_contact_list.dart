@@ -2,6 +2,8 @@
 //
 // Tippen oeffnet tel: bzw. mailto:. Schlaegt das fehl, wird der Kontakt in die
 // Zwischenablage kopiert und ein ruhiger Hinweis gezeigt — kein Fehlerdialog.
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -155,9 +157,10 @@ class _Zeile extends StatelessWidget {
               ),
               child: LayoutBuilder(
                 builder: (ctx, constraints) {
+                  const kreisGroesse = 34.0;
                   final kreis = Container(
-                    width: 34,
-                    height: 34,
+                    width: kreisGroesse,
+                    height: kreisGroesse,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: c.surfaceTint,
@@ -166,51 +169,93 @@ class _Zeile extends StatelessWidget {
                     child: Icon(PwIcons.user, size: 16, color: c.iconOnTint),
                   );
 
+                  final namensStil = TextStyle(
+                    fontFamily: 'NunitoSans',
+                    fontSize: 15,
+                    height: 1.3,
+                    fontWeight: FontWeight.w600,
+                    color: c.textHeading,
+                  );
+                  final rollenStil =
+                      t.bodyMedium?.copyWith(color: c.textMuted);
+
                   final namensblock = Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        person.name,
-                        style: TextStyle(
-                          fontFamily: 'NunitoSans',
-                          fontSize: 15,
-                          height: 1.3,
-                          fontWeight: FontWeight.w600,
-                          color: c.textHeading,
-                        ),
-                      ),
-                      Text(
-                        person.rolle,
-                        style: t.bodyMedium?.copyWith(color: c.textMuted),
-                      ),
+                      Text(person.name, style: namensStil),
+                      Text(person.rolle, style: rollenStil),
                     ],
                   );
 
-                  final kontaktzeile = Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        person.perTelefon ? PwIcons.phone : PwIcons.mail,
-                        size: 14,
-                        color: c.textLink,
-                      ),
-                      const SizedBox(width: PwSpace.s3),
-                      Flexible(
-                        child: Text(
-                          person.kontakt,
-                          style: kontaktStil,
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  );
+                  // Steht der Kontakt in einer eigenen Zeile, darf er
+                  // umbrechen. Eine lange Adresse passt auf einem schmalen
+                  // Telefon sonst auch dort nicht hinein, und abgeschnitten
+                  // laesst sie sich nicht mehr abtippen.
+                  Widget kontaktzeileMit({required bool umbruch}) => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: umbruch
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(top: umbruch ? 3 : 0),
+                            child: Icon(
+                              person.perTelefon
+                                  ? PwIcons.phone
+                                  : PwIcons.mail,
+                              size: 14,
+                              color: c.textLink,
+                            ),
+                          ),
+                          const SizedBox(width: PwSpace.s3),
+                          Flexible(
+                            child: Text(
+                              person.kontakt,
+                              style: kontaktStil,
+                              softWrap: umbruch,
+                              overflow: umbruch
+                                  ? TextOverflow.clip
+                                  : TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      );
 
-                  // Auf schmalen Geraeten steht der Kontakt unter Name und
-                  // Rolle. Nebeneinander wuerde beides umbrechen und die
-                  // Adresse abgeschnitten.
-                  final eng = constraints.maxWidth < 330;
+                  // Nebeneinander nur, wenn beides wirklich nebeneinander
+                  // passt — sonst untereinander.
+                  //
+                  // Gemessen statt geraten: eine feste Schwelle war auf einem
+                  // 393-dp-Telefon um drei Pixel zu niedrig, und "Kinder-
+                  // schutzbeauftragter" brach mitten im Wort um. Ausgerechnet
+                  // an der Stelle, an der jemand nachschlaegt, an wen er sich
+                  // wendet. Das Messen traegt ausserdem die Textskalierung
+                  // mit, gegen die keine feste Zahl bestehen kann
+                  // (DESIGN.md 9: bis 200 Prozent ohne Ueberlauf).
+                  double breiteVon(String text, TextStyle? stil) {
+                    final maler = TextPainter(
+                      text: TextSpan(text: text, style: stil),
+                      textDirection: Directionality.of(ctx),
+                      textScaler: MediaQuery.textScalerOf(ctx),
+                      maxLines: 1,
+                    )..layout();
+                    return maler.width;
+                  }
+
+                  final blockBreite = math.max(
+                    breiteVon(person.name, namensStil),
+                    breiteVon(person.rolle, rollenStil),
+                  );
+                  final kontaktBreite = 14 +
+                      PwSpace.s3 +
+                      breiteVon(person.kontakt, kontaktStil);
+                  // Kreis und sein Abstand gehen ab: sie stehen links davon,
+                  // nicht in derselben Zeile.
+                  final platz = constraints.maxWidth -
+                      kreisGroesse -
+                      PwSpace.gapTight;
+                  final eng =
+                      blockBreite + PwSpace.gapTight + kontaktBreite > platz;
 
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,14 +270,22 @@ class _Zeile extends StatelessWidget {
                                 children: [
                                   namensblock,
                                   const SizedBox(height: PwSpace.s3),
-                                  kontaktzeile,
+                                  kontaktzeileMit(umbruch: true),
                                 ],
                               )
                             : Row(
                                 children: [
+                                  // Der Kontakt zuerst, mit seiner natuerlichen
+                                  // Breite: Flutter misst die starren Kinder
+                                  // einer Row vor den flexiblen. Stand hier
+                                  // frueher ein Flexible, schnappte sich der
+                                  // Namensblock ueber Expanded allen Platz und
+                                  // die Telefonnummer wurde abgeschnitten —
+                                  // eine halbe Nummer ist schlimmer als ein
+                                  // Umbruch.
                                   Expanded(child: namensblock),
                                   const SizedBox(width: PwSpace.gapTight),
-                                  Flexible(child: kontaktzeile),
+                                  kontaktzeileMit(umbruch: false),
                                 ],
                               ),
                       ),

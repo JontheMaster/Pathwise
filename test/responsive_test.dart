@@ -19,7 +19,9 @@ import 'package:pathwise/data/fortschritt_speicher.dart';
 import 'package:pathwise/data/spiegel_repository.dart';
 import 'package:pathwise/data/szenario_modelle.dart';
 import 'package:pathwise/data/szenario_repository.dart';
+import 'package:flutter/rendering.dart';
 import 'package:pathwise/design/components/pw_card.dart';
+import 'package:pathwise/design/components/pw_contact_list.dart';
 import 'package:pathwise/design/pathwise_theme.dart';
 import 'package:pathwise/screens/auswertung_screen.dart';
 import 'package:pathwise/screens/einstieg_screen.dart';
@@ -31,6 +33,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'schriften.dart';
 import 'verein_probe.dart';
+
+/// Prueft, ob ein Text abgeschnitten wurde.
+bool _abgeschnitten(WidgetTester t, Finder f) =>
+    t.renderObject<RenderParagraph>(f).didExceedMaxLines;
 
 /// Geraeteklassen, gegen die geprueft wird. Die Werte sind logische Pixel.
 const _groessen = <String, Size>{
@@ -360,5 +366,96 @@ void main() {
         expect(fehler, isNull);
       });
     }
+  });
+
+  // Die Ansprechpersonen sind die Stelle, an der jemand nachschlaegt, an wen
+  // er sich wendet. Ein abgeschnittener Kontakt ist dort teurer als anderswo.
+  group('Ansprechpersonen', () {
+    const personen = [
+      PwPerson(
+        name: 'Michael Brandt',
+        rolle: 'Kinderschutzbeauftragter',
+        kontakt: 'kinderschutz@postsv.de',
+        perTelefon: false,
+      ),
+      PwPerson(
+        name: 'Sabine Reuter',
+        rolle: 'Abteilungsleitung',
+        kontakt: '0911 55 00 12',
+        perTelefon: true,
+      ),
+      // Kurzer Name, lange Adresse: der Kontakt will mehr als die Haelfte der
+      // Zeile. Zwei gleich gewichtete Flex-Kinder wuerden ihn auf die Haelfte
+      // stutzen, obwohl beides zusammen bequem hinpasst.
+      PwPerson(
+        name: 'Ali Yücel',
+        rolle: 'Trainer',
+        kontakt: 'kinderschutzbeauftragter@grossersportverein-nuernberg.de',
+        perTelefon: false,
+      ),
+    ];
+
+    Future<void> bauen(WidgetTester tester, double breite) async {
+      tester.view.physicalSize = Size(breite, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(MaterialApp(
+        theme: pwTheme(dark: true),
+        home: const Scaffold(
+          body: Padding(
+            padding: EdgeInsets.all(16),
+            child: PwContactList(
+              verein: 'Post SV Nürnberg',
+              personen: personen,
+            ),
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('kürzen nie einen Kontakt weg', (tester) async {
+      // Eine halbe Telefonnummer ist schlimmer als ein Umbruch. Frueher nahm
+      // sich der Namensblock ueber Expanded allen Platz, und die Nummer wurde
+      // zu "0911 55 00 …".
+      for (final breite in [320.0, 360.0, 390.0, 393.0, 600.0, 900.0]) {
+        await bauen(tester, breite);
+        for (final p in personen) {
+          expect(_abgeschnitten(tester, find.text(p.kontakt)), isFalse,
+              reason: '${p.kontakt} bei $breite dp');
+        }
+      }
+    });
+
+    testWidgets('brechen eine lange Rolle nicht mitten im Wort', (tester) async {
+      // Bei 393 dp — einem sehr verbreiteten Telefon — passte "Kinderschutz-
+      // beauftragter" um wenige Pixel nicht neben die Adresse und brach
+      // mitten im Wort. Die Rolle muss auf eine Zeile passen; sonst gehoert
+      // der Kontakt darunter.
+      for (final breite in [320.0, 360.0, 390.0, 393.0, 412.0, 430.0]) {
+        await bauen(tester, breite);
+
+        final rolle = find.text('Kinderschutzbeauftragter');
+        final absatz = tester.renderObject<RenderParagraph>(rolle);
+        final zeilenhoehe = absatz.text.style!.fontSize! *
+            (absatz.text.style!.height ?? 1.0);
+
+        expect(
+          absatz.size.height,
+          lessThan(zeilenhoehe * 1.6),
+          reason: 'Rolle bricht bei $breite dp um',
+        );
+      }
+    });
+
+    testWidgets('stellen den Kontakt daneben, wenn er hinpasst',
+        (tester) async {
+      await bauen(tester, 900);
+      final name = tester.getRect(find.text('Michael Brandt'));
+      final kontakt = tester.getRect(find.text('kinderschutz@postsv.de'));
+      expect(kontakt.left, greaterThan(name.right),
+          reason: 'auf breiten Fenstern steht der Kontakt rechts');
+    });
   });
 }

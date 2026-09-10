@@ -8,6 +8,11 @@
 // Geprueft wird, was Widget-Tests nicht abdecken: dass die App wirklich
 // startet, die Assets aus dem Buendel liest, Supabase initialisiert und sich
 // mit echten Gesten bedienen laesst.
+//
+// Der Lauf traegt bewusst *keinen* Vereinscode ein, bevor ein Szenario
+// durchgespielt wird: mit Verein wuerden echte Zaehlwerte hochgezaehlt, und
+// eine Testfahrt hat im Einschaetzungsspiegel eines Vereins nichts zu suchen.
+// Der Code wird stattdessen in einem eigenen Lauf geprueft, der nur liest.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -102,11 +107,49 @@ void main() {
     expect(find.text('KLÄRUNGSBEDÜRFTIG'), findsOneWidget);
     expect(find.text('GRENZVERLETZEND'), findsOneWidget);
     expect(find.text('EINSCHÄTZUNGSSPIEGEL'), findsOneWidget);
+
+    // Ohne Vereinscode nennt die App keine Ansprechperson. Die Angaben im
+    // Buendel gehoeren dem Pilotverein — jemandem aus einem anderen Verein
+    // eine fremde Kinderschutz-Adresse zu nennen waere schlimmer als keine.
+    expect(find.text('ANSPRECHPERSONEN'), findsOneWidget);
+    expect(find.text('Michael Brandt'), findsNothing);
+    expect(
+      find.textContaining('Die Ansprechpersonen deines Vereins erscheinen'),
+      findsOneWidget,
+    );
+
+    // Zurück zur Übersicht. Dort kommt jetzt die einmalige Frage nach dem
+    // Vereinscode — sie kam vorher nicht, weil die Erststart-Karte stand.
+    await tippen(tester, find.text('Zur Übersicht'));
+    expect(find.text('Bist du in einem Verein?'), findsOneWidget);
+    await tippen(tester, find.text('Später'));
+
+    expect(find.text('Abgeschlossen'), findsOneWidget);
+  });
+
+  testWidgets('Vereinscode holt die Angaben aus der Datenbank',
+      (tester) async {
+    // Der einzige Lauf, der wirklich ans Netz geht — und er liest nur.
+    await app.main();
+    await tester.pumpAndSettle(const Duration(seconds: 5));
+
+    await tippen(tester, find.byTooltip('Einstellungen'));
+    expect(find.text('Vereinsangaben'), findsWidgets);
+
+    await tester.enterText(find.byType(TextField).first, 'postsv-2026');
+    await tester.pumpAndSettle();
+    await tippen(tester, find.text('Prüfen'));
+    await tester.pumpAndSettle(const Duration(seconds: 5));
+
+    // Name, Code und Ansprechpersonen stammen jetzt aus der Datenbank.
+    expect(find.text('Post SV Nürnberg'), findsWidgets);
+    expect(find.text('Code POSTSV-2026'), findsOneWidget);
+    expect(find.text('Michael Brandt'), findsOneWidget);
     expect(find.text('ANSPRECHPERSONEN · POST SV NÜRNBERG'), findsOneWidget);
 
-    // Zurück zur Übersicht: das Szenario gilt als abgeschlossen.
-    await tippen(tester, find.text('Zur Übersicht'));
-    expect(find.text('Abgeschlossen'), findsOneWidget);
+    // Wieder entfernen: die Ansprechpersonen verschwinden mit.
+    await tippen(tester, find.text('Verein entfernen'));
+    expect(find.text('Michael Brandt'), findsNothing);
   });
 
   testWidgets('Overlays öffnen und schließen', (tester) async {
@@ -123,6 +166,7 @@ void main() {
     // Info-Sheet über das i in der Kopfzeile.
     await tippen(tester, find.byTooltip('So funktioniert Pathwise'));
     expect(find.text('Kein Konto, keine Anmeldung'), findsWidgets);
+    expect(find.text('Dein Verein über einen Code'), findsWidgets);
     await tippen(tester, find.text('Verstanden'));
 
     // Rückmeldungs-Sheet: das Textfeld muss bedienbar sein.
@@ -158,8 +202,10 @@ void main() {
     await tippen(tester, find.byTooltip('Einstellungen'));
     expect(find.text('DARSTELLUNG'), findsOneWidget);
     expect(find.text('BEWEGUNG'), findsOneWidget);
-    // Die Vereinsangaben stehen weiter unten auf derselben Seite.
-    expect(find.text('Post SV Nürnberg'), findsWidgets);
+    // Die Vereinsangaben stehen weiter unten auf derselben Seite — ohne
+    // eingetragenen Code mit dem Feld dafuer statt mit einem Vereinsnamen.
+    expect(find.text('Vereinsangaben'), findsWidgets);
+    expect(find.text('Vereinscode'), findsOneWidget);
     expect(find.text('EXTERNE BERATUNG'), findsOneWidget);
     expect(find.text('WAS GESPEICHERT WIRD'), findsOneWidget);
 
