@@ -11,6 +11,7 @@ import '../design/components/pw_label.dart';
 import '../design/components/pw_press_scale.dart';
 import '../design/components/pw_step_indicator.dart';
 import '../design/components/pw_tag.dart';
+import '../design/components/pw_wenn_sichtbar.dart';
 import '../design/pathwise_theme.dart';
 import '../design/pathwise_tokens.dart';
 import '../state/durchlauf_state.dart';
@@ -294,13 +295,22 @@ class _SzenarioKarte extends StatelessWidget {
 
     // Die Geste liegt ueber der Karte und ist auf deren Rundung beschnitten,
     // damit nichts in die Nachbarkarten ragt.
+    //
+    // Sie startet erst, wenn die Karte im Bild steht. Der Scrollbereich baut
+    // alle Karten sofort — ohne diese Kopplung liefe die Geste bei einer Karte
+    // weiter unten ab, waehrend niemand hinsieht, und waere danach als gezeigt
+    // abgehakt.
     return Stack(
       children: [
         karte,
         Positioned.fill(
           child: ClipRRect(
             borderRadius: PwRadius.card,
-            child: PwKonfetti(onFertig: onGefeiert ?? () {}),
+            child: PwWennSichtbar(
+              builder: (ctx, sichtbar) => sichtbar
+                  ? PwKonfetti(onFertig: onGefeiert ?? () {})
+                  : const SizedBox.expand(),
+            ),
           ),
         ),
       ],
