@@ -12,6 +12,7 @@ import 'data/spiegel_repository.dart';
 import 'data/supabase_config.dart';
 import 'data/szenario_repository.dart';
 import 'design/pathwise_theme.dart';
+import 'screens/route_beobachter.dart';
 import 'screens/uebersicht_screen.dart';
 import 'state/durchlauf_state.dart';
 
@@ -78,6 +79,9 @@ class PathwiseApp extends ConsumerWidget {
           child: kind ?? const SizedBox.shrink(),
         );
       },
+      // Damit die Uebersicht merkt, wenn sie nach einem Szenario wieder
+      // obenauf liegt (siehe route_beobachter.dart).
+      navigatorObservers: [pwRouteBeobachter],
       home: const UebersichtScreen(),
     );
   }

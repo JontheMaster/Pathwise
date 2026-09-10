@@ -18,6 +18,7 @@ import '../state/durchlauf_state.dart';
 import 'einstieg_screen.dart';
 import 'overlays.dart';
 import 'pw_scaffold.dart';
+import 'route_beobachter.dart';
 
 class UebersichtScreen extends ConsumerStatefulWidget {
   const UebersichtScreen({super.key});
@@ -26,7 +27,8 @@ class UebersichtScreen extends ConsumerStatefulWidget {
   ConsumerState<UebersichtScreen> createState() => _UebersichtScreenState();
 }
 
-class _UebersichtScreenState extends ConsumerState<UebersichtScreen> {
+class _UebersichtScreenState extends ConsumerState<UebersichtScreen>
+    with RouteAware {
   /// Laeuft, solange die Vereinsfrage offen auf dem Schirm steht.
   bool _fragtGerade = false;
 
@@ -46,16 +48,54 @@ class _UebersichtScreenState extends ConsumerState<UebersichtScreen> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is ModalRoute<void>) {
+      pwRouteBeobachter.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    pwRouteBeobachter.unsubscribe(this);
+    super.dispose();
+  }
+
+  /// Zurueck aus einem Szenario: jetzt liegt die Uebersicht wieder obenauf.
+  /// Flutter baut sie dabei nicht neu, deshalb der RouteObserver.
+  ///
+  /// Einen Frame warten, nicht sofort: didPopNext laeuft mitten im Aufraeumen
+  /// des Navigators, und wer dort etwas pusht, laeuft in dessen Sperre.
+  @override
+  void didPopNext() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _vielleichtFragen());
+  }
+
   /// Fragt einmalig nach dem Vereinscode.
   ///
-  /// Nicht waehrend die Erststart-Karte steht: die ist beim allerersten
+  /// Zwei Bedingungen, beide aus dem Verhalten heraus:
+  ///
+  /// Nicht, solange die Erststart-Karte steht — die ist beim allerersten
   /// Oeffnen die Einfuehrung in die App, und ein Sheet darueber verdeckt
-  /// genau den Text, der erklaert, worum es geht. Die Frage kommt, sobald
-  /// die Karte weg ist — also nach dem ersten Antippen von "Szenario
-  /// starten". Deshalb steht die Pruefung im Aufbau und nicht in initState.
-  void _vielleichtFragen(bool erststartKarteSteht) {
-    if (_fragtGerade || erststartKarteSteht) return;
-    if (!ref.read(durchlaufProvider).vereinFragen) return;
+  /// genau den Text, der erklaert, worum es geht.
+  ///
+  /// Und nur, wenn die Uebersicht auch obenauf liegt. Sie baut naemlich auch
+  /// dann neu, wenn ein Szenario darueber offen ist — und genau in dem Moment
+  /// tut sie das: "Erstes Szenario ansehen" nimmt die Erststart-Karte weg und
+  /// oeffnet in derselben Bewegung das Szenario. Ohne diese Pruefung ginge die
+  /// Frage ueber dem gerade geoeffneten Szenario auf.
+  ///
+  /// Zusammen heisst das: die Frage kommt, sobald man das erste Mal aus einem
+  /// Szenario auf die Uebersicht zurueckkommt.
+  void _vielleichtFragen() {
+    if (_fragtGerade || !mounted) return;
+
+    final s = ref.read(durchlaufProvider);
+    if (!s.vereinFragen) return;
+    if (!s.fortschritt.erststartGesehen && s.erststartAn) return;
+    if (ModalRoute.of(context)?.isCurrent != true) return;
 
     _fragtGerade = true;
     vereinsfrageZeigen(context).then((_) {
@@ -74,8 +114,7 @@ class _UebersichtScreenState extends ConsumerState<UebersichtScreen> {
     final laufend = s.laufendes;
     final erststart = !s.fortschritt.erststartGesehen && s.erststartAn;
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _vielleichtFragen(erststart));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _vielleichtFragen());
 
     return PwScaffold(
       titel: 'Pathwise',

@@ -13,6 +13,8 @@ import 'package:pathwise/data/szenario_modelle.dart';
 import 'package:pathwise/data/szenario_repository.dart';
 import 'package:pathwise/design/components/pw_contact_list.dart';
 import 'package:pathwise/design/pathwise_theme.dart';
+import 'package:pathwise/screens/einstieg_screen.dart';
+import 'package:pathwise/screens/route_beobachter.dart';
 import 'package:pathwise/screens/uebersicht_screen.dart';
 import 'package:pathwise/state/durchlauf_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,6 +58,7 @@ void main() {
             theme: pwTheme(dark: false),
             darkTheme: pwTheme(dark: true),
             themeMode: ThemeMode.dark,
+            navigatorObservers: [pwRouteBeobachter],
             home: const UebersichtScreen(),
           ),
         ),
@@ -84,6 +87,52 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text(_frage), findsOneWidget);
+    });
+
+    testWidgets('legt sich nicht über ein gerade geöffnetes Szenario',
+        (tester) async {
+      // "Erstes Szenario ansehen" nimmt die Erststart-Karte weg und oeffnet
+      // in derselben Bewegung das Szenario. Die Uebersicht baut dabei neu,
+      // liegt aber schon darunter — die Frage darf trotzdem nicht aufgehen.
+      final (widget, _) = huelle(const Fortschritt());
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      // ensureVisible ist noetig: der Knopf steht unterhalb des Sichtfensters,
+      // und tester.tap warnt dort nur, statt zu scheitern.
+      final knopf = find.text('Erstes Szenario ansehen');
+      await tester.ensureVisible(knopf);
+      await tester.pumpAndSettle();
+      await tester.tap(knopf);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(EinstiegScreen), findsOneWidget,
+          reason: 'der Einstieg ins Szenario steht offen');
+      expect(find.text(_frage), findsNothing);
+    });
+
+    testWidgets('kommt, sobald man aus dem Szenario zurückkommt',
+        (tester) async {
+      // Der Gegentest zum vorigen: irgendwann muss die Frage ja kommen. Beim
+      // Zurueckkommen baut Flutter die Uebersicht nicht neu — dafuer gibt es
+      // den RouteObserver.
+      final (widget, behaelter) = huelle(const Fortschritt());
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      final knopf = find.text('Erstes Szenario ansehen');
+      await tester.ensureVisible(knopf);
+      await tester.pumpAndSettle();
+      await tester.tap(knopf);
+      await tester.pumpAndSettle();
+      expect(find.text(_frage), findsNothing);
+
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
+
+      expect(find.text(_frage), findsOneWidget);
+      expect(behaelter.read(durchlaufProvider).vereinFragen, isTrue,
+          reason: 'erst das Schliessen merkt die Frage als erledigt');
     });
 
     testWidgets('"Später" schliesst sie und fragt nicht wieder',
