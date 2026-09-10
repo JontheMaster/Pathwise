@@ -561,6 +561,12 @@ Der visuelle Entwurf liegt als Design-Handoff unter `design_reference/` (Referen
 interaktiver Prototyp, Screenshots). `DESIGN.md` im Repo-Root ist die maßgebliche Fassung für die
 Implementierung.
 
+An zwei Stellen geht die App inzwischen darüber hinaus, weil die zentrale Datenhaltung dazukam.
+`DESIGN.md` §7 beschreibt **sechs** Info-Blöcke in der Erststart-Karte und im Info-Sheet; es sind
+jetzt **sieben** — der siebte erklärt den Vereinscode, den es zum Zeitpunkt des Entwurfs noch
+nicht gab. Und §11 Punkt 2 („Vereinszuordnung") führt genau diese Zuordnung als offenen Punkt
+ohne Entwurf; sie ist jetzt gebaut.
+
 **Schriften:** Jost, Nunito Sans, JetBrains Mono — SIL Open Font License, Lizenztexte unter
 `assets/fonts/`.
 **Icons:** [Lucide](https://lucide.dev) 0.441, ISC License.

@@ -41,7 +41,7 @@ void main() {
     });
 
     test('Rahmen, Infos, Beratung, Module und Personen sind vollstaendig', () {
-      expect(inhalt.infos, hasLength(6));
+      expect(inhalt.infos, hasLength(7));
       expect(inhalt.beratung, hasLength(2));
       expect(inhalt.module, hasLength(3));
       expect(inhalt.personen, hasLength(2));

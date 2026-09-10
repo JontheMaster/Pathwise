@@ -442,6 +442,11 @@
       "text": "Niemand kann nachvollziehen, welche Möglichkeit du gewählt hast, ob du ein Szenario abgebrochen hast oder wie oft du die App öffnest. Es gibt keinen Nachweis und keine Auswertung über dich."
     },
     {
+      "ikon": "shield",
+      "titel": "Dein Verein über einen Code",
+      "text": "Damit am Ende die richtigen Ansprechpersonen stehen, gibst du einmal den Code deines Vereins ein — beim ersten Start oder später in den Einstellungen. Der Code ist keine Anmeldung: Er ordnet dieses Gerät einem Verein zu, mehr nicht. Was du entscheidest, bleibt auch mit Code anonym. Ohne Code läuft die App weiter, dann stehen nur die bundesweiten Nummern."
+    },
+    {
       "ikon": "list-checks",
       "titel": "Auswertung nach jedem Szenario",
       "text": "Am Ende siehst du, welche Merkmale in der Situation eine Rolle gespielt haben: was fachlich in Ordnung war, was aufmerksam machen sollte und was eine Grenze verletzt hätte."
@@ -449,7 +454,7 @@
     {
       "ikon": "users",
       "titel": "Wie andere entschieden haben",
-      "text": "In der Auswertung siehst du zusätzlich, wie sich andere Trainerinnen und Trainer an derselben Stelle entschieden haben — als Einordnung, nicht als Bewertung."
+      "text": "In der Auswertung siehst du zusätzlich, wie sich andere Trainerinnen und Trainer deines Vereins an derselben Stelle entschieden haben — als Einordnung, nicht als Bewertung. Dafür braucht die App den Vereinscode."
     },
     {
       "ikon": "rotate-ccw",

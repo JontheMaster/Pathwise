@@ -50,6 +50,26 @@ class _FesterSpiegel implements SpiegelRepository {
 }
 
 
+/// Laedt alle Image-Widgets wirklich, bevor das Bild verglichen wird.
+///
+/// Image.asset dekodiert asynchron. Im Widget-Test passiert das nur innerhalb
+/// von runAsync — sonst haengt es davon ab, ob ein frueherer Test das Bild
+/// schon in den Cache gelegt hat, und dieselbe Aufnahme sieht je nach
+/// Reihenfolge anders aus. Betrifft hier das Logo in Kopfzeile und
+/// Seitenleiste, das einzige Bildmotiv der App.
+Future<void> _bilderLaden(WidgetTester tester) async {
+  final bilder = tester.widgetList<Image>(find.byType(Image)).toList();
+  if (bilder.isEmpty) return;
+
+  final stelle = tester.element(find.byType(MaterialApp));
+  await tester.runAsync(() async {
+    for (final b in bilder) {
+      await precacheImage(b.image, stelle);
+    }
+  });
+  await tester.pumpAndSettle();
+}
+
 void main() {
   late PwInhalt inhalt;
 
@@ -128,6 +148,8 @@ void main() {
       await danach(tester);
       await tester.pumpAndSettle();
     }
+
+    await _bilderLaden(tester);
     await expectLater(
       find.byType(MaterialApp),
       matchesGoldenFile('goldens/$name.png'),
