@@ -279,6 +279,7 @@ class _ZaehlerSpion implements SpiegelRepository {
   Future<void> zaehlen({
     required String? vereinId,
     required String szenarioId,
+    required String signatur,
     required int punktIndex,
     required String optionId,
   }) async {
@@ -287,5 +288,6 @@ class _ZaehlerSpion implements SpiegelRepository {
   }
 
   @override
-  Future<SpiegelDaten> laden(String szenarioId, {String? vereinId}) async => SpiegelDaten.fehler;
+  Future<SpiegelDaten> laden(String szenarioId,
+          {required String signatur, String? vereinId}) async => SpiegelDaten.fehler;
 }

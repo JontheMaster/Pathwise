@@ -10,6 +10,8 @@
 //   360-599    Standard, eine Spalte
 //   600-899    Seitenpolster 24, Inhalt auf 640 zentriert, Raster zweispaltig
 //   >= 900     Zweispalten-Layout mit Seitenleiste, Ampel-Listen dreispaltig
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -44,7 +46,8 @@ class _StillerSpiegel implements SpiegelRepository {
   const _StillerSpiegel();
 
   @override
-  Future<SpiegelDaten> laden(String s, {String? vereinId}) async => const SpiegelDaten(
+  Future<SpiegelDaten> laden(String s,
+          {required String signatur, String? vereinId}) async => const SpiegelDaten(
         status: SpiegelStatus.da,
         werte: {
           0: {'a': 34, 'b': 12, 'c': 12},
@@ -57,6 +60,7 @@ class _StillerSpiegel implements SpiegelRepository {
   Future<void> zaehlen({
     required String? vereinId,
     required String szenarioId,
+    required String signatur,
     required int punktIndex,
     required String optionId,
   }) async {}
@@ -324,5 +328,37 @@ void main() {
         expect(check.left, closeTo(ok.left, 1), reason: 'bei $breite dp');
       }
     });
+
+    // Auf Web und Desktop haengt eine ScrollView nicht von selbst am
+    // PrimaryScrollController. Eine Scrollbar ohne eigenen Controller greift
+    // aber genau darauf zurueck und wirft dann beim ersten Mausrad-Ereignis.
+    // Im Test faellt das nur auf, wenn die Plattform auch eine Desktop-
+    // Plattform ist — mit der Vorgabe (Android) laeuft es durch.
+    for (final plattform in [TargetPlatform.macOS, TargetPlatform.windows]) {
+      testWidgets('Mausrad scrollt ohne Fehler ($plattform)', (tester) async {
+        // Nicht ueber addTearDown zuruecksetzen: der Test-Rahmen prueft die
+        // Debug-Variablen, bevor die Aufraeumer laufen.
+        debugDefaultTargetPlatformOverride = plattform;
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(huelle(
+          const UebersichtScreen(),
+          const Fortschritt(erststartGesehen: true),
+        ));
+        await tester.pumpAndSettle();
+
+        final zeiger = TestPointer(1, PointerDeviceKind.mouse);
+        final mitte = tester.getCenter(find.byType(UebersichtScreen));
+        await tester.sendEventToBinding(zeiger.hover(mitte));
+        await tester.sendEventToBinding(zeiger.scroll(const Offset(0, 240)));
+        await tester.pumpAndSettle();
+
+        final fehler = tester.takeException();
+        debugDefaultTargetPlatformOverride = null;
+        expect(fehler, isNull);
+      });
+    }
   });
 }

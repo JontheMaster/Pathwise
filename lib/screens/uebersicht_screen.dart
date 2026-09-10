@@ -37,7 +37,12 @@ class _UebersichtScreenState extends ConsumerState<UebersichtScreen> {
     // eine geaenderte Nummer ohne neue App-Fassung ankommt. Scheitert es,
     // bleiben die alten stehen.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) ref.read(durchlaufProvider.notifier).vereinAuffrischen();
+      if (!mounted) return;
+      final notifier = ref.read(durchlaufProvider.notifier);
+      notifier.vereinAuffrischen();
+      // Und die Szenarien: die Uebersicht steht bereits mit denen aus dem
+      // Buendel, der Abruf tauscht sie aus, sobald er da ist.
+      notifier.szenarienAuffrischen();
     });
   }
 

@@ -48,6 +48,7 @@ class Fortschritt {
     this.bewegung = PwBewegung.normal,
     this.verein,
     this.vereinGefragt = false,
+    this.fassungen = const {},
   });
 
   /// "szenarioId:punktIndex" -> "a" | "b" | "c"
@@ -83,6 +84,14 @@ class Fortschritt {
   /// „Später" gewaehlt hat, soll nicht bei jedem Start neu gefragt werden.
   final bool vereinGefragt;
 
+  /// szenarioId -> Fassung, in der dieses Geraet das Szenario angefangen hat.
+  ///
+  /// Wird ein Szenario ueberarbeitet, waehrend jemand mittendrin steckt,
+  /// wechselte sonst zwischen zwei Entscheidungspunkten die Leitfrage. Der
+  /// angeheftete Wert bleibt, bis "Nochmal" gedrueckt wird — auch nach dem
+  /// Abschluss, damit die Auswertung zu den getroffenen Entscheidungen passt.
+  final Map<String, int> fassungen;
+
   static String schluessel(String szenarioId, int punkt) => '$szenarioId:$punkt';
 
   String? wahl(String szenarioId, int punkt) =>
@@ -99,6 +108,7 @@ class Fortschritt {
     PwVerein? verein,
     bool vereinEntfernen = false,
     bool? vereinGefragt,
+    Map<String, int>? fassungen,
   }) =>
       Fortschritt(
         wahlen: wahlen ?? this.wahlen,
@@ -110,7 +120,18 @@ class Fortschritt {
         bewegung: bewegung ?? this.bewegung,
         verein: vereinEntfernen ? null : (verein ?? this.verein),
         vereinGefragt: vereinGefragt ?? this.vereinGefragt,
+        fassungen: fassungen ?? this.fassungen,
       );
+}
+
+Map<String, int> _fassungenAusText(String? roh) {
+  if (roh == null || roh.isEmpty) return const {};
+  try {
+    return (jsonDecode(roh) as Map<String, dynamic>)
+        .map((k, v) => MapEntry(k, (v as num).toInt()));
+  } catch (_) {
+    return const {};
+  }
 }
 
 class FortschrittSpeicher {
@@ -124,6 +145,7 @@ class FortschrittSpeicher {
   static const _kTheme = 'pw_theme_mode';
   static const _kVerein = 'pw_verein';
   static const _kVereinGefragt = 'pw_verein_gefragt';
+  static const _kFassungen = 'pw_fassungen';
   static const _kBewegung = 'pw_bewegung';
   /// Vorgaenger: ein blosser Schalter. Wird beim Laden uebernommen.
   static const _kBewegungAlt = 'pw_bewegung_reduziert';
@@ -141,6 +163,7 @@ class FortschrittSpeicher {
       gefeiert: (p.getStringList(_kGefeiert) ?? const []).toSet(),
       erststartGesehen: p.getBool(_kErststart) ?? false,
       verein: PwVerein.ausText(p.getString(_kVerein)),
+      fassungen: _fassungenAusText(p.getString(_kFassungen)),
       vereinGefragt: p.getBool(_kVereinGefragt) ?? false,
       bewegung: p.containsKey(_kBewegung)
           ? PwBewegung.vonSchluessel(p.getString(_kBewegung))
@@ -170,6 +193,7 @@ class FortschrittSpeicher {
       _kBewegungAlt,
       _kVerein,
       _kVereinGefragt,
+      _kFassungen,
     ]) {
       await p.remove(k);
     }
@@ -185,6 +209,7 @@ class FortschrittSpeicher {
     await p.setString(_kTheme, f.themeMode.name);
     await p.setString(_kBewegung, f.bewegung.schluessel);
     await p.setBool(_kVereinGefragt, f.vereinGefragt);
+    await p.setString(_kFassungen, jsonEncode(f.fassungen));
     if (f.verein == null) {
       await p.remove(_kVerein);
     } else {

@@ -48,9 +48,12 @@ class _AuswertungScreenState extends ConsumerState<AuswertungScreen> {
   }
 
   Future<void> _spiegelLaden() async {
+    final s = ref.read(durchlaufProvider);
+    final sz = s.inhalt.szenarien.firstWhere((x) => x.id == widget.szenarioId);
     final daten = await ref.read(spiegelRepositoryProvider).laden(
           widget.szenarioId,
-          vereinId: ref.read(durchlaufProvider).vereinId,
+          signatur: sz.signatur,
+          vereinId: s.vereinId,
         );
     if (mounted) setState(() => _spiegel = daten);
   }

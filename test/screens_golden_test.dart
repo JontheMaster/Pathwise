@@ -36,12 +36,14 @@ class _FesterSpiegel implements SpiegelRepository {
   final SpiegelDaten daten;
 
   @override
-  Future<SpiegelDaten> laden(String szenarioId, {String? vereinId}) async => daten;
+  Future<SpiegelDaten> laden(String szenarioId,
+          {required String signatur, String? vereinId}) async => daten;
 
   @override
   Future<void> zaehlen({
     required String? vereinId,
     required String szenarioId,
+    required String signatur,
     required int punktIndex,
     required String optionId,
   }) async {}

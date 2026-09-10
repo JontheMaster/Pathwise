@@ -168,13 +168,15 @@ void main() {
       await const SpiegelRepository().zaehlen(
         vereinId: null,
         szenarioId: 'egal',
+        signatur: 'a' * 32,
         punktIndex: 0,
         optionId: 'a',
       );
     });
 
     test('lädt ohne Verein den eigenen Leerzustand', () async {
-      final daten = await const SpiegelRepository().laden('egal');
+      final daten =
+          await const SpiegelRepository().laden('egal', signatur: 'a' * 32);
       expect(daten.status, SpiegelStatus.ohneVerein);
     });
   });

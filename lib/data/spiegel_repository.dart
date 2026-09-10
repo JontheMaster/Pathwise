@@ -84,16 +84,23 @@ class SpiegelRepository {
   Future<void> zaehlen({
     required String? vereinId,
     required String szenarioId,
+    required String signatur,
     required int punktIndex,
     required String optionId,
   }) async {
     final c = _client;
     // Ohne Verein wird nicht gezaehlt: die Zahl gehoert zu einem Team.
-    if (c == null || vereinId == null) return;
+    //
+    // Ohne Signatur auch nicht: dann stammt das Szenario aus dem Buendel, also
+    // aus der Rueckfallebene ohne Netz — und ohne Netz kaeme der Zaehlwert
+    // ohnehin nicht an. Die Signatur bindet die Zahl an die Fassung der
+    // Entscheidungspunkte, in der sie entstanden ist.
+    if (c == null || vereinId == null || signatur.isEmpty) return;
     try {
       await c.rpc('zaehlwert_erhoehen', params: {
         'p_verein': vereinId,
         'p_szenario': szenarioId,
+        'p_signatur': signatur,
         'p_punkt': punktIndex,
         'p_option': optionId,
       });
@@ -103,14 +110,25 @@ class SpiegelRepository {
   }
 
   /// Beim Oeffnen der Auswertung.
-  Future<SpiegelDaten> laden(String szenarioId, {String? vereinId}) async {
+  Future<SpiegelDaten> laden(
+    String szenarioId, {
+    required String signatur,
+    String? vereinId,
+  }) async {
     if (vereinId == null) return SpiegelDaten.ohneVerein;
+    // Ohne Signatur gibt es nichts abzurufen — das Szenario kommt aus dem
+    // Buendel, und dort gelten die vorbelegten Anteile.
+    if (signatur.isEmpty) return SpiegelDaten.ohneBackend;
     final c = _client;
     if (c == null) return SpiegelDaten.ohneBackend;
     try {
       final zeilen = await c.rpc(
         'spiegel',
-        params: {'p_verein': vereinId, 'p_szenario': szenarioId},
+        params: {
+          'p_verein': vereinId,
+          'p_szenario': szenarioId,
+          'p_signatur': signatur,
+        },
       );
       final werte = <int, Map<String, int>>{};
       for (final z in (zeilen as List).cast<Map<String, dynamic>>()) {

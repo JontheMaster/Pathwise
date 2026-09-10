@@ -1,6 +1,14 @@
 # Vorschlag: Szenarien und Vereinsangaben aus der Datenbank, dazu ein Dashboard
 
-**Stand 10. September 2026 — ein Vorschlag, nichts davon ist umgesetzt.**
+**Stand 10. September 2026 — als Vorschlag geschrieben.**
+
+> **Was daraus geworden ist:** Die Phasen 1 bis 3 sind gebaut und in Betrieb —
+> Vereinsangaben über einen Vereinscode
+> ([`0002_vereine.sql`](../supabase/migrations/0002_vereine.sql)) und Szenarien mit Entwürfen
+> und Fassungen ([`0003_szenarien.sql`](../supabase/migrations/0003_szenarien.sql)). Das
+> Dashboard (Phase 4) steht noch aus. Wo dieses Papier und das SQL auseinandergehen, gilt das
+> SQL; die kurze Fassung steht im [README](../README.md#backend). Dieser Text bleibt als
+> Begründung stehen, warum es so und nicht anders aufgebaut ist.
 
 Zwei Wünsche hängen zusammen und werden hier gemeinsam beantwortet:
 

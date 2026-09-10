@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/fortschritt_speicher.dart';
 import '../data/spiegel_repository.dart';
 import '../data/szenario_modelle.dart';
+import '../data/szenario_repository.dart';
 import '../data/verein_modelle.dart';
 import '../data/verein_repository.dart';
 
@@ -99,20 +100,30 @@ class DurchlaufState {
   bool get vereinFragen =>
       fortschritt.verein == null && !fortschritt.vereinGefragt;
 
-  DurchlaufState copyWith({Fortschritt? fortschritt, String? themenfeldFilter}) =>
+  DurchlaufState copyWith({
+    PwInhalt? inhalt,
+    Fortschritt? fortschritt,
+    String? themenfeldFilter,
+  }) =>
       DurchlaufState(
-        inhalt: inhalt,
+        inhalt: inhalt ?? this.inhalt,
         fortschritt: fortschritt ?? this.fortschritt,
         themenfeldFilter: themenfeldFilter ?? this.themenfeldFilter,
       );
 }
 
 class DurchlaufNotifier extends Notifier<DurchlaufState> {
-  DurchlaufNotifier(this._start, this._speicher, this._spiegel);
+  DurchlaufNotifier(
+    this._start,
+    this._speicher,
+    this._spiegel, [
+    this._szenarien = const SzenarioRepository(),
+  ]);
 
   final DurchlaufState _start;
   final FortschrittSpeicher _speicher;
   final SpiegelRepository _spiegel;
+  final SzenarioRepository _szenarien;
 
   @override
   DurchlaufState build() => _start;
@@ -196,8 +207,40 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
 
   void begonnen(PwSzenario s) {
     if (state.fortschritt.begonnen.contains(s.id)) return;
-    _setzen(state.fortschritt
-        .copyWith(begonnen: {...state.fortschritt.begonnen, s.id}));
+    _setzen(state.fortschritt.copyWith(
+      begonnen: {...state.fortschritt.begonnen, s.id},
+      // Die Fassung anheften: ab hier gilt sie fuer dieses Geraet, bis
+      // "Nochmal" gedrueckt wird.
+      fassungen: s.ausDatenbank
+          ? {...state.fortschritt.fassungen, s.id: s.fassung}
+          : state.fortschritt.fassungen,
+    ));
+  }
+
+  /// Holt die Szenarien aus der Datenbank und tauscht sie gegen die aus dem
+  /// Buendel. Laeuft beim Start nebenher; scheitert es, bleibt das Buendel.
+  ///
+  /// Angefangene Szenarien behalten ihre angeheftete Fassung — auch wenn
+  /// inzwischen eine neuere veroeffentlicht wurde.
+  Future<void> szenarienAuffrischen() async {
+    final aktuell = await _szenarien.ausDatenbank();
+    if (aktuell == null) return;
+
+    final angeheftet = state.fortschritt.fassungen;
+    final fertig = <PwSzenario>[];
+    for (final sz in aktuell) {
+      final wunsch = angeheftet[sz.id];
+      if (wunsch == null || wunsch == sz.fassung) {
+        fertig.add(sz);
+        continue;
+      }
+      // Ueberarbeitet, waehrend jemand mittendrin steckt: die alte Fassung
+      // holen. Ist sie nicht mehr abrufbar, gilt die aktuelle — besser ein
+      // veraenderter Text als ein verschwundenes Szenario.
+      fertig.add(await _szenarien.fassung(sz.id, wunsch) ?? sz);
+    }
+
+    state = state.copyWith(inhalt: state.inhalt.mitSzenarien(fertig));
   }
 
   /// Eine Option waehlen. Der Zaehlwert geht nebenher ins Netz; scheitert das,
@@ -223,6 +266,7 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
       _spiegel.zaehlen(
         vereinId: state.vereinId,
         szenarioId: s.id,
+        signatur: s.signatur,
         punktIndex: punkt,
         optionId: optionId,
       );
@@ -240,12 +284,19 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
   /// "Nochmal" — loescht nur die Wahlen dieses Szenarios (DESIGN.md 8).
   /// `gezaehlt` bleibt absichtlich stehen: der Wiederholungsdurchlauf soll den
   /// Spiegel nicht ein zweites Mal hochzaehlen.
+  ///
+  /// Die angeheftete Fassung faellt dabei weg. Der laufende Wiederholungs-
+  /// durchlauf spielt noch die geladene Fassung zu Ende — mitten im Szenario
+  /// den Text auszutauschen waere genau das, was das Anheften verhindern soll.
+  /// Beim naechsten Start greift dann die aktuelle Fassung, und [begonnen]
+  /// heftet sie neu an.
   void nochmal(PwSzenario s) {
     final wahlen = {...state.fortschritt.wahlen};
     for (var p = 0; p < s.punkte.length; p++) {
       wahlen.remove(Fortschritt.schluessel(s.id, p));
     }
-    _setzen(state.fortschritt.copyWith(wahlen: wahlen));
+    final fassungen = {...state.fortschritt.fassungen}..remove(s.id);
+    _setzen(state.fortschritt.copyWith(wahlen: wahlen, fassungen: fassungen));
   }
 }
 

@@ -110,6 +110,8 @@ class PwSzenario {
     required this.ausgangssituation,
     required this.punkte,
     required this.merkmale,
+    this.fassung = 0,
+    this.signatur = '',
   });
 
   final String id;
@@ -122,6 +124,21 @@ class PwSzenario {
   final String ausgangssituation;
   final List<PwPunkt> punkte;
   final List<PwMerkmal> merkmale;
+
+  /// Fassungsnummer aus der Datenbank. 0 heisst: aus dem App-Buendel.
+  ///
+  /// Wer ein Szenario angefangen hat, spielt es in seiner Fassung zu Ende —
+  /// sonst wechselte mitten im Durchlauf die Leitfrage
+  /// (supabase/migrations/0003_szenarien.sql).
+  final int fassung;
+
+  /// Fingerabdruck ueber Leitfragen und Handlungsoptionen. Die Zaehlwerte des
+  /// Einschaetzungsspiegels haengen daran: ein korrigierter Tippfehler im
+  /// Titel laesst ihn stehen, eine geaenderte Handlungsoption faengt neu an.
+  /// Leer heisst: aus dem Buendel, es wird nicht gezaehlt.
+  final String signatur;
+
+  bool get ausDatenbank => fassung > 0 && signatur.isNotEmpty;
 
   List<PwMerkmal> merkmaleDerStufe(PwStufe s) =>
       merkmale.where((m) => m.stufe == s).toList(growable: false);
@@ -145,6 +162,8 @@ class PwSzenario {
         merkmale: (j['merkmale'] as List)
             .map((m) => PwMerkmal.ausJson(m as Map<String, dynamic>))
             .toList(growable: false),
+        fassung: (j['fassung'] as num?)?.toInt() ?? 0,
+        signatur: j['signatur'] as String? ?? '',
       );
 }
 
@@ -248,6 +267,17 @@ class PwInhalt {
   final List<PwModul> module;
   final List<PwPerson> personen;
   final String verein;
+
+  /// Dieselben Rahmendaten mit ausgetauschten Szenarien — fuer den Abruf aus
+  /// der Datenbank, der nur die Szenarien betrifft.
+  PwInhalt mitSzenarien(List<PwSzenario> neue) => PwInhalt(
+        szenarien: neue,
+        infos: infos,
+        beratung: beratung,
+        module: module,
+        personen: personen,
+        verein: verein,
+      );
 
   /// "Alle" gefolgt von den Themenfeldern in Reihenfolge der Szenarien
   /// (PathwiseApp.dc.html Z. 815).

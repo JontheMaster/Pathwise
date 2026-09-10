@@ -310,15 +310,17 @@ lib/
     components/                    16 Komponenten mit allen States aus DESIGN.md §4
   data/
     szenario_modelle.dart          Szenario, Punkt, Option, Merkmal, Info, Beratung, Person
-    szenario_repository.dart       lädt assets/szenarien.json
-    fortschritt_speicher.dart      lokale Persistenz
+    szenario_repository.dart       Szenarien aus der Datenbank, Bündel als Rückfallebene
+    verein_modelle.dart            Verein, abgerufen über den Vereinscode
+    verein_repository.dart         schlägt einen Vereinscode nach
+    fortschritt_speicher.dart      lokale Persistenz, inkl. angehefteter Fassungen
     spiegel_repository.dart        Zählwerte senden und lesen
     rueckmeldung_repository.dart   Rückmeldung einsenden
     supabase_config.dart           URL und Key, per --dart-define überschreibbar
   state/durchlauf_state.dart       Riverpod
   screens/                         Übersicht, Durchlauf, Auswertung, Einstellungen,
                                    vier Overlays, PwScaffold (Kopf, Inhalt, Fuß, Leiste)
-assets/szenarien.json              Szenarien, Infos, Beratung, Personen, Module
+assets/szenarien.json              Rückfallebene ohne Netz; Infos und Module stehen nur hier
 supabase/migrations/               Schema
 test/                              Regeltests und Golden-Aufnahmen aller Screens
 design_reference/                  Design-Handoff mit Prototyp und Screenshots (kein Projektcode)
@@ -382,29 +384,69 @@ flutter run --dart-define=SUPABASE_URL=https://… --dart-define=SUPABASE_KEY=sb
 Der publishable key ist dafür gemacht, im Client zu stehen — er gibt für sich genommen keine
 Rechte. Was möglich ist, entscheidet allein RLS.
 
-**Schema** ([`supabase/migrations/0001_pathwise.sql`](supabase/migrations/0001_pathwise.sql)):
+**Schema** (`supabase/migrations/`):
 
-| Objekt | Zugriff für `anon` |
+| Tabelle | Zugriff für `anon` | Inhalt |
+|---|---|---|
+| `szenarien`, `szenario_fassungen` | **keiner** | Szenarien mit Entwurfsstatus und jeder veröffentlichten Fassung |
+| `vereine`, `ansprechpersonen`, `beratungsstellen` | **keiner** | Vereinsangaben, abrufbar nur über den Vereinscode |
+| `zaehlwerte` | **keiner** | Einschätzungsspiegel, je Verein und Fassung |
+| `rueckmeldungen` | nur `insert` | eingesandte Rückmeldungen — kein `select`, `update` oder `delete` |
+
+Keine dieser Tabellen ist direkt lesbar. Der einzige Weg hinein sind fünf Funktionen, jede
+`security definer` und mit eigener Argumentprüfung:
+
+| Funktion | Was sie tut |
 |---|---|
-| `zaehlwerte` (Tabelle) | **keiner** — RLS aktiv, keine Policy |
-| `zaehlwert_erhoehen(szenario, punkt, option)` | ausführbar; erhöht um genau eins, prüft die Argumente |
-| `spiegel(szenario)` | ausführbar; liefert die Zählwerte eines Szenarios |
-| `rueckmeldungen` (Tabelle) | nur `insert` — kein `select`, `update` oder `delete` |
+| `szenarien_aktuell()` | alle **veröffentlichten** Szenarien in ihrer aktuellen Fassung. Entwürfe bleiben unsichtbar |
+| `szenario_fassung(id, fassung)` | eine bestimmte frühere Fassung — für einen angefangenen Durchlauf |
+| `vereinsangaben(code)` | Name, Ansprechpersonen und Beratungsstellen zu einem Vereinscode, sonst `null` |
+| `zaehlwert_erhoehen(verein, szenario, signatur, punkt, option)` | erhöht um genau eins |
+| `spiegel(verein, szenario, signatur)` | die Zählwerte eines Szenarios für einen Verein |
 
-Die Schreibfunktion ist `security definer`, damit Clients nur zählen und keine beliebigen
-Zählstände setzen können. Prozentanteile und die Schwelle für „zu wenige Einschätzungen" rechnet
-die App.
+Prozentanteile und die Schwelle für „zu wenige Einschätzungen" rechnet die App.
 
-> Der Datenbank-Linter meldet zu diesem Schema drei Punkte (`rls_enabled_no_policy`, zweimal
-> `*_security_definer_function_executable`). Alle drei sind **beabsichtigt** und im SQL
-> begründet: Die App hat keine Anmeldung, `anon` muss zählen und lesen dürfen, und der
-> Direktzugriff auf die Tabelle ist genau deshalb gesperrt.
+### Fassungen und die Signatur
+
+Szenarien sind zentral bearbeitbar. Daraus folgen zwei Regeln, die im SQL festgeschrieben sind
+([`0003_szenarien.sql`](supabase/migrations/0003_szenarien.sql)):
+
+**Wer angefangen hat, spielt zu Ende.** Beim Start eines Szenarios merkt sich das Gerät dessen
+Fassungsnummer. Wird das Szenario überarbeitet, während jemand mittendrin steckt, holt die App
+weiterhin die angeheftete Fassung — sonst wechselte zwischen zwei Entscheidungspunkten die
+Leitfrage. Erst „Nochmal" gibt die Fassung wieder frei.
+
+**Zählwerte gehören zu der Fassung, in der sie entstanden.** Nicht zum Szenario und nicht zur
+Fassungsnummer, sondern zur *Signatur*: einem Fingerabdruck über Leitfragen und
+Handlungsoptionen, sonst nichts. Ein korrigierter Tippfehler im Titel lässt den
+Einschätzungsspiegel damit stehen; eine geänderte Handlungsoption fängt ihn neu an. Sonst zeigte
+der Balken Prozente über einen Text, den so nie jemand gelesen hat.
+
+Ohne Netz greift `assets/szenarien.json` als Rückfallebene. Diese Szenarien tragen keine
+Signatur und werden nicht gezählt — ohne Netz käme der Zählwert ohnehin nicht an.
+
+### Vereinscode
+
+Die Vereinsangaben lagen bis dahin im App-Bündel: eine geänderte Telefonnummer hieß neue APK für
+alle. Jetzt pflegt sie eine Person zentral, und ein Gerät erfährt seinen Verein über einen kurzen
+Code, den es einmal eingibt — beim ersten Start, überspringbar, jederzeit in den Einstellungen
+nachtragbar. Der Code ist kein Login und kein Geheimnis; er ordnet zu, mehr nicht.
+
+Ohne Code zeigt die App **keine** Ansprechpersonen. Die Angaben aus dem Bündel als Vorgabe zu
+nehmen hieße, jemandem aus einem anderen Verein eine fremde Kinderschutz-Adresse zu nennen —
+jemand könnte einen Verdacht dorthin schreiben. Lieber keine Ansprechperson als die falsche. Die
+bundesweiten Nummern (Hilfetelefon, Nummer gegen Kummer) bleiben davon unberührt.
+
+> Der Datenbank-Linter meldet zu diesem Schema drei Arten von Punkten
+> (`rls_enabled_no_policy`, `anon_*` und `authenticated_security_definer_function_executable`).
+> Alle sind **beabsichtigt** und im SQL begründet: Die App hat keine Anmeldung, `anon` muss
+> zählen und lesen dürfen, und der Direktzugriff auf die Tabellen ist genau deshalb gesperrt.
 
 ## Qualitätssicherung
 
 ```bash
 flutter analyze     # keine Befunde
-flutter test        # 26 Tests
+flutter test        # 108 Tests
 ```
 
 **[`test/widget_test.dart`](test/widget_test.dart)** prüft die Regeln, nicht das Aussehen:
@@ -446,7 +488,7 @@ auf die Grundfunktion.
 | F12 | Jederzeit unterbrechbar, Fortschritt auf dem Gerät, Fortsetzen am letzten Punkt | Muss | – | ✅ |
 | F13 | Abgeschlossene Szenarien erneut startbar | Kann | 4 | ✅ „Nochmal" |
 | F14 | Übersicht bearbeiteter und offener Szenarien, ohne Punktestand und Bestenliste | Kann | – | ✅ Status je Karte |
-| F15 | Ansprechpersonen, Meldewege und Szenarien ohne technische Kenntnisse pflegbar | Soll | – | ⚠️ **teilweise** — Inhalte liegen getrennt in `assets/szenarien.json`, eine Oberfläche zum Pflegen gibt es nicht |
+| F15 | Ansprechpersonen, Meldewege und Szenarien ohne technische Kenntnisse pflegbar | Soll | – | ⚠️ **teilweise** — Szenarien und Vereinsangaben liegen zentral in der Datenbank und wirken ohne neue App-Fassung; die Oberfläche zum Pflegen (Dashboard) ist noch nicht gebaut |
 
 ### Nichtfunktional
 
@@ -463,8 +505,8 @@ auf die Grundfunktion.
 | NF09 | Szenarien erfunden, aber realitätsnah; keine realen Vorfälle | Muss | ✅ |
 | NF10 | Spielelemente ordnen sich dem Inhalt unter; keine Richtig-Falsch-Bewertung | Muss | ✅ in der Vorgabe — eine Abschluss-Geste gibt es nur, wenn man sie in den Einstellungen einschaltet ([Begründung](#die-eine-bewusste-ausnahme--abschaltbar-und-standardmäßig-aus)) |
 | NF11 | Freiwillig, ohne Nachweis-, Abschluss- oder Fristenpflicht | Muss | ✅ |
-| NF12 | Vereinsangaben in wenigen Minuten ohne technische Kenntnisse pflegbar | Kann | ❌ **offen** — siehe F15 |
-| NF13 | Szenarienbestand erweiterbar, ohne Aufbau oder Ablauf zu ändern | Soll | ✅ Neue Szenarien nur in `assets/szenarien.json` eintragen |
+| NF12 | Vereinsangaben in wenigen Minuten ohne technische Kenntnisse pflegbar | Kann | ⚠️ **teilweise** — zentral änderbar, aber bisher nur über SQL; siehe F15 |
+| NF13 | Szenarienbestand erweiterbar, ohne Aufbau oder Ablauf zu ändern | Soll | ✅ Neue Szenarien als Zeile in `szenarien` — erst als Entwurf, dann veröffentlicht |
 
 ## Grenzen
 

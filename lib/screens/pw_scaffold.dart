@@ -95,28 +95,7 @@ class PwScaffold extends ConsumerWidget {
                 onEinstellungen: onEinstellungen,
               ),
               Expanded(
-                child: Scrollbar(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(polster),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: PwSpace.contentMaxWidth,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            for (var i = 0; i < inhalt.length; i++) ...[
-                              if (i > 0) const SizedBox(height: PwSpace.gap),
-                              inhalt[i],
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                child: _Inhaltsflaeche(polster: polster, inhalt: inhalt),
               ),
               _Fusszeile(
                 polster: polster,
@@ -135,6 +114,61 @@ class PwScaffold extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// Der scrollbare Inhaltsbereich.
+///
+/// Eigener ScrollController, und zwar aus einem konkreten Grund: ohne ihn
+/// greift die Scrollbar auf den PrimaryScrollController zurueck. Auf Handys
+/// haengt dort die ScrollView von selbst mit drin, auf Web und Desktop nicht —
+/// dort haette die Scrollbar dann keine Position und wirft beim ersten
+/// Mausrad-Ereignis.
+class _Inhaltsflaeche extends StatefulWidget {
+  const _Inhaltsflaeche({required this.polster, required this.inhalt});
+
+  final double polster;
+  final List<Widget> inhalt;
+
+  @override
+  State<_Inhaltsflaeche> createState() => _InhaltsflaecheState();
+}
+
+class _InhaltsflaecheState extends State<_Inhaltsflaeche> {
+  final _regler = ScrollController();
+
+  @override
+  void dispose() {
+    _regler.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scrollbar(
+      controller: _regler,
+      child: SingleChildScrollView(
+        controller: _regler,
+        padding: EdgeInsets.all(widget.polster),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: PwSpace.contentMaxWidth,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < widget.inhalt.length; i++) ...[
+                  if (i > 0) const SizedBox(height: PwSpace.gap),
+                  widget.inhalt[i],
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
