@@ -172,6 +172,15 @@ class _PwInputState extends State<PwInput> {
         textCapitalization: widget.grossschreibung
             ? TextCapitalization.characters
             : TextCapitalization.sentences,
+        // Codes sind keine Woerter: ohne Autokorrektur und Vorschlaege, und
+        // ohne die Umwandlung von "--" und Anfuehrungszeichen, die iOS sonst
+        // vornimmt. Sonst "korrigiert" die Tastatur einen gueltigen Code.
+        autocorrect: !widget.grossschreibung,
+        enableSuggestions: !widget.grossschreibung,
+        smartDashesType:
+            widget.grossschreibung ? SmartDashesType.disabled : null,
+        smartQuotesType:
+            widget.grossschreibung ? SmartQuotesType.disabled : null,
         inputFormatters: widget.grossschreibung
             ? [
                 TextInputFormatter.withFunction(

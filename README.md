@@ -451,14 +451,27 @@ bundesweiten Nummern (Hilfetelefon, Nummer gegen Kummer) bleiben davon unberühr
 ## Die Verwaltung
 
 Szenarien und Vereinsangaben liegen zentral in der Datenbank. Gepflegt werden sie über ein
-eigenes Flutter-Web-Dashboard, das **nicht dauerhaft online ist**: es läuft, solange es gestartet
-ist, und nur auf dem eigenen Rechner.
+eigenes Flutter-Dashboard, das **nicht dauerhaft online ist**: es läuft als Programm auf dem
+eigenen Rechner, solange es gestartet ist.
 
 ```bash
-flutter run -d chrome -t lib/admin/main.dart --dart-define=SUPABASE_SECRET_KEY=sb_secret_...
+flutter run -d macos -t lib/admin/main.dart --dart-define=SUPABASE_SECRET_KEY=sb_secret_...
 ```
 
+Unter Windows `-d windows` statt `-d macos`.
+
 Den geheimen Schlüssel findest du in der Supabase-Konsole unter *Project Settings → API keys*.
+
+### Warum nicht im Browser
+
+Supabase weist die geheimen Schlüssel (`sb_secret_…`) mit HTTP 401 ab, sobald eine Anfrage aus
+einem Browser kommt — erkannt am User-Agent. Im Browser endet deshalb jede Abfrage mit
+„Invalid API key", auch mit dem richtigen Schlüssel. Ein Desktop-Programm schickt keinen
+Browser-User-Agent, dort geht der Schlüssel durch. Wer die Verwaltung trotzdem im Browser startet,
+sieht statt der irreführenden Fehlermeldung eine Sperrseite mit dem richtigen Befehl.
+
+Unter macOS braucht das Programm dafür das Recht auf ausgehende Verbindungen
+(`com.apple.security.network.client` in `macos/Runner/*.entitlements`).
 
 ### Warum kein Login
 
@@ -476,9 +489,10 @@ Deshalb ist die Absicherung eine andere, und sie steckt in
 | Ohne Schlüssel startet nur eine Sperrseite | ein Start ohne `--dart-define`, der stillschweigend nichts täte |
 | Die Seite läuft **nur auf localhost** — exakt, nicht als Teilstring | ein hochgeladener Build, und `localhost.angreifer.de` gleich mit |
 | `build/` ist git-ignoriert | ein Build mit Schlüssel im Repo |
+| Ein `sb_secret_`-Schlüssel im Browser führt zur Sperrseite | ein 401, der nach falschem Schlüssel aussieht, obwohl er stimmt |
 
-Der Schlüssel liegt damit nur im Speicher des Rechners, auf dem gestartet wurde. Tab schließen
-beendet die Verwaltung.
+Der Schlüssel liegt damit nur im Speicher des Rechners, auf dem gestartet wurde. Programm
+schließen beendet die Verwaltung.
 
 ### Was sie kann
 
@@ -491,12 +505,12 @@ beendet die Verwaltung.
 
 ### Was noch nicht gegengeprüft ist
 
-Eine Naht bleibt offen: der Aufruf aus dem Browser an Supabase **mit dem echten geheimen
-Schlüssel**. Beide Seiten davon sind geprüft — die Oberfläche über 22 Tests gegen eine Attrappe,
-und jede Abfrage und jeder Schreibvorgang einzeln gegen das echte Schema. Dazwischen fehlt der
-Lauf mit dem Schlüssel selbst, weil der in deiner Hand bleibt und nirgends sonst auftauchen soll.
-Der erste Start zeigt, ob er stimmt: bei falschem Schlüssel steht statt der Liste „Nicht abrufbar
-· Invalid API key".
+Eine Naht bleibt offen: der Lauf **mit dem echten geheimen Schlüssel**, weil der in deiner Hand
+bleibt und nirgends sonst auftauchen soll. Geprüft ist alles darum herum: die Oberfläche über
+24 Tests gegen eine Attrappe, jede Abfrage einzeln gegen das echte Schema, und die Verwaltung
+als macOS-Programm gegen das echte Projekt — mit einem Attrappen-Schlüssel kommt dort die Antwort
+von Supabase an (401), kein Netzwerkfehler. Der erste Start mit dem echten Schlüssel zeigt, ob er
+stimmt: bei falschem Schlüssel steht statt der Liste „Nicht abrufbar · Invalid API key".
 
 Zwei Stellen fragen ausdrücklich nach, weil sie mehr mitnehmen, als der Knopf vermuten lässt:
 Ein Szenario zu **löschen** nimmt seine Fassungen und Zählwerte mit — wer es nur aus der App
@@ -507,7 +521,7 @@ Zählwerte seines Teams mit — wer ihn nur stilllegen will, schaltet ihn ab.
 
 ```bash
 flutter analyze     # keine Befunde
-flutter test        # 135 Tests
+flutter test        # 137 Tests
 ```
 
 **[`test/widget_test.dart`](test/widget_test.dart)** prüft die Regeln, nicht das Aussehen:
@@ -522,6 +536,10 @@ Diese Bilder sind der Abgleich mit den Referenz-Screenshots aus dem Design-Hando
 ```bash
 flutter test --update-goldens test/screens_golden_test.dart
 ```
+
+Die Bilder sind unter Windows aufgenommen. macOS rendert die Glyphenkanten anders, dort schlagen
+die 21 Vergleiche mit 2–12 % Abweichung fehl, ohne dass sich am Layout etwas geändert hätte.
+Maßgeblich ist der Lauf unter Windows.
 
 Der „Kommt bald"-Dialog wird dabei mit `disableAnimations` aufgenommen — zugleich der Nachweis,
 dass die drei Dauerschleifen bei reduzierter Bewegung nicht anlaufen.
@@ -683,12 +701,13 @@ Hilfetelefon Sexueller Missbrauch: **0800 22 55 530**, anonym und kostenfrei.
 |---|---|---|
 | **Android** (nativ) | Integrationstests im Emulator, Android 14 / API 34, x86_64; dazu von Hand durchgespielt: Vereinsfrage, Codeeingabe gegen die echte Datenbank, Ansprechpersonen | ✅ läuft |
 | **Web** (Browser) | Release-Build ausgeliefert und im Browser durchgespielt; 51 Layoutprüfungen über sechs Fenstergrößen | ✅ läuft |
-| **Verwaltung** (Flutter Web, lokal) | Sperrseiten im Browser geprüft, jede Datenbankabfrage gegen das echte Schema gegengeprüft, Oberfläche über 22 Tests gegen eine Attrappe | ⚠️ [ein Rest offen](#die-verwaltung) |
-| **iOS** (nativ) | Konfiguration gesetzt, aber auf Windows nicht baubar — Xcode ist Pflicht | ⚠️ ungeprüft |
+| **Verwaltung** (Desktop, lokal) | Als macOS-Programm gegen das echte Projekt gestartet, die Anfrage kommt an; Browser-Sperre im Browser geprüft; jede Datenbankabfrage gegen das echte Schema; Oberfläche über 24 Tests gegen eine Attrappe | ⚠️ [Lauf mit echtem Schlüssel offen](#die-verwaltung) |
+| **iOS** (nativ) | Integrationstests im Simulator, iPhone 17 Pro / iOS 26.5, 4 von 4 grün — Durchlauf, Vereinscode gegen die echte Datenbank, Overlays, Einstellungen; Release-Build auf einem iPhone mit iOS 26.6.1 installiert und gestartet | ✅ läuft |
 
-Die iOS-Seite ist von der zentralen Datenhaltung **nicht berührt**: es kam kein Plugin dazu, und
-unter `ios/` hat sich seither keine Datei geändert. Was dort noch aussteht, ist derselbe
-Xcode-Build wie vorher.
+Auf iOS braucht das Vereinscode-Feld eine Besonderheit: ohne Autokorrektur, Vorschläge und
+„intelligente" Striche und Anführungszeichen, sonst verändert die Tastatur einen gültigen Code
+([`pw_field.dart`](lib/design/components/pw_field.dart)). Signiert wird mit einem persönlichen
+Apple-Team; so gebaute Fassungen laufen sieben Tage.
 
 Die Layoutprüfung deckt 320×568, 390×844, 844×390, 834×1112, 1112×834 und 1440×900 ab,
 jeweils über alle Screens. Sie schlägt fehl, sobald ein `RenderFlex` überläuft.

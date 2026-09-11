@@ -20,6 +20,14 @@ class PwLogo extends StatelessWidget {
         fit: BoxFit.cover,
         filterQuality: FilterQuality.medium,
         excludeFromSemantics: true,
+        // Fehlt das Bild, bleibt die Stelle genau so gross wie die Marke.
+        // Flutters Fehlerkasten ist breiter und schiebt sonst den Rest der
+        // Zeile hinaus — in der Verwaltung stand der Titel dann senkrecht.
+        errorBuilder: (context, error, stackTrace) => SizedBox(
+          width: groesse,
+          height: groesse,
+          child: const ColoredBox(color: Colors.white),
+        ),
       ),
     );
   }

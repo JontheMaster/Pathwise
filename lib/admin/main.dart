@@ -4,9 +4,11 @@
 // den Einstiegspunkt: was hier steht, landet nie in einem App-Build. Der
 // Compiler faengt bei lib/main.dart an und kommt hier nie vorbei.
 //
-// Starten:
-//   flutter run -d chrome -t lib/admin/main.dart \
+// Starten (unter Windows -d windows):
+//   flutter run -d macos -t lib/admin/main.dart \
 //     --dart-define=SUPABASE_SECRET_KEY=sb_secret_...
+//
+// Nicht im Browser: Supabase weist geheime Schluessel dort ab.
 //
 // Der Schluessel steht nirgends im Repo (siehe admin_config.dart). Ohne ihn
 // zeigt das Dashboard eine Sperrseite mit genau diesem Befehl.

@@ -66,6 +66,44 @@ void main() {
           reason: 'dafür gibt es keinen Befehl, der es richtig macht');
     });
 
+    test('im Browser sperrt ein geheimer Schlüssel, bevor Supabase ihn abweist',
+        () {
+      expect(
+        AdminConfig.hindernis('localhost',
+            imBrowser: true, schluessel: 'sb_secret_abc'),
+        AdminHindernis.imBrowser,
+      );
+      // Als Desktop-Programm geht derselbe Schlüssel durch.
+      expect(
+        AdminConfig.hindernis('', imBrowser: false, schluessel: 'sb_secret_abc'),
+        isNull,
+      );
+      // Den alten service_role-Schlüssel sperrt Supabase im Browser nicht.
+      expect(
+        AdminConfig.hindernis('localhost',
+            imBrowser: true, schluessel: 'eyJhbGciOiJIUzI1NiJ9.x.y'),
+        isNull,
+      );
+      // Der fremde Host bleibt der schwerere Fehler.
+      expect(
+        AdminConfig.hindernis('pathwise.de',
+            imBrowser: true, schluessel: 'sb_secret_abc'),
+        AdminHindernis.nichtLokal,
+      );
+    });
+
+    testWidgets('die Browser-Sperre nennt den Befehl für den Desktop',
+        (tester) async {
+      await tester.pumpWidget(
+        const AdminApp(hindernis: AdminHindernis.imBrowser),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Im Browser geht der Schlüssel nicht'), findsOneWidget);
+      expect(find.textContaining('flutter run -d macos'), findsOneWidget);
+      expect(find.textContaining('-d chrome'), findsNothing);
+    });
+
     testWidgets('die Sperrseite nennt den Befehl', (tester) async {
       await tester.pumpWidget(
         const AdminApp(hindernis: AdminHindernis.ohneSchluessel),
