@@ -4,6 +4,24 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<!-- pathwise://szenario/<id> — ueber diese Adresse oeffnen Widget und
+	     Erinnerung ein Szenario (ios/Runner/PathwiseBruecke.swift). -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>de.sommerer.pathwise</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>pathwise</string>
+			</array>
+		</dict>
+	</array>
+	<!-- Flutters eigenes Deep-Linking aus: es wuerde die Adresse zusaetzlich als
+	     benannte Route pushen, und die App hat keine benannten Routen. Die
+	     Adresse nimmt PathwiseBruecke entgegen. -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<!-- Ohne diese Eintraege liefert canLaunchUrl auf iOS false fuer tel: und

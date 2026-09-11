@@ -49,6 +49,7 @@ class Fortschritt {
     this.verein,
     this.vereinGefragt = false,
     this.fassungen = const {},
+    this.erinnerung = false,
   });
 
   /// "szenarioId:punktIndex" -> "a" | "b" | "c"
@@ -92,6 +93,10 @@ class Fortschritt {
   /// Abschluss, damit die Auswertung zu den getroffenen Entscheidungen passt.
   final Map<String, int> fassungen;
 
+  /// Ob Pathwise sich einmal am Tag meldet. Aus ist die Vorgabe: die App
+  /// draengt sich nicht auf, wer es moechte, schaltet es ein.
+  final bool erinnerung;
+
   static String schluessel(String szenarioId, int punkt) => '$szenarioId:$punkt';
 
   String? wahl(String szenarioId, int punkt) =>
@@ -109,6 +114,7 @@ class Fortschritt {
     bool vereinEntfernen = false,
     bool? vereinGefragt,
     Map<String, int>? fassungen,
+    bool? erinnerung,
   }) =>
       Fortschritt(
         wahlen: wahlen ?? this.wahlen,
@@ -121,6 +127,7 @@ class Fortschritt {
         verein: vereinEntfernen ? null : (verein ?? this.verein),
         vereinGefragt: vereinGefragt ?? this.vereinGefragt,
         fassungen: fassungen ?? this.fassungen,
+        erinnerung: erinnerung ?? this.erinnerung,
       );
 }
 
@@ -146,6 +153,7 @@ class FortschrittSpeicher {
   static const _kVerein = 'pw_verein';
   static const _kVereinGefragt = 'pw_verein_gefragt';
   static const _kFassungen = 'pw_fassungen';
+  static const _kErinnerung = 'pw_erinnerung';
   static const _kBewegung = 'pw_bewegung';
   /// Vorgaenger: ein blosser Schalter. Wird beim Laden uebernommen.
   static const _kBewegungAlt = 'pw_bewegung_reduziert';
@@ -165,6 +173,7 @@ class FortschrittSpeicher {
       verein: PwVerein.ausText(p.getString(_kVerein)),
       fassungen: _fassungenAusText(p.getString(_kFassungen)),
       vereinGefragt: p.getBool(_kVereinGefragt) ?? false,
+      erinnerung: p.getBool(_kErinnerung) ?? false,
       bewegung: p.containsKey(_kBewegung)
           ? PwBewegung.vonSchluessel(p.getString(_kBewegung))
           : (p.getBool(_kBewegungAlt) ?? false)
@@ -194,6 +203,7 @@ class FortschrittSpeicher {
       _kVerein,
       _kVereinGefragt,
       _kFassungen,
+      _kErinnerung,
     ]) {
       await p.remove(k);
     }
@@ -210,6 +220,7 @@ class FortschrittSpeicher {
     await p.setString(_kBewegung, f.bewegung.schluessel);
     await p.setBool(_kVereinGefragt, f.vereinGefragt);
     await p.setString(_kFassungen, jsonEncode(f.fassungen));
+    await p.setBool(_kErinnerung, f.erinnerung);
     if (f.verein == null) {
       await p.remove(_kVerein);
     } else {

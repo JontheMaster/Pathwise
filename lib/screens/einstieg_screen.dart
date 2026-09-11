@@ -88,7 +88,16 @@ class EinstiegScreen extends ConsumerWidget {
 
 /// Ein Szenario oeffnen: noch nicht begonnen fuehrt zum Einstieg, begonnen
 /// direkt zum zuletzt offenen Entscheidungspunkt (DESIGN.md 6).
-void szenarioOeffnen(BuildContext context, WidgetRef ref, PwSzenario sz) {
+void szenarioOeffnen(BuildContext context, WidgetRef ref, PwSzenario sz) =>
+    szenarioOeffnenMit(Navigator.of(context), ref, sz);
+
+/// Wie [szenarioOeffnen], fuer Wege von ausserhalb der Screens — wenn die App
+/// ueber das Widget oder die Erinnerung geoeffnet wird.
+void szenarioOeffnenMit(
+  NavigatorState navigator,
+  WidgetRef ref,
+  PwSzenario sz,
+) {
   final s = ref.read(durchlaufProvider);
   final begonnen = s.fortschritt.begonnen.contains(sz.id);
 
@@ -96,7 +105,6 @@ void szenarioOeffnen(BuildContext context, WidgetRef ref, PwSzenario sz) {
       ? PunktScreen(szenarioId: sz.id, startPunkt: s.letzterPunkt(sz))
       : EinstiegScreen(szenarioId: sz.id);
 
-  final navigator = Navigator.of(context);
   navigator.popUntil((r) => r.isFirst);
   navigator.push(pwRoute(ziel, PwTransition.oeffnen));
 }

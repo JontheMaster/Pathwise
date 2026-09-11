@@ -7,15 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		052396C1F324F3C74FF93963 /* PathwiseAnsicht.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8E64A145AE76E31C5EC2FC /* PathwiseAnsicht.swift */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		1965C1EA774BEB106E8DB3D4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1AC36B71AA0048953500E81 /* Foundation.framework */; };
+		1DDB9DDE5D0AE44542206CD0 /* PathwiseWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9F07F7374954CA36471608B3 /* PathwiseWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		6202EF5A2DDEF4C20E455C7F /* NunitoSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 45956E85BCD326D6433C74B2 /* NunitoSans-SemiBold.ttf */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		81A4A0750C6D06FBA0D9D73A /* PathwiseBruecke.swift in Sources */ = {isa = PBXBuildFile; fileRef = A005F95FB1BAA2C8F95DDFF9 /* PathwiseBruecke.swift */; };
+		890CC69CED55A5B58E49DD48 /* NunitoSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 694D1FA48027B7D3C6D55186 /* NunitoSans-Bold.ttf */; };
+		8CEEB84CE95FF9480C1B90D7 /* NunitoSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E42868B6C015B398FDA1D0FA /* NunitoSans-Regular.ttf */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		A68750699E87F692B607DECB /* Jost-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B6763B522B64D79EFAE3BEC0 /* Jost-Medium.ttf */; };
+		B50D76C652B2105C6B11C835 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 57B7DC551DF2C983E3696F6A /* Assets.xcassets */; };
+		D0CE49433329EC6F516FFDBD /* Jost-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4FF589077DF5BA31A9D74 /* Jost-Light.ttf */; };
+		E61AFCC242576739440A2948 /* PathwiseWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775BDAE82107B884A1532DD /* PathwiseWidget.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,6 +36,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 97C146ED1CF9000F007C117D;
 			remoteInfo = Runner;
+		};
+		D0DECCAAC99350A5377A50D2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 68434095D7B8193B9CE6C611;
+			remoteInfo = PathwiseWidget;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -39,6 +57,17 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		ED32D791CA4B442F11AD827D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1DDB9DDE5D0AE44542206CD0 /* PathwiseWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +76,12 @@
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		45956E85BCD326D6433C74B2 /* NunitoSans-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "NunitoSans-SemiBold.ttf"; path = "../assets/fonts/NunitoSans-SemiBold.ttf"; sourceTree = SOURCE_ROOT; };
+		534666CD7C4175256EDB37FF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		57B7DC551DF2C983E3696F6A /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5AC4FF589077DF5BA31A9D74 /* Jost-Light.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "Jost-Light.ttf"; path = "../assets/fonts/Jost-Light.ttf"; sourceTree = SOURCE_ROOT; };
+		694D1FA48027B7D3C6D55186 /* NunitoSans-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "NunitoSans-Bold.ttf"; path = "../assets/fonts/NunitoSans-Bold.ttf"; sourceTree = SOURCE_ROOT; };
+		71F0C2DF152015E9EBE43482 /* PathwiseWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = PathwiseWidget.entitlements; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -59,6 +94,14 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9F07F7374954CA36471608B3 /* PathwiseWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PathwiseWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A005F95FB1BAA2C8F95DDFF9 /* PathwiseBruecke.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PathwiseBruecke.swift; sourceTree = "<group>"; };
+		AF8E64A145AE76E31C5EC2FC /* PathwiseAnsicht.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PathwiseAnsicht.swift; sourceTree = "<group>"; };
+		B6763B522B64D79EFAE3BEC0 /* Jost-Medium.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "Jost-Medium.ttf"; path = "../assets/fonts/Jost-Medium.ttf"; sourceTree = SOURCE_ROOT; };
+		B8CAF76B37B17072AE20FD7C /* Runner.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		E1AC36B71AA0048953500E81 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		E42868B6C015B398FDA1D0FA /* NunitoSans-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "NunitoSans-Regular.ttf"; path = "../assets/fonts/NunitoSans-Regular.ttf"; sourceTree = SOURCE_ROOT; };
+		E775BDAE82107B884A1532DD /* PathwiseWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PathwiseWidget.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +110,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FEE7AAA664BA82A4AF1F44FF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1965C1EA774BEB106E8DB3D4 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +130,32 @@
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
 			);
 			path = RunnerTests;
+			sourceTree = "<group>";
+		};
+		654502A9EFCE1E70FA3D4F61 /* PathwiseWidget */ = {
+			isa = PBXGroup;
+			children = (
+				E775BDAE82107B884A1532DD /* PathwiseWidget.swift */,
+				AF8E64A145AE76E31C5EC2FC /* PathwiseAnsicht.swift */,
+				57B7DC551DF2C983E3696F6A /* Assets.xcassets */,
+				534666CD7C4175256EDB37FF /* Info.plist */,
+				71F0C2DF152015E9EBE43482 /* PathwiseWidget.entitlements */,
+				6E9C284E5ED9721263B3197D /* Schriften */,
+			);
+			name = PathwiseWidget;
+			path = PathwiseWidget;
+			sourceTree = "<group>";
+		};
+		6E9C284E5ED9721263B3197D /* Schriften */ = {
+			isa = PBXGroup;
+			children = (
+				5AC4FF589077DF5BA31A9D74 /* Jost-Light.ttf */,
+				B6763B522B64D79EFAE3BEC0 /* Jost-Medium.ttf */,
+				E42868B6C015B398FDA1D0FA /* NunitoSans-Regular.ttf */,
+				45956E85BCD326D6433C74B2 /* NunitoSans-SemiBold.ttf */,
+				694D1FA48027B7D3C6D55186 /* NunitoSans-Bold.ttf */,
+			);
+			name = Schriften;
 			sourceTree = "<group>";
 		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
@@ -100,6 +177,8 @@
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
+				D3927E4DFE7738D8E4392247 /* Frameworks */,
+				654502A9EFCE1E70FA3D4F61 /* PathwiseWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,6 +187,7 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
+				9F07F7374954CA36471608B3 /* PathwiseWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -124,8 +204,26 @@
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				A005F95FB1BAA2C8F95DDFF9 /* PathwiseBruecke.swift */,
+				B8CAF76B37B17072AE20FD7C /* Runner.entitlements */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		B6287E2694B06E6A14E9C9D5 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				E1AC36B71AA0048953500E81 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		D3927E4DFE7738D8E4392247 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B6287E2694B06E6A14E9C9D5 /* iOS */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -148,6 +246,23 @@
 			productReference = 331C8081294A63A400263BE5 /* RunnerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		68434095D7B8193B9CE6C611 /* PathwiseWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 68641C55C922BC4B2575E1A0 /* Build configuration list for PBXNativeTarget "PathwiseWidget" */;
+			buildPhases = (
+				62852B842A0F0AFE8641ACFD /* Sources */,
+				FEE7AAA664BA82A4AF1F44FF /* Frameworks */,
+				32FAC48172411D50F3F10DE6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PathwiseWidget;
+			productName = PathwiseWidget;
+			productReference = 9F07F7374954CA36471608B3 /* PathwiseWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		97C146ED1CF9000F007C117D /* Runner */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
@@ -157,11 +272,13 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				ED32D791CA4B442F11AD827D /* Embed Foundation Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D13CBADEABDFE96D9797839B /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -185,6 +302,11 @@
 						CreatedOnToolsVersion = 14.0;
 						TestTargetID = 97C146ED1CF9000F007C117D;
 					};
+					68434095D7B8193B9CE6C611 = {
+						CreatedOnToolsVersion = 26.0;
+						DevelopmentTeam = Z7CFMY87LP;
+						ProvisioningStyle = Automatic;
+					};
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 1100;
@@ -201,7 +323,7 @@
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
-				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */,
+				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -209,11 +331,25 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
+				68434095D7B8193B9CE6C611 /* PathwiseWidget */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		32FAC48172411D50F3F10DE6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B50D76C652B2105C6B11C835 /* Assets.xcassets in Resources */,
+				D0CE49433329EC6F516FFDBD /* Jost-Light.ttf in Resources */,
+				A68750699E87F692B607DECB /* Jost-Medium.ttf in Resources */,
+				8CEEB84CE95FF9480C1B90D7 /* NunitoSans-Regular.ttf in Resources */,
+				6202EF5A2DDEF4C20E455C7F /* NunitoSans-SemiBold.ttf in Resources */,
+				890CC69CED55A5B58E49DD48 /* NunitoSans-Bold.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807F294A63A400263BE5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -277,6 +413,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		62852B842A0F0AFE8641ACFD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E61AFCC242576739440A2948 /* PathwiseWidget.swift in Sources */,
+				052396C1F324F3C74FF93963 /* PathwiseAnsicht.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97C146EA1CF9000F007C117D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -284,6 +429,7 @@
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
+				81A4A0750C6D06FBA0D9D73A /* PathwiseBruecke.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +440,12 @@
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
+		};
+		D13CBADEABDFE96D9797839B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PathwiseWidget;
+			target = 68434095D7B8193B9CE6C611 /* PathwiseWidget */;
+			targetProxy = D0DECCAAC99350A5377A50D2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -317,6 +469,34 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		23140B789A8CF477D1609F9B /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = PathwiseWidget/PathwiseWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Z7CFMY87LP;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PathwiseWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.sommerer.pathwise.PathwiseWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
 		249021D3217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -376,15 +556,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = Z7CFMY87LP;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Z7CFMY87LP;
 				PRODUCT_BUNDLE_IDENTIFIER = de.sommerer.pathwise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -392,6 +573,34 @@
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Profile;
+		};
+		274BEFF198790519D796C03E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = PathwiseWidget/PathwiseWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Z7CFMY87LP;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PathwiseWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.sommerer.pathwise.PathwiseWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
 		};
 		331C8088294A63A400263BE5 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -439,6 +648,33 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
 			};
 			name = Profile;
+		};
+		4094FA313EFCB2730C588C7C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = PathwiseWidget/PathwiseWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Z7CFMY87LP;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PathwiseWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.sommerer.pathwise.PathwiseWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 		97C147031CF9000F007C117D /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -559,15 +795,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = Z7CFMY87LP;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Z7CFMY87LP;
 				PRODUCT_BUNDLE_IDENTIFIER = de.sommerer.pathwise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -583,15 +820,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = Z7CFMY87LP;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Z7CFMY87LP;
 				PRODUCT_BUNDLE_IDENTIFIER = de.sommerer.pathwise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -609,6 +847,16 @@
 				331C8088294A63A400263BE5 /* Debug */,
 				331C8089294A63A400263BE5 /* Release */,
 				331C808A294A63A400263BE5 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		68641C55C922BC4B2575E1A0 /* Build configuration list for PBXNativeTarget "PathwiseWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				274BEFF198790519D796C03E /* Release */,
+				4094FA313EFCB2730C588C7C /* Debug */,
+				23140B789A8CF477D1609F9B /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -636,7 +884,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */ = {
+		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
 		};

@@ -26,6 +26,7 @@ Eine Flutter-Codebasis für **Web, iOS und Android**.
 - [Die fünf Regeln, die nicht gebrochen werden](#die-fünf-regeln-die-nicht-gebrochen-werden)
   - [Die eine bewusste Ausnahme](#die-eine-bewusste-ausnahme--abschaltbar-und-standardmäßig-aus)
 - [Einstellungen](#einstellungen)
+- [Widget und Erinnerung](#widget-und-erinnerung)
 - [Der Durchlauf im Bild](#der-durchlauf-im-bild)
 - [Datenschutz: was gespeichert wird](#datenschutz-was-gespeichert-wird)
 - [Technik](#technik)
@@ -238,6 +239,9 @@ Erreichbar über das Zahnrad auf der Übersicht.
 - **Bewegung** — drei Stufen auf einer Achse: *Reduziert* (alles sofort im Endzustand),
   *Normal* (die Bewegungen aus `DESIGN.md` §5, Vorgabe) und *Verspielt* (dazu Gesten, die
   nichts erklären). Hat das Gerät „Bewegung reduzieren" gesetzt, gilt das ohnehin.
+- **Erinnerung** — *Aus* (Vorgabe) oder *Einmal am Tag*, gegen 18 Uhr. Eingeschaltet wird erst,
+  wenn iOS die Mitteilungen erlaubt; sonst steht dort, wo sie sich erlauben lassen. Nur auf iOS,
+  siehe [Widget und Erinnerung](#widget-und-erinnerung).
 - **Vereinsangaben** — Ansprechpersonen, externe Beratung und was gespeichert wird. Steht
   vorerst hier, bis geklärt ist, wie ein Gerät seinen Verein erfährt (`DESIGN.md` §11, Punkt 2).
 - **Alle lokalen Daten löschen** — mit Rückfrage. `DESIGN.md` §11 führt das als fehlend und
@@ -246,6 +250,48 @@ Erreichbar über das Zahnrad auf der Übersicht.
 Bewusst **nicht** enthalten: eine Sprachauswahl (die App gibt es nur auf Deutsch — eine Liste
 mit einem Eintrag wäre Schaufenster) und eine Textgröße (dafür ist die Systemeinstellung da,
 und die App trägt sie bis 200 % ohne Überlauf).
+
+## Widget und Erinnerung
+
+Beides gibt es **nur auf iOS**, und beides folgt der „Weiter machen"-Karte der Übersicht.
+
+**Das Widget** (klein, mittel, groß) steht in der Formensprache einer Karte: Kartenfläche, oben
+die Farbkante der Marke, Mikro-Label, Titel in Jost, eine korallene Aktion. Die Darstellung —
+hell, dunkel oder wie das System — übernimmt es aus der App.
+
+- Steckt jemand **mitten in einem Szenario**, zeigt es dieses mit dem offenen Entscheidungspunkt
+  und „Fortsetzen".
+- Sonst schlägt es ein **noch nicht abgeschlossenes Szenario** vor, mit Themenfeld und
+  Vorgeschichte — alle vier Stunden ein anderes, auch wenn die App geschlossen bleibt. Sind alle
+  durch, stehen wieder alle zur Wahl.
+- Ein Tipp öffnet die App **direkt im Szenario**: beim Einstieg oder, wenn begonnen, am offenen
+  Punkt — genau wie ein Tipp auf seine Karte in der Übersicht.
+
+**Die Erinnerung** ist **standardmäßig aus** und wird unter *Einstellungen → Erinnerung*
+eingeschaltet. Dann meldet sich Pathwise einmal am Tag gegen 18 Uhr mit einem Szenario, jeden
+Tag einem anderen — oder, wenn eines unterbrochen ist, mit „Weiter machen". Ein Tipp führt direkt
+hinein.
+
+Eine tägliche Mitteilung ist ein Anstoß. Deshalb gelten für sie dieselben
+[Regeln](#die-fünf-regeln-die-nicht-gebrochen-werden) wie für die App:
+
+| Regel | Umsetzung |
+|---|---|
+| Keine Serie, kein Zähler, keine Frist | Wer einen Tag auslässt, verpasst nichts und hört davon auch nichts |
+| Kein Ton, keine Zahl am App-Symbol | Beim System wird nur die Anzeige der Mitteilung angefragt |
+| Kein Banner über der offenen App | Läuft Pathwise gerade, landet sie still in der Mitteilungszentrale |
+| Sie läuft aus | Geplant wird 14 Tage im Voraus, jedes Öffnen schiebt das weiter. Wer die App zwei Wochen nicht öffnet, hört danach nichts mehr von ihr |
+
+**Technisch ohne Plugin.** Die App reicht ihren Stand über einen eigenen Kanal an iOS
+([`einsprung_bruecke.dart`](lib/data/einsprung_bruecke.dart) ↔
+[`PathwiseBruecke.swift`](ios/Runner/PathwiseBruecke.swift)), das Widget liest ihn aus einer App
+Group ([`ios/PathwiseWidget/`](ios/PathwiseWidget/)). Was vorgeschlagen wird, entscheidet
+[`vorschlag.dart`](lib/data/vorschlag.dart). Ein Plugin hätte auch in die Android-, Web- und
+Desktop-Builds eingegriffen; so bleiben sie unberührt. Die App Group lässt sich auch mit einem
+kostenlosen Apple-Team signieren.
+
+**Auf Android fehlt beides.** Ein Android-Widget wäre eine eigene Umsetzung, die Erinnerung
+ebenso. Der Schalter in den Einstellungen erscheint dort nicht.
 
 ## Der Durchlauf im Bild
 
@@ -264,11 +310,16 @@ Handy genutzt.
 
 **Auf dem Gerät** (`shared_preferences`, im Web `localStorage`): getroffene Entscheidungen,
 begonnene Szenarien, welche Entscheidungspunkte bereits gezählt wurden, welche Szenarien ihre
-Abschluss-Geste schon hatten, ob die Erststart-Karte gesehen wurde, und die beiden
-Einstellungen (Darstellung, Bewegung).
+Abschluss-Geste schon hatten, ob die Erststart-Karte gesehen wurde, und die Einstellungen
+(Darstellung, Bewegung, Erinnerung).
 
 Über **Einstellungen → Alle lokalen Daten löschen** lässt sich das vollständig entfernen; die
 App steht danach wie beim ersten Öffnen da.
+
+**Für das Widget** legt die App auf iOS eine Kopie dessen ab, was es zeigt: Titel, Themenfeld und
+Vorgeschichte der offenen Szenarien und den offenen Punkt eines unterbrochenen. Die Kopie liegt
+in einer App Group auf dem Gerät und verlässt es nicht. Auch die **Erinnerung** wird auf dem
+Gerät geplant — es gibt keinen Push-Dienst und keinen Server, der sie verschickt.
 
 **Zentral, und zwar ausschließlich das:**
 
@@ -318,14 +369,19 @@ lib/
     spiegel_repository.dart        Zählwerte senden und lesen
     rueckmeldung_repository.dart   Rückmeldung einsenden
     supabase_config.dart           URL und Key, per --dart-define überschreibbar
+    vorschlag.dart                 was Widget und Erinnerung vorschlagen
+    einsprung_bruecke.dart         Kanal zu iOS: Widget, Erinnerung, Tipps zurück in die App
   state/durchlauf_state.dart       Riverpod
   screens/                         Übersicht, Durchlauf, Auswertung, Einstellungen,
-                                   fünf Overlays, PwScaffold (Kopf, Inhalt, Fuß, Leiste)
+                                   fünf Overlays, PwScaffold (Kopf, Inhalt, Fuß, Leiste),
+                                   einsprung.dart hält Widget und Erinnerung aktuell
   admin/                           Die Verwaltung — eigener Einstieg, nie Teil eines App-Builds
     main.dart                      Einstieg, prüft Schlüssel und Host, dann erst Supabase
     admin_config.dart              Schlüssel per --dart-define, localhost-Prüfung
     admin_repository.dart          Schnittstelle + Supabase-Umsetzung
     seiten/                        Szenarien mit Editor, Vereine, Rückmeldungen, Zahlen
+ios/Runner/PathwiseBruecke.swift   Gegenseite des Kanals, plant die Erinnerung
+ios/PathwiseWidget/                das Widget (SwiftUI, WidgetKit)
 assets/szenarien.json              Rückfallebene ohne Netz; Infos und Module stehen nur hier
 supabase/migrations/               Schema
 test/                              Regeltests und Golden-Aufnahmen aller Screens
@@ -521,7 +577,7 @@ Zählwerte seines Teams mit — wer ihn nur stilllegen will, schaltet ihn ab.
 
 ```bash
 flutter analyze     # keine Befunde
-flutter test        # 137 Tests
+flutter test        # 158 Tests
 ```
 
 **[`test/widget_test.dart`](test/widget_test.dart)** prüft die Regeln, nicht das Aussehen:
@@ -543,6 +599,13 @@ Maßgeblich ist der Lauf unter Windows.
 
 Der „Kommt bald"-Dialog wird dabei mit `disableAnimations` aufgenommen — zugleich der Nachweis,
 dass die drei Dauerschleifen bei reduzierter Bewegung nicht anlaufen.
+
+**[`test/einsprung_test.dart`](test/einsprung_test.dart)** prüft Widget und Erinnerung auf der
+Dart-Seite: was das Widget zeigt (unterbrochen vor offen, Abgeschlossenes erst wieder, wenn alles
+durch ist), dass die Erinnerung 14 Tage lang täglich um 18 Uhr kommt — auch über die
+Zeitumstellung —, jeden Tag ein anderes Szenario vorschlägt und ohne Ausrufezeichen, Frist oder
+Serie auskommt, dass ein Tipp beim Einstieg oder am offenen Punkt landet und dass der Schalter
+erst nach der Erlaubnis des Systems einrastet.
 
 **[`test/admin_test.dart`](test/admin_test.dart)** prüft die Verwaltung gegen eine Attrappe des
 Repositories — die echte braucht den geheimen Schlüssel, und der gehört nicht in einen Testlauf.
@@ -638,9 +701,9 @@ Praktik entfällt damit.
 - **Nicht gestaltet und deshalb nicht gebaut** (siehe `DESIGN.md` §11): Splash und App-Icon,
   Vereinszuordnung, Ladezustände beim Erststart, Offline-Banner, Fehler-Screen, Einstellungen
   über das Theme hinaus, Datenlöschung, Suche in der Szenarioliste, die drei angekündigten
-  Module hinter „Kommt bald", Deeplinks, Push und Widgets.
-- **Ein iOS-Build ist bisher nicht auf einem Mac verifiziert.** Konfiguration ist gesetzt, Web
-  und Android sind gebaut.
+  Module hinter „Kommt bald".
+- **Widget und Erinnerung gibt es nur auf iOS.** Auf Android fehlen beide; dort wären sie eine
+  eigene Umsetzung. Der Schalter in den Einstellungen erscheint nur, wo es die Erinnerung gibt.
 
 **Inhaltlich.** **Alle Szenariotexte sind erfunden und fachlich ungeprüft.** Vor jeder Verwendung
 im Verein müssen sie durch den Kinderschutzbeauftragten geprüft werden. Ebenfalls offen:
@@ -702,7 +765,7 @@ Hilfetelefon Sexueller Missbrauch: **0800 22 55 530**, anonym und kostenfrei.
 | **Android** (nativ) | Integrationstests im Emulator, Android 14 / API 34, x86_64; dazu von Hand durchgespielt: Vereinsfrage, Codeeingabe gegen die echte Datenbank, Ansprechpersonen | ✅ läuft |
 | **Web** (Browser) | Release-Build ausgeliefert und im Browser durchgespielt; 51 Layoutprüfungen über sechs Fenstergrößen | ✅ läuft |
 | **Verwaltung** (Desktop, lokal) | Als macOS-Programm gegen das echte Projekt gestartet, die Anfrage kommt an; Browser-Sperre im Browser geprüft; jede Datenbankabfrage gegen das echte Schema; Oberfläche über 24 Tests gegen eine Attrappe | ⚠️ [Lauf mit echtem Schlüssel offen](#die-verwaltung) |
-| **iOS** (nativ) | Integrationstests im Simulator, iPhone 17 Pro / iOS 26.5, 4 von 4 grün — Durchlauf, Vereinscode gegen die echte Datenbank, Overlays, Einstellungen; Release-Build auf einem iPhone mit iOS 26.6.1 installiert und gestartet | ✅ läuft |
+| **iOS** (nativ) | Integrationstests im Simulator, iPhone 17 Pro / iOS 26.5, 4 von 4 grün — Durchlauf, Vereinscode gegen die echte Datenbank, Overlays, Einstellungen; Widget und Erinnerung im Simulator von Hand geprüft: Widget „Zum Durchdenken" und „Weiter machen", Tipp aufs Widget, Kalt- und Warmstart über `pathwise://`, Erlaubnisdialog, 14 geplante Erinnerungen, Tipp auf die Mitteilung; Release-Build mit Widget auf einem iPhone mit iOS 26.6.1 installiert und gestartet | ✅ läuft |
 
 Auf iOS braucht das Vereinscode-Feld eine Besonderheit: ohne Autokorrektur, Vorschläge und
 „intelligente" Striche und Anführungszeichen, sonst verändert die Tastatur einen gültigen Code

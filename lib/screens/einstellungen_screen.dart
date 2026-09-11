@@ -16,7 +16,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/einsprung_bruecke.dart';
 import '../data/fortschritt_speicher.dart';
+import '../data/vorschlag.dart';
 import '../design/components/pw_button.dart';
 import '../design/components/pw_card.dart';
 import '../design/components/pw_contact_list.dart';
@@ -121,6 +123,12 @@ class EinstellungenScreen extends ConsumerWidget {
             ),
           ],
         ),
+
+        // ── Erinnerung ───────────────────────────────────────────────────
+        // Nur wo es sie gibt, auf iOS. Anderswo fehlt der Abschnitt ganz,
+        // statt einen Schalter zu zeigen, der nichts tut.
+        if (ref.watch(einsprungBrueckeProvider).verfuegbar)
+          const _ErinnerungAbschnitt(),
 
         Divider(color: c.divider, height: 1),
 
@@ -266,6 +274,107 @@ Future<void> _loeschenBestaetigen(BuildContext context, WidgetRef ref) async {
       ),
     ),
   );
+}
+
+/// Die tägliche Erinnerung. Eingeschaltet wird erst, wenn das System die
+/// Mitteilungen erlaubt — sonst stünde „Einmal am Tag" gewählt da, und es käme
+/// nie etwas.
+class _ErinnerungAbschnitt extends ConsumerStatefulWidget {
+  const _ErinnerungAbschnitt();
+
+  @override
+  ConsumerState<_ErinnerungAbschnitt> createState() =>
+      _ErinnerungAbschnittState();
+}
+
+class _ErinnerungAbschnittState extends ConsumerState<_ErinnerungAbschnitt> {
+  /// Das System lässt keine Mitteilungen zu.
+  bool _gesperrt = false;
+  bool _fragt = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Eingeschaltet, aber inzwischen in den iOS-Einstellungen verboten: dann
+    // soll hier stehen, warum nichts mehr kommt.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || !ref.read(durchlaufProvider).fortschritt.erinnerung) {
+        return;
+      }
+      try {
+        final e = await ref.read(einsprungBrueckeProvider).erlaubnis();
+        if (mounted && e == PwErlaubnis.abgelehnt) {
+          setState(() => _gesperrt = true);
+        }
+      } catch (_) {}
+    });
+  }
+
+  Future<void> _einschalten() async {
+    if (_fragt) return;
+    setState(() => _fragt = true);
+
+    var erlaubt = false;
+    try {
+      erlaubt = await ref.read(einsprungBrueckeProvider).erlaubnisAnfragen();
+    } catch (_) {}
+    if (!mounted) return;
+
+    setState(() {
+      _fragt = false;
+      _gesperrt = !erlaubt;
+    });
+    if (erlaubt) ref.read(durchlaufProvider.notifier).erinnerungSetzen(true);
+  }
+
+  void _ausschalten() {
+    setState(() => _gesperrt = false);
+    ref.read(durchlaufProvider.notifier).erinnerungSetzen(false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final an =
+        ref.watch(durchlaufProvider.select((s) => s.fortschritt.erinnerung));
+    final c = context.pw;
+    final t = Theme.of(context).textTheme;
+
+    return _Abschnitt(
+      label: 'Erinnerung',
+      erklaerung: 'Einmal am Tag gegen $kErinnerungStunde Uhr ein Szenario zum '
+          'Durchdenken. Keine Serie, kein Zähler — wer einen Tag auslässt, '
+          'verpasst nichts.',
+      kinder: [
+        _Wahlfeld(
+          titel: 'Aus',
+          zusatz: 'Pathwise meldet sich nicht von selbst.',
+          gewaehlt: !an,
+          onTap: _ausschalten,
+        ),
+        _Wahlfeld(
+          titel: 'Einmal am Tag',
+          zusatz: 'Jeden Tag ein anderes Szenario. Hast du eins '
+              'unterbrochen, geht es dort weiter.',
+          gewaehlt: an && !_gesperrt,
+          onTap: _einschalten,
+        ),
+        if (_gesperrt) ...[
+          Text(
+            'Mitteilungen sind für Pathwise in den iOS-Einstellungen '
+            'ausgeschaltet. Dort lassen sie sich erlauben.',
+            style: t.bodyMedium?.copyWith(color: c.textMuted),
+          ),
+          PwButton(
+            label: 'Mitteilungen erlauben',
+            groesse: PwButtonGroesse.sm,
+            onPressed: () => ref
+                .read(einsprungBrueckeProvider)
+                .systemEinstellungenOeffnen(),
+          ),
+        ],
+      ],
+    );
+  }
 }
 
 /// Überschrift, Erklärsatz und die Felder eines Einstellungsblocks.

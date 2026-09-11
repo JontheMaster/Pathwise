@@ -1090,6 +1090,8 @@ gefüllten Icon-Sätze mischen, keine eigenen SVGs zeichnen.
    Schutzkonzept) existieren nur als „Kommt bald"-Kachel.
 10. **Push, Widgets, Deeplinks, Tablet-Landscape über 900 dp hinaus, Web-Fassung** —
     alles außerhalb des bisherigen Entwurfs.
+    *Nachtrag:* Widget und tägliche Erinnerung sind für iOS gebaut — in der Formensprache der
+    Karten (4.3) und nach den Verboten aus Abschnitt 1. Siehe README, „Widget und Erinnerung".
 
 **Inhaltlich zu klären (nicht Entwicklungsaufgabe, aber blockierend für den Einsatz):**
 

@@ -195,6 +195,14 @@ class DurchlaufNotifier extends Notifier<DurchlaufState> {
     _setzen(state.fortschritt.copyWith(bewegung: b));
   }
 
+  /// Die taegliche Erinnerung ein- oder ausschalten. Die Erlaubnis des
+  /// Systems holt die Einstellungsseite vorher ein; geplant wird in
+  /// screens/einsprung.dart, sobald sich der Zustand hier aendert.
+  void erinnerungSetzen(bool an) {
+    if (state.fortschritt.erinnerung == an) return;
+    _setzen(state.fortschritt.copyWith(erinnerung: an));
+  }
+
   /// Loescht alles, was auf dem Geraet liegt: Entscheidungen, Fortschritt und
   /// die Einstellungen. Danach steht die App wie beim ersten Oeffnen da.
   Future<void> allesLoeschen() async {
